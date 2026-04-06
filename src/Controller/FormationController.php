@@ -14,16 +14,31 @@ use Symfony\Component\Routing\Attribute\Route;
 final class FormationController extends AbstractController
 {
     #[Route(name: 'app_formation_index', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
-    {
-        $formations = $entityManager
-            ->getRepository(Formation::class)
-            ->findAll();
+public function index(EntityManagerInterface $entityManager): Response
+{
+    $formations = $entityManager
+        ->getRepository(Formation::class)
+        ->findAll();
 
-        return $this->render('formation/index.html.twig', [
-            'formations' => $formations,
-        ]);
+    // Get the current user role
+    $user = $this->getUser();
+    //$role = $user ? $user->getRole() : null;
+      $role = 'Admin'; 
+
+    // Choose template based on role
+    if ($role === 'Admin') {
+        $template = 'formation/admin_formations.html.twig';
+    } elseif ($role === 'Coach') {
+        $template = 'formation/coach_formations.html.twig';
+    } else {
+        // Patient or not logged in
+        $template = 'formation/patient_formations.html.twig';
     }
+
+    return $this->render($template, [
+        'formations' => $formations,
+    ]);
+}
 
     #[Route('/new', name: 'app_formation_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

@@ -1,0 +1,196 @@
+{% extends 'base.html.twig' %}
+{% block title %}Coach — Mes Formations{% endblock %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-dark:  #0f2a4a;
+    --blue-mid:   #1a4a7a;
+    --blue-light: #2d7dd2;
+    --blue-pale:  #e8f2ff;
+    --orange:     #f4845f;
+    --orange-soft:#fff3ef;
+    --white:      #ffffff;
+    --gray-100:   #f7f9fc;
+    --gray-200:   #eef2f7;
+    --gray-400:   #94a3b8;
+    --gray-700:   #374151;
+    --radius:     14px;
+    --shadow-sm:  0 2px 8px rgba(15,42,74,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--gray-100); color: var(--gray-700); }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; height: 100vh; width: 240px;
+    background: linear-gradient(160deg, #1a4a7a 0%, #0f2a4a 100%);
+    display: flex; flex-direction: column; padding: 28px 20px;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15); z-index: 100;
+  }
+  .sidebar-logo { font-size: 22px; font-weight: 800; color: var(--white); margin-bottom: 4px; }
+  .sidebar-logo span { color: var(--orange); }
+  .sidebar-role {
+    background: rgba(244,132,95,0.15); color: var(--orange);
+    border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 700;
+    display: inline-block; margin-bottom: 32px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    color: rgba(255,255,255,0.65); font-size: 14px; font-weight: 500;
+    text-decoration: none; margin-bottom: 4px; transition: all 0.2s;
+  }
+  .sidebar-link:hover, .sidebar-link.active { background: rgba(255,255,255,0.12); color: var(--white); }
+  .sidebar-link.active { background: var(--blue-light); }
+  .sidebar-bottom { margin-top: auto; }
+  .coach-info { display: flex; align-items: center; gap: 10px; }
+  .coach-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--orange); color: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px;
+  }
+  .coach-name { color: var(--white); font-weight: 600; font-size: 14px; }
+  .coach-label { color: var(--gray-400); font-size: 12px; }
+
+  .main { margin-left: 240px; padding: 36px 40px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+  .page-title { font-size: 26px; font-weight: 800; color: var(--blue-dark); }
+  .page-title span { color: var(--orange); }
+  .btn-new {
+    background: linear-gradient(135deg, var(--orange), #e06d47);
+    color: var(--white); border: none; border-radius: 10px;
+    padding: 11px 22px; font-size: 14px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(244,132,95,0.4); transition: all 0.2s;
+  }
+  .btn-new:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(244,132,95,0.5); }
+
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .formation-card {
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .formation-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(15,42,74,0.14); }
+  .card-header {
+    background: linear-gradient(135deg, var(--blue-dark), var(--blue-mid));
+    padding: 20px 22px; position: relative; overflow: hidden;
+  }
+  .card-header::after {
+    content: '📚'; position: absolute; right: 16px; top: 50%;
+    transform: translateY(-50%); font-size: 42px; opacity: 0.15;
+  }
+  .card-category {
+    background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9);
+    border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+    display: inline-block; margin-bottom: 8px;
+  }
+  .card-title { color: var(--white); font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .card-body { padding: 18px 22px; }
+  .card-desc { font-size: 13px; color: var(--gray-400); line-height: 1.6; margin-bottom: 16px; }
+  .card-meta { display: flex; gap: 12px; margin-bottom: 18px; }
+  .meta-pill {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--gray-100); border-radius: 8px;
+    padding: 5px 10px; font-size: 12px; color: var(--gray-700); font-weight: 500;
+  }
+  .card-actions { display: flex; gap: 8px; }
+  .btn-sm {
+    flex: 1; padding: 9px; border-radius: 9px;
+    font-size: 13px; font-weight: 600; border: none;
+    cursor: pointer; text-decoration: none; text-align: center;
+    transition: all 0.15s;
+  }
+  .btn-sm-blue { background: var(--blue-pale); color: var(--blue-light); }
+  .btn-sm-blue:hover { background: var(--blue-light); color: var(--white); }
+  .btn-sm-orange { background: var(--orange-soft); color: var(--orange); }
+  .btn-sm-orange:hover { background: var(--orange); color: var(--white); }
+  .btn-sm-red { background: #fff0f0; color: #ef4444; }
+  .btn-sm-red:hover { background: #ef4444; color: var(--white); }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+  .empty-state .icon { font-size: 56px; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 20px; font-weight: 700; color: var(--blue-dark); margin-bottom: 8px; }
+  .empty-state p { color: var(--gray-400); font-size: 14px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">Health<span>Connect</span></div>
+  <div class="sidebar-role">👨‍🏫 Coach</div>
+  <a href="#" class="sidebar-link active">📚 Mes Formations</a>
+  <a href="#" class="sidebar-link">📝 Mes Quiz</a>
+  <a href="#" class="sidebar-link">👥 Mes Patients</a>
+  <a href="#" class="sidebar-link">📊 Statistiques</a>
+  <div class="sidebar-bottom">
+    <div class="coach-info">
+      <div class="coach-avatar">C</div>
+      <div>
+        <div class="coach-name">Mon Profil</div>
+        <div class="coach-label">Coach</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Mes <span>Formations</span></div>
+    </div>
+    <a href="{{ path('app_formation_new') }}" class="btn-new">＋ Créer une Formation</a>
+  </div>
+
+  {% if formations|length > 0 %}
+  <div class="cards-grid">
+    {% for formation in formations %}
+    <div class="formation-card">
+      <div class="card-header">
+        {% if formation.category %}
+          <div class="card-category">{{ formation.category }}</div>
+        {% endif %}
+        <div class="card-title">{{ formation.title }}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-desc">
+          {{ formation.description|slice(0, 100) }}{% if formation.description|length > 100 %}...{% endif %}
+        </div>
+        <div class="card-meta">
+          <div class="meta-pill">🎥 {% if formation.videoUrl %}Vidéo ajoutée{% else %}Sans vidéo{% endif %}</div>
+          <div class="meta-pill">📝 Quiz</div>
+        </div>
+        <div class="card-actions">
+          <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-sm btn-sm-blue">Voir</a>
+          <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn-sm btn-sm-orange">Modifier</a>
+          <form method="post" action="{{ path('app_formation_delete', {'id': formation.id}) }}" onsubmit="return confirm('Supprimer ?')" style="flex:1">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+            <button class="btn-sm btn-sm-red" style="width:100%">Supprimer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="icon">📭</div>
+    <h3>Aucune formation créée</h3>
+    <p>Commencez par créer votre première formation</p>
+    <a href="{{ path('app_formation_new') }}" class="btn-new" style="display:inline-flex">＋ Créer maintenant</a>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>
+{% endblock %}
