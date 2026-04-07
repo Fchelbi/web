@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Vérification · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #F0E6D8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .icon { font-size: 60px; margin-bottom: 20px; }
+        h2 { color: #2C3E50; font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .subtitle { color: #999; font-size: 13px; margin-bottom: 6px; }
+        .email { color: #4A6FA5; font-weight: 700; font-size: 14px; margin-bottom: 28px; }
+        .error-msg {
+            background: #ffe0e0; color: #c0392b;
+            padding: 12px; border-radius: 10px;
+            font-size: 13px; margin-bottom: 20px;
+        }
+        .code-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .code-inputs input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            border: 2px solid #E8E0D5;
+            border-radius: 12px;
+            background: #F5EFE6;
+            color: #2C3E50;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .code-inputs input:focus { border-color: #4A6FA5; background: white; }
+
+        .save-device {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 14px;
+            background: #F5EFE6;
+            border-radius: 12px;
+            border: 1.5px solid #E8E0D5;
+        }
+        .save-device input {
+            width: 18px;
+            height: 18px;
+            accent-color: #4A6FA5;
+            cursor: pointer;
+        }
+        .save-device label {
+            font-size: 13px;
+            color: #555;
+            cursor: pointer;
+            text-align: left;
+        }
+        .save-device label span {
+            display: block;
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #E8895A;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #d4784a; }
+        .resend {
+            display: block;
+            margin-top: 16px;
+            color: #4A6FA5;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .resend:hover { text-decoration: underline; }
+        .back {
+            display: block;
+            margin-top: 10px;
+            color: #999;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        .timer { color: #E8895A; font-size: 13px; margin-top: 16px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">🔐</div>
+    <h2>Vérification en 2 étapes</h2>
+    <p class="subtitle">Un code a été envoyé à</p>
+    <p class="email">{{ email }}</p>
+
+    {% if error %}
+        <div class="error-msg">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" id="codeForm">
+        <div class="code-inputs">
+            <input type="text" maxlength="1" class="code-digit" autofocus>
+            <input type="text" maxlength="1" class="code-digit">
+            <input type="text" maxlength="1" class="code-digit">
+            <input type="text" maxlength="1" class="code-digit">
+            <input type="text" maxlength="1" class="code-digit">
+            <input type="text" maxlength="1" class="code-digit">
+        </div>
+
+        <input type="hidden" name="code" id="hiddenCode">
+
+        <!-- Save device option -->
+        <div class="save-device">
+            <input type="checkbox" name="save_device" id="save_device" value="1">
+            <label for="save_device">
+                Enregistrer cet appareil
+                <span>Vous ne serez plus demandé le code sur cet appareil</span>
+            </label>
+        </div>
+
+        <button type="submit" class="btn">✅ Vérifier</button>
+    </form>
+
+    <p class="timer">⏱️ Code valide pendant <span id="countdown">10:00</span></p>
+    <a href="{{ path('app_2fa_resend') }}" class="resend">🔄 Renvoyer le code</a>
+    <a href="{{ path('app_login') }}" class="back">← Retour à la connexion</a>
+</div>
+
+<script>
+    const digits = document.querySelectorAll('.code-digit');
+    digits.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            if (e.target.value.length === 1 && index < digits.length - 1) {
+                digits[index + 1].focus();
+            }
+            updateHidden();
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                digits[index - 1].focus();
+            }
+        });
+    });
+
+    function updateHidden() {
+        let code = '';
+        digits.forEach(d => code += d.value);
+        document.getElementById('hiddenCode').value = code;
+    }
+
+    let seconds = 600;
+    const el = document.getElementById('countdown');
+    const timer = setInterval(() => {
+        seconds--;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+        if (seconds <= 0) {
+            clearInterval(timer);
+            el.textContent = 'Expiré !';
+            el.style.color = '#e74c3c';
+        }
+    }, 1000);
+</script>
+</body>
+</html>

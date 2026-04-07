@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Admin · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #F0E6D8; min-height: 100vh; }
+
+        .navbar {
+            background: #4A6FA5;
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .navbar h1 { font-size: 20px; font-weight: 700; }
+        .navbar h1 span { color: #E8895A; }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.15);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .navbar a:hover { background: rgba(255,255,255,0.25); }
+
+        .content { padding: 30px 40px; }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .top-bar h2 { font-size: 22px; color: #2C3E50; }
+
+        .btn-add {
+            background: #E8895A;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-add:hover { background: #d4784a; }
+
+        .filters {
+            background: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        .filters input, .filters select {
+            padding: 10px 14px;
+            border: 1.5px solid #E8E0D5;
+            border-radius: 8px;
+            background: #F5EFE6;
+            font-size: 14px;
+            outline: none;
+            flex: 1;
+            min-width: 160px;
+        }
+        .filters input:focus, .filters select:focus { border-color: #4A6FA5; }
+        .filters button {
+            padding: 10px 20px;
+            background: #4A6FA5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .filters button:hover { background: #3a5f95; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .stat-card .number { font-size: 28px; font-weight: 700; color: #4A6FA5; }
+        .stat-card .label { font-size: 12px; color: #999; margin-top: 4px; }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border-collapse: collapse;
+        }
+        thead { background: #4A6FA5; color: white; }
+        thead th { padding: 14px 16px; text-align: left; font-size: 13px; font-weight: 600; }
+        tbody tr { border-bottom: 1px solid #F0EAE0; transition: background 0.15s; }
+        tbody tr:hover { background: #FDF8F3; }
+        tbody td { padding: 14px 16px; font-size: 14px; color: #333; }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-admin { background: #fde8d8; color: #E8895A; }
+        .badge-coach { background: #d8eafd; color: #4A6FA5; }
+        .badge-patient { background: #d8fde8; color: #27ae60; }
+
+        .actions { display: flex; gap: 8px; }
+        .btn-edit {
+            padding: 6px 14px;
+            background: #4A6FA5;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .btn-edit:hover { background: #3a5f95; }
+        .btn-delete {
+            padding: 6px 14px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-delete:hover { background: #c0392b; }
+
+        .empty { text-align: center; padding: 40px; color: #999; font-size: 15px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>Echo<span>Care</span> · Admin</h1>
+    <a href="{{ path('app_logout') }}">🚪 Déconnexion</a>
+</nav>
+
+<div class="content">
+    <div class="top-bar">
+        <h2>👥 Gestion des Utilisateurs</h2>
+        <div style="display:flex; gap:10px; align-items:center;">
+    <a href="{{ path('admin_dashboard') }}" 
+       title="Actualiser"
+       style="background:white; border:1.5px solid #E8E0D5; color:#4A6FA5; padding:10px 14px; border-radius:10px; text-decoration:none; font-size:18px; transition:all 0.2s; display:flex; align-items:center;"
+       onmouseover="this.style.background='#4A6FA5';this.style.color='white'"
+       onmouseout="this.style.background='white';this.style.color='#4A6FA5'"
+    >🔄</a>
+    <a href="{{ path('admin_user_new') }}" class="btn-add">+ Ajouter un utilisateur</a>
+</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="number">{{ users|length }}</div>
+            <div class="label">Total</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color:#E8895A">
+                {{ users|filter(u => u.role == 'Admin')|length }}
+            </div>
+            <div class="label">Admins</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color:#4A6FA5">
+                {{ users|filter(u => u.role == 'Coach')|length }}
+            </div>
+            <div class="label">Coachs</div>
+        </div>
+        <div class="stat-card">
+            <div class="number" style="color:#27ae60">
+                {{ users|filter(u => u.role == 'Patient')|length }}
+            </div>
+            <div class="label">Patients</div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <form method="get" class="filters">
+        <input type="text" name="search" placeholder="🔍 Rechercher par nom, prénom ou email..."
+               value="{{ search }}">
+        <select name="role">
+            <option value="">Tous les rôles</option>
+            <option value="Admin" {{ role == 'Admin' ? 'selected' : '' }}>👑 Admin</option>
+            <option value="Coach" {{ role == 'Coach' ? 'selected' : '' }}>🏋️ Coach</option>
+            <option value="Patient" {{ role == 'Patient' ? 'selected' : '' }}>🌿 Patient</option>
+        </select>
+        <button type="submit">Filtrer</button>
+    </form>
+
+    <!-- Tableau -->
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nom Prénom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+                <th>Rôle</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if users is empty %}
+                <tr><td colspan="6" class="empty">Aucun utilisateur trouvé</td></tr>
+            {% else %}
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td><strong>{{ user.nom }} {{ user.prenom }}</strong></td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.numTel ?? '—' }}</td>
+                    <td>
+                        <span class="badge badge-{{ user.role|lower }}">
+                            {% if user.role == 'Admin' %}👑{% elseif user.role == 'Coach' %}🏋️{% else %}🌿{% endif %}
+                            {{ user.role }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ path('admin_user_edit', {id: user.id}) }}" class="btn-edit">✏️ Modifier</a>
+                            <form method="post" action="{{ path('admin_user_delete', {id: user.id}) }}"
+                                  onsubmit="return confirm('Supprimer cet utilisateur ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                <button type="submit" class="btn-delete">🗑️ Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

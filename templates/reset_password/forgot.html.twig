@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mot de passe oublié · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #F0E6D8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .icon { font-size: 50px; text-align: center; margin-bottom: 16px; }
+        h2 { color: #2C3E50; font-size: 24px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        .subtitle { color: #999; font-size: 13px; text-align: center; margin-bottom: 28px; }
+        .success-box {
+            background: #d8fde8;
+            color: #27ae60;
+            padding: 14px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .field-label {
+            font-size: 11px; font-weight: 700; color: #4A6FA5;
+            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; display: block;
+        }
+        input {
+            width: 100%; padding: 13px 16px;
+            border: 1.5px solid #E8E0D5; border-radius: 10px;
+            background: #F5EFE6; font-size: 14px; color: #333;
+            outline: none; margin-bottom: 20px;
+        }
+        input:focus { border-color: #4A6FA5; background: white; }
+        .btn {
+            width: 100%; padding: 14px;
+            background: #E8895A; color: white; border: none;
+            border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer;
+        }
+        .btn:hover { background: #d4784a; }
+        .back {
+            display: block; text-align: center; margin-top: 16px;
+            color: #4A6FA5; text-decoration: none; font-size: 13px;
+        }
+        .back:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">🔑</div>
+    <h2>Mot de passe oublié ?</h2>
+    <p class="subtitle">Entrez votre email pour recevoir un lien de réinitialisation</p>
+
+    {% if success %}
+        <div class="success-box">
+            ✅ Si cet email existe, un lien vous a été envoyé !
+        </div>
+    {% endif %}
+
+    <form method="post">
+        <label class="field-label">Adresse Email</label>
+        <input type="email" name="email" placeholder="vous@exemple.com" required>
+        <button type="submit" class="btn">Envoyer le lien</button>
+    </form>
+
+    <a href="{{ path('app_login') }}" class="back">← Retour à la connexion</a>
+</div>
+</body>
+</html>

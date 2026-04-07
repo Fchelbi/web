@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #F0E6D8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 0;
+        }
+        .container {
+            display: flex;
+            width: 820px;
+            min-height: 600px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .left-panel {
+            background: #4A6FA5;
+            width: 40%;
+            padding: 50px 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+        }
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+        }
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        .logo-area h1 { font-size: 28px; font-weight: 700; }
+        .logo-area h1 span { color: #E8895A; }
+        .logo-area p { font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
+        .features { display: flex; flex-direction: column; gap: 20px; }
+        .feature-item { border-left: 3px solid #E8895A; padding-left: 14px; }
+        .feature-item h3 { font-size: 14px; font-weight: 600; }
+        .feature-item p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+        .version { text-align: center; font-size: 11px; opacity: 0.4; }
+        .right-panel {
+            background: #FAF7F2;
+            width: 60%;
+            padding: 40px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .dots { display: flex; gap: 6px; margin-bottom: 24px; }
+        .dot { width: 28px; height: 4px; border-radius: 2px; }
+        .dot:nth-child(1) { background: #E8895A; }
+        .dot:nth-child(2) { background: #E8C99A; }
+        .dot:nth-child(3) { background: #4A6FA5; }
+        .right-panel h2 { font-size: 26px; font-weight: 700; color: #2C3E50; margin-bottom: 4px; }
+        .right-panel .subtitle { font-size: 13px; color: #999; margin-bottom: 24px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .field-group { display: flex; flex-direction: column; margin-bottom: 16px; }
+        .field-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #4A6FA5;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        input, select {
+            padding: 12px 16px;
+            border: 1.5px solid #E8E0D5;
+            border-radius: 10px;
+            background: #F5EFE6;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        input:focus, select:focus { border-color: #4A6FA5; background: white; }
+        input.error { border-color: #e74c3c; }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 44px; }
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 16px;
+            user-select: none;
+        }
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: #E8E0D5;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s, background 0.3s;
+        }
+        .strength-text { font-size: 11px; color: #999; margin-top: 4px; }
+        .error-msg {
+            font-size: 11px;
+            color: #e74c3c;
+            margin-top: 4px;
+            display: none;
+        }
+        .server-error {
+            background: #ffe0e0;
+            color: #c0392b;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            text-align: center;
+        }
+        .btn-signup {
+            width: 100%;
+            padding: 14px;
+            background: #E8895A;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 6px;
+        }
+        .btn-signup:hover { background: #d4784a; }
+        .separator {
+            text-align: center;
+            color: #ccc;
+            font-size: 13px;
+            margin: 14px 0;
+            position: relative;
+        }
+        .separator::before, .separator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: #E8E0D5;
+        }
+        .separator::before { left: 0; }
+        .separator::after { right: 0; }
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: transparent;
+            color: #4A6FA5;
+            border: 1.5px solid #4A6FA5;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .btn-login:hover { background: #4A6FA5; color: white; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="left-panel">
+        <div class="logo-area">
+            <div class="logo-icon">🧠</div>
+            <div>
+                <h1>Echo<span>Care</span></h1>
+                <p>Psychologie · Bien-être</p>
+            </div>
+        </div>
+        <div class="features">
+            <div class="feature-item">
+                <h3>Rejoignez-nous</h3>
+                <p>Créez votre espace personnel</p>
+            </div>
+            <div class="feature-item">
+                <h3>3 profils disponibles</h3>
+                <p>Admin · Coach · Patient</p>
+            </div>
+            <div class="feature-item">
+                <h3>100% sécurisé</h3>
+                <p>Vos données sont protégées</p>
+            </div>
+        </div>
+        <div class="version">EchoCare v2.0</div>
+    </div>
+
+    <div class="right-panel">
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+        <h2>Créer un compte</h2>
+        <p class="subtitle">Remplissez les informations ci-dessous</p>
+
+        {% if error %}
+            <div class="server-error">❌ {{ error }}</div>
+        {% endif %}
+
+        <form method="post" id="signupForm" novalidate>
+
+            <div class="row-2">
+                <div class="field-group">
+                    <label class="field-label">Nom</label>
+                    <input type="text" name="nom" id="nom" placeholder="Votre nom" required>
+                    <span class="error-msg" id="nom-error">Nom requis (min 2 caractères)</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Prénom</label>
+                    <input type="text" name="prenom" id="prenom" placeholder="Votre prénom" required>
+                    <span class="error-msg" id="prenom-error">Prénom requis (min 2 caractères)</span>
+                </div>
+            </div>
+
+            <div class="row-2">
+                <div class="field-group">
+                    <label class="field-label">Email</label>
+                    <input type="email" name="email" id="email" placeholder="vous@exemple.com" required>
+                    <span class="error-msg" id="email-error">Email invalide</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Téléphone</label>
+                    <input type="text" name="num_tel" id="num_tel" placeholder="Ex: 22 000 000">
+                    <span class="error-msg" id="tel-error">8 chiffres requis</span>
+                </div>
+            </div>
+
+            <div class="row-2">
+                <div class="field-group">
+                    <label class="field-label">Mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="password" id="password" placeholder="••••••••" required>
+                        <span class="toggle-pw" onclick="togglePw('password', this)">👁️</span>
+                    </div>
+                    <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                    <span class="strength-text" id="strength-text"></span>
+                    <span class="error-msg" id="pw-error">Min 8 car. avec majuscule, chiffre et symbole</span>
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Confirmer mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" name="confirm_password" id="confirm_password" placeholder="••••••••" required>
+                        <span class="toggle-pw" onclick="togglePw('confirm_password', this)">👁️</span>
+                    </div>
+                    <span class="error-msg" id="confirm-error">Les mots de passe ne correspondent pas</span>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label class="field-label">Rôle</label>
+                <select name="role" id="role" required>
+                    <option value="">-- Choisir un rôle --</option>
+                    <option value="Patient">🌿 Patient</option>
+                    <option value="Coach">🏋️ Coach</option>
+                    <option value="Admin">👑 Admin</option>
+                </select>
+                <span class="error-msg" id="role-error">Veuillez choisir un rôle</span>
+            </div>
+
+            <button type="submit" class="btn-signup">S'inscrire</button>
+        </form>
+
+        <div class="separator">ou</div>
+        <a href="{{ path('app_login') }}" class="btn-login">Déjà un compte ? Se connecter</a>
+    </div>
+
+</div>
+
+<script>
+    function togglePw(id, el) {
+        const input = document.getElementById(id);
+        input.type = input.type === 'password' ? 'text' : 'password';
+        el.textContent = input.type === 'password' ? '👁️' : '🙈';
+    }
+
+    document.getElementById('password').addEventListener('input', function () {
+        const val = this.value;
+        const fill = document.getElementById('strength-fill');
+        const text = document.getElementById('strength-text');
+        let score = 0;
+        if (val.length >= 8) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        const levels = [
+            { w: '0%', c: 'transparent', t: '' },
+            { w: '25%', c: '#e74c3c', t: '🔴 Très faible' },
+            { w: '50%', c: '#e67e22', t: '🟠 Faible' },
+            { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
+            { w: '100%', c: '#2ecc71', t: '🟢 Fort' },
+        ];
+        fill.style.width = levels[score].w;
+        fill.style.background = levels[score].c;
+        text.textContent = levels[score].t;
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', function (e) {
+        let valid = true;
+        const nom = document.getElementById('nom');
+        const prenom = document.getElementById('prenom');
+        const email = document.getElementById('email');
+        const tel = document.getElementById('num_tel');
+        const pw = document.getElementById('password');
+        const cpw = document.getElementById('confirm_password');
+        const role = document.getElementById('role');
+        const show = (id) => { document.getElementById(id).style.display = 'block'; };
+        const hide = (id) => { document.getElementById(id).style.display = 'none'; };
+        if (nom.value.trim().length < 2) { nom.classList.add('error'); show('nom-error'); valid = false; }
+        else { nom.classList.remove('error'); hide('nom-error'); }
+        if (prenom.value.trim().length < 2) { prenom.classList.add('error'); show('prenom-error'); valid = false; }
+        else { prenom.classList.remove('error'); hide('prenom-error'); }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.classList.add('error'); show('email-error'); valid = false; }
+        else { email.classList.remove('error'); hide('email-error'); }
+        if (tel.value && !/^\d{8}$/.test(tel.value.replace(/\s/g, ''))) { tel.classList.add('error'); show('tel-error'); valid = false; }
+        else { tel.classList.remove('error'); hide('tel-error'); }
+        const strongPw = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(pw.value);
+        if (!strongPw) { pw.classList.add('error'); show('pw-error'); valid = false; }
+        else { pw.classList.remove('error'); hide('pw-error'); }
+        if (pw.value !== cpw.value) { cpw.classList.add('error'); show('confirm-error'); valid = false; }
+        else { cpw.classList.remove('error'); hide('confirm-error'); }
+        if (!role.value) { role.classList.add('error'); show('role-error'); valid = false; }
+        else { role.classList.remove('error'); hide('role-error'); }
+        if (!valid) e.preventDefault();
+    });
+</script>
+</body>
+</html>
