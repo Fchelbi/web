@@ -151,6 +151,25 @@
         .empty { text-align: center; padding: 40px; color: #999; font-size: 15px; }
     </style>
 </head>
+<script>
+// Recherche dynamique
+document.getElementById('searchInput')?.addEventListener('input', filterTable);
+document.getElementById('roleFilter')?.addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const role = document.getElementById('roleFilter')?.value.toLowerCase() || '';
+    const rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const roleCell = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
+        const matchSearch = text.includes(search);
+        const matchRole = !role || roleCell.includes(role);
+        row.style.display = matchSearch && matchRole ? '' : 'none';
+    });
+}
+</script>
 <body>
 
 <nav class="navbar">
@@ -200,9 +219,11 @@
 
     <!-- Filtres -->
     <form method="get" class="filters">
-        <input type="text" name="search" placeholder="🔍 Rechercher par nom, prénom ou email..."
-               value="{{ search }}">
-        <select name="role">
+        <input type="text" id="searchInput" name="search" 
+            placeholder="🔍 Rechercher par nom, prénom ou email..."
+            value="{{ search }}">
+
+        <select id="roleFilter" name="role">
             <option value="">Tous les rôles</option>
             <option value="Admin" {{ role == 'Admin' ? 'selected' : '' }}>👑 Admin</option>
             <option value="Coach" {{ role == 'Coach' ? 'selected' : '' }}>🏋️ Coach</option>

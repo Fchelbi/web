@@ -17,8 +17,14 @@ class PatientController extends AbstractController
         $user = $this->getUser();
         $last = $repo->findOneBy(['user' => $user], ['createdAt' => 'DESC']);
 
-        return $this->render('patient/index.html.twig', [
+        $response = $this->render('patient/index.html.twig', [
             'last' => $last,
         ]);
+
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 }

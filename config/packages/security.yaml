@@ -21,16 +21,16 @@ security:
                 check_path: app_login
                 enable_csrf: true
                 success_handler: App\Security\LoginSuccessHandler
+            logout:
+                path: app_logout
+                target: app_login
+                invalidate_session: true
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: 604800
                 path: /
-            logout:
-                path: app_logout
-                target: app_login
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/coach, roles: ROLE_COACH }
         - { path: ^/patient, roles: ROLE_PATIENT }
-    
