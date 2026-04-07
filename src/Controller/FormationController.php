@@ -23,7 +23,7 @@ public function index(EntityManagerInterface $entityManager): Response
     // Get the current user role
     $user = $this->getUser();
     //$role = $user ? $user->getRole() : null;
-      $role = 'Admin'; 
+      $role = 'Patient'; 
 
     // Choose template based on role
     if ($role === 'Admin') {

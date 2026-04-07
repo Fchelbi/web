@@ -1,42 +1,85 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Formation{% endblock %}
-
+{% block title %}{{ formation.title }} | EchoCare{% endblock %}
 {% block body %}
-    <h1>Formation</h1>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px}
+  .back-btn{display:inline-flex;align-items:center;gap:8px;color:var(--blue-light);font-weight:600;text-decoration:none;margin-bottom:24px;font-size:14px}
+  .back-btn:hover{color:var(--blue-dark)}
+  .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;max-width:800px;margin:0 auto}
+  .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:32px 36px}
+  .header-logo{font-size:15px;font-weight:800;color:rgba(255,255,255,.6);margin-bottom:10px}.header-logo span{color:var(--orange)}
+  .header-category{background:rgba(244,132,95,.2);color:var(--orange);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:12px}
+  .header-title{font-size:28px;font-weight:800;color:var(--white);line-height:1.3}
+  .card-body{padding:32px 36px}
+  .section{margin-bottom:28px}
+  .section-label{font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .section-text{font-size:15px;line-height:1.7;color:var(--gray-700)}
+  .video-wrap{border-radius:12px;overflow:hidden;background:var(--blue-dark);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
+  .video-wrap iframe{width:100%;height:100%;border:none}
+  .no-video{text-align:center;padding:40px;color:var(--gray-400)}
+  .no-video .icon{font-size:48px;margin-bottom:12px}
+  .card-actions{display:flex;gap:12px;padding:24px 36px;border-top:1px solid var(--gray-200);background:var(--gray-100)}
+  .btn-edit{background:var(--blue-light);color:var(--white);border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
+  .btn-edit:hover{background:var(--blue-dark)}
+  .btn-back{background:var(--white);color:var(--gray-700);border:1.5px solid var(--gray-200);border-radius:10px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s}
+  .btn-back:hover{background:var(--gray-200)}
+  .btn-del{background:#fff0f0;color:#ef4444;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;margin-left:auto;transition:.2s}
+  .btn-del:hover{background:#ef4444;color:var(--white)}
+</style>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ formation.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ formation.title }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ formation.description }}</td>
-            </tr>
-            <tr>
-                <th>Video_url</th>
-                <td>{{ formation.video_Url }}</td>
-            </tr>
-            <tr>
-                <th>Category</th>
-                <td>{{ formation.category }}</td>
-            </tr>
-            <tr>
-                <th>Coach_id</th>
-                <td>{{ formation.coach_Id }}</td>
-            </tr>
-        </tbody>
-    </table>
+<div style="max-width:800px;margin:0 auto">
+  <a href="{{ path('app_formation_index') }}" class="back-btn">← Retour aux formations</a>
 
-    <a href="{{ path('app_formation_index') }}">back to list</a>
+  <div class="card">
+    <div class="card-header">
+      <div class="header-logo">Echo<span>Care</span></div>
+      {% if formation.category %}
+        <div class="header-category">{{ formation.category }}</div>
+      {% endif %}
+      <div class="header-title">{{ formation.title }}</div>
+    </div>
 
-    <a href="{{ path('app_formation_edit', {'id': formation.id}) }}">edit</a>
+    <div class="card-body">
+      {% if formation.description %}
+      <div class="section">
+        <div class="section-label">📝 Description</div>
+        <div class="section-text">{{ formation.description }}</div>
+      </div>
+      {% endif %}
 
-    {{ include('formation/_delete_form.html.twig') }}
+      <div class="section">
+        <div class="section-label">🎥 Vidéo</div>
+        {% if formation.videoUrl %}
+          <div class="video-wrap">
+            {% set videoId = formation.videoUrl|split('v=')|last|split('&')|first %}
+            {% if 'youtube' in formation.videoUrl %}
+              <iframe src="https://www.youtube.com/embed/{{ videoId }}" allowfullscreen></iframe>
+            {% else %}
+              <iframe src="{{ formation.videoUrl }}" allowfullscreen></iframe>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="video-wrap no-video">
+            <div>
+              <div class="icon">🎬</div>
+              <div>Aucune vidéo ajoutée pour cette formation</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <a href="{{ path('app_formation_index') }}" class="btn-back">← Retour</a>
+      <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn-edit">✏️ Modifier</a>
+      <form method="post" action="{{ path('app_formation_delete', {'id': formation.id}) }}" onsubmit="return confirm('Supprimer cette formation ?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
+        <button class="btn-del">🗑 Supprimer</button>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
