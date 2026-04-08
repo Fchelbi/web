@@ -1,13 +1,81 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Edit Formation{% endblock %}
-
+{% block title %}{{ formation.id ? 'Modifier' : 'Nouvelle' }} Formation | EchoCare{% endblock %}
 {% block body %}
-    <h1>Edit Formation</h1>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+  .form-card{background:#fff;border-radius:var(--radius);box-shadow:0 8px 32px rgba(15,42,74,.12);width:100%;max-width:580px;overflow:hidden}
+  .form-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:28px 32px}
+  .form-logo{font-size:16px;font-weight:800;color:rgba(255,255,255,.6);margin-bottom:8px}.form-logo span{color:var(--orange)}
+  .form-title{font-size:22px;font-weight:800;color:#fff}
+  .form-body{padding:32px}
+  .field{margin-bottom:22px}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--blue-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+  .form-input{width:100%;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;color:var(--gray-700);outline:none;transition:.2s;background:#fff}
+  .form-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(45,125,210,.1)}
+  .form-input.is-invalid{border-color:#ef4444;background:#fff8f8}
+  textarea.form-input{resize:vertical;min-height:100px}
+  select.form-input{cursor:pointer}
+  .error-msg{color:#ef4444;font-size:12px;margin-top:6px;display:flex;align-items:center;gap:4px;font-weight:600}
+  .hint{color:var(--gray-400);font-size:12px;margin-top:5px}
+  .form-actions{display:flex;gap:12px;margin-top:28px;padding-top:20px;border-top:1px solid var(--gray-200)}
+  .btn-submit{flex:1;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 4px 12px rgba(244,132,95,.35)}
+  .btn-submit:hover{background:#e06d47;transform:translateY(-1px)}
+  .btn-cancel{background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;padding:13px 22px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .btn-cancel:hover{background:var(--gray-200)}
+</style>
 
-    {{ include('formation/_form.html.twig', {'button_label': 'Update'}) }}
+<div class="form-card">
+  <div class="form-header">
+    <div class="form-logo">Echo<span>Care</span></div>
+    <div class="form-title">{{ formation.id ? '✏️ Modifier la Formation' : '➕ Nouvelle Formation' }}</div>
+  </div>
+  <div class="form-body">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-    <a href="{{ path('app_formation_index') }}">back to list</a>
+      <div class="field">
+        <label>Titre <span style="color:var(--orange)">*</span></label>
+        {{ form_widget(form.title, {'attr': {'class': 'form-input' ~ (form.title.vars.errors|length > 0 ? ' is-invalid' : ''), 'placeholder': 'Ex: Nutrition et bien-être'}}) }}
+        {% if form.title.vars.errors|length > 0 %}
+          <div class="error-msg">⚠️ {{ form_errors(form.title) }}</div>
+        {% endif %}
+      </div>
 
-    {{ include('formation/_delete_form.html.twig') }}
+      <div class="field">
+        <label>Description</label>
+        {{ form_widget(form.description, {'attr': {'class': 'form-input' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'Décrivez le contenu de la formation...'}}) }}
+        {% if form.description.vars.errors|length > 0 %}
+          <div class="error-msg">⚠️ {{ form_errors(form.description) }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label>Catégorie <span style="color:var(--orange)">*</span></label>
+        {{ form_widget(form.category, {'attr': {'class': 'form-input' ~ (form.category.vars.errors|length > 0 ? ' is-invalid' : '')}}) }}
+        {% if form.category.vars.errors|length > 0 %}
+          <div class="error-msg">⚠️ {{ form_errors(form.category) }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label>URL Vidéo</label>
+        {{ form_widget(form.videoUrl, {'attr': {'class': 'form-input' ~ (form.videoUrl.vars.errors|length > 0 ? ' is-invalid' : ''), 'placeholder': 'https://youtube.com/watch?v=...'}}) }}
+        <div class="hint">🎥 Collez l'URL complète YouTube ou autre plateforme vidéo</div>
+        {% if form.videoUrl.vars.errors|length > 0 %}
+          <div class="error-msg">⚠️ {{ form_errors(form.videoUrl) }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ path('app_formation_index') }}" class="btn-cancel">← Annuler</a>
+        <button type="submit" class="btn-submit">
+          {{ formation.id ? '💾 Sauvegarder les modifications' : '✅ Créer la Formation' }}
+        </button>
+      </div>
+
+    {{ form_end(form) }}
+  </div>
+</div>
 {% endblock %}

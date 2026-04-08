@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gérer le Quiz — {{ formation.title }} | EchoCare{% endblock %}
+{% block body %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px 20px}
+  .page-wrap{max-width:760px;margin:0 auto}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--blue-light);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:24px}
+  .back-link:hover{opacity:.75}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+  .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:24px 30px}
+  .formation-name{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:4px}
+  .card-title{font-size:22px;font-weight:800;color:#fff}
+  .card-body{padding:30px}
+  /* ── Quiz present ── */
+  .quiz-info{display:flex;align-items:center;gap:16px;background:var(--blue-pale);border-radius:12px;padding:18px 22px;margin-bottom:24px}
+  .quiz-icon{font-size:32px}
+  .quiz-name{font-size:16px;font-weight:700;color:var(--blue-dark)}
+  .quiz-meta{font-size:13px;color:var(--gray-400);margin-top:3px}
+  /* ── Empty state ── */
+  .empty-quiz{text-align:center;padding:48px;color:var(--gray-400)}
+  .empty-quiz-icon{font-size:48px;margin-bottom:12px}
+  .empty-quiz-title{font-size:18px;font-weight:700;color:var(--blue-dark);margin-bottom:6px}
+  /* ── Buttons ── */
+  .actions-row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--orange);color:#fff;box-shadow:0 4px 12px rgba(244,132,95,.3)}.btn-primary:hover{background:#e06d47}
+  .btn-secondary{background:var(--gray-100);color:var(--gray-700)}.btn-secondary:hover{background:var(--gray-200)}
+  .btn-purple{background:#f0f4ff;color:#6366f1}.btn-purple:hover{background:#6366f1;color:#fff}
+  .btn-red{background:#fff0f0;color:#ef4444}.btn-red:hover{background:#ef4444;color:#fff}
+  .notice{background:#fff8e1;border-left:3px solid #f59e0b;border-radius:8px;padding:14px 18px;font-size:13px;color:#92400e;margin-top:20px}
+  .flash-success{background:#e8f8f0;color:#27ae60;border-radius:10px;padding:13px 18px;font-weight:600;margin-bottom:20px}
+  .flash-warning{background:#fff8e1;color:#92400e;border-radius:10px;padding:13px 18px;font-weight:600;margin-bottom:20px}
+</style>
+
+<div class="page-wrap">
+  <a href="{{ path('app_formation_index') }}" class="back-link">← Retour aux formations</a>
+
+  {% for msg in app.flashes('success') %}
+    <div class="flash-success">✅ {{ msg }}</div>
+  {% endfor %}
+  {% for msg in app.flashes('warning') %}
+    <div class="flash-warning">⚠️ {{ msg }}</div>
+  {% endfor %}
+
+  <div class="card">
+    <div class="card-header">
+      <div class="formation-name">📚 {{ formation.title }}</div>
+      <div class="card-title">📝 Gestion du Quiz</div>
+    </div>
+    <div class="card-body">
+
+      {% if quiz is not null %}
+
+        {# ── Quiz exists — show info + actions ── #}
+        <div class="quiz-info">
+          <div class="quiz-icon">📝</div>
+          <div>
+            <div class="quiz-name">{{ quiz.title }}</div>
+            <div class="quiz-meta">
+              Score de passage : {{ quiz.passingScore }}% •
+              {{ quiz.questions|length }} question(s)
+            </div>
+          </div>
+        </div>
+
+        <div class="actions-row">
+          {# Edit — links to app_quiz_edit #}
+          <a href="{{ path('app_quiz_edit', {'id': formation.id}) }}" class="btn btn-purple">✏️ Modifier le Quiz</a>
+
+          {# Preview — links to app_quiz_preview #}
+          <a href="{{ path('app_quiz_preview', {'id': formation.id}) }}" class="btn btn-secondary">👁️ Aperçu</a>
+
+          {# Delete — POST with CSRF token #}
+          <form method="post" action="{{ path('app_quiz_delete', {'id': formation.id}) }}"
+                onsubmit="return confirm('Supprimer définitivement ce quiz ?')" style="display:inline">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_quiz_' ~ quiz.id) }}">
+            <button type="submit" class="btn btn-red">🗑️ Supprimer</button>
+          </form>
+        </div>
+
+      {% else %}
+
+        {# ── No quiz yet ── #}
+        <div class="empty-quiz">
+          <div class="empty-quiz-icon">📭</div>
+          <div class="empty-quiz-title">Aucun quiz pour cette formation</div>
+          <div style="font-size:14px;margin-bottom:20px">
+            Créez un quiz pour évaluer vos apprenants après la vidéo.
+          </div>
+          <a href="{{ path('app_quiz_edit', {'id': formation.id}) }}" class="btn btn-primary">＋ Créer un Quiz</a>
+        </div>
+
+        <div class="notice">
+          💡 Le quiz permet aux patients de tester leurs connaissances après avoir regardé la formation.
+        </div>
+
+      {% endif %}
+
+      <div class="actions-row" style="margin-top:28px;border-top:1px solid var(--gray-200);padding-top:20px">
+        <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn btn-secondary">← Voir la Formation</a>
+        <a href="{{ path('app_formation_index') }}" class="btn btn-secondary">📚 Toutes les Formations</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

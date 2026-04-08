@@ -1,66 +1,65 @@
 <?php
-
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use App\Entity\Question;
-
 #[ORM\Entity]
 class Reponse
 {
-
     #[ORM\Id]
+    #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
-    private int $id;
+    private ?int $id = null;
 
-        #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: "reponses")]
+    // Property name is $question (holds the full object, not just an ID)
+    // mappedBy in Question must match: mappedBy: 'question'
+    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: "reponses")]
     #[ORM\JoinColumn(name: 'question_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Question $question_id;
+    private ?Question $question = null;
 
+    // camelCase — ReponseType field name must match: 'optionText'
     #[ORM\Column(type: "string", length: 255)]
-    private string $option_text;
+    private string $optionText = '';
 
+    // camelCase — ReponseType field name must match: 'isCorrect'
     #[ORM\Column(type: "boolean")]
-    private bool $is_correct;
+    private bool $isCorrect = false;
 
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function getOptionText(): string
     {
-        $this->id = $value;
+        return $this->optionText;
     }
 
-    public function getQuestion_id()
+    public function setOptionText(string $optionText): self
     {
-        return $this->question_id;
+        $this->optionText = $optionText;
+        return $this;
     }
 
-    public function setQuestion_id($value)
+    public function getIsCorrect(): bool
     {
-        $this->question_id = $value;
+        return $this->isCorrect;
     }
 
-    public function getOption_text()
+    public function setIsCorrect(bool $isCorrect): self
     {
-        return $this->option_text;
+        $this->isCorrect = $isCorrect;
+        return $this;
     }
 
-    public function setOption_text($value)
+    public function getQuestion(): ?Question
     {
-        $this->option_text = $value;
+        return $this->question;
     }
 
-    public function getIs_correct()
+    public function setQuestion(?Question $question): self
     {
-        return $this->is_correct;
-    }
-
-    public function setIs_correct($value)
-    {
-        $this->is_correct = $value;
+        $this->question = $question;
+        return $this;
     }
 }

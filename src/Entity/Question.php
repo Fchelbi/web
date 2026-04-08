@@ -1,98 +1,104 @@
 <?php
-
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-use App\Entity\Quiz;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Reponse;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 class Question
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
 
-        #[ORM\ManyToOne(targetEntity: Quiz::class, inversedBy: "questions")]
-    #[ORM\JoinColumn(name: 'quiz_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    private Quiz $quiz_id;
+    // The owning side of the ManyToOne — mappedBy in Quiz must match this property name "quiz"
+    #[ORM\ManyToOne(targetEntity: Quiz::class, inversedBy: 'questions')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Quiz $quiz = null;
 
-    #[ORM\Column(type: "text")]
-    private string $question_text;
+    // camelCase property — QuestionType field name must also be camelCase (questionText)
+    #[ORM\Column(type: Types::TEXT)]
+    private ?string $questionText = null;
 
-    #[ORM\Column(type: "integer")]
-    private int $points;
+    #[ORM\Column]
+    private int $points = 1;
 
-    public function getId()
+    #[ORM\OneToMany(
+        mappedBy: 'question',
+        targetEntity: Reponse::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $reponses;
+
+    public function __construct()
+    {
+        $this->reponses = new ArrayCollection();
+    }
+
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId($value)
+    public function getQuiz(): ?Quiz
     {
-        $this->id = $value;
+        return $this->quiz;
     }
 
-    public function getQuiz_id()
+    public function setQuiz(?Quiz $quiz): self
     {
-        return $this->quiz_id;
+        $this->quiz = $quiz;
+        return $this;
     }
 
-    public function setQuiz_id($value)
+    public function getQuestionText(): ?string
     {
-        $this->quiz_id = $value;
+        return $this->questionText;
     }
 
-    public function getQuestion_text()
+    public function setQuestionText(string $questionText): self
     {
-        return $this->question_text;
+        $this->questionText = $questionText;
+        return $this;
     }
 
-    public function setQuestion_text($value)
-    {
-        $this->question_text = $value;
-    }
-
-    public function getPoints()
+    public function getPoints(): int
     {
         return $this->points;
     }
 
-    public function setPoints($value)
+    public function setPoints(int $points): self
     {
-        $this->points = $value;
+        $this->points = $points;
+        return $this;
     }
 
-    #[ORM\OneToMany(mappedBy: "question_id", targetEntity: Reponse::class)]
-    private Collection $reponses;
+    public function getReponses(): Collection
+    {
+        return $this->reponses;
+    }
 
-        public function getReponses(): Collection
-        {
-            return $this->reponses;
+    // Required by CollectionType with by_reference: false
+    public function addReponse(Reponse $reponse): self
+    {
+        if (!$this->reponses->contains($reponse)) {
+            $this->reponses->add($reponse);
+            $reponse->setQuestion($this);
         }
-    
-        public function addReponse(Reponse $reponse): self
-        {
-            if (!$this->reponses->contains($reponse)) {
-                $this->reponses[] = $reponse;
-                $reponse->setQuestion_id($this);
+        return $this;
+    }
+
+    public function removeReponse(Reponse $reponse): self
+    {
+        if ($this->reponses->removeElement($reponse)) {
+            if ($reponse->getQuestion() === $this) {
+                $reponse->setQuestion(null);
             }
-    
-            return $this;
         }
-    
-        public function removeReponse(Reponse $reponse): self
-        {
-            if ($this->reponses->removeElement($reponse)) {
-                // set the owning side to null (unless already changed)
-                if ($reponse->getQuestion_id() === $this) {
-                    $reponse->setQuestion_id(null);
-                }
-            }
-    
-            return $this;
-        }
+        return $this;
+    }
 }

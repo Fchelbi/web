@@ -3,44 +3,67 @@
 {% block body %}
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --blue-dark:#0f2a4a;--blue-mid:#1a4a7a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;
-    --orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;
-    --gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;
-    --shadow-sm:0 2px 8px rgba(15,42,74,.08);--radius:14px;
-  }
+  :root{--blue-dark:#0f2a4a;--blue-mid:#1a4a7a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--shadow-sm:0 2px 8px rgba(15,42,74,.08);--radius:14px}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700)}
   .sidebar{position:fixed;top:0;left:0;height:100vh;width:240px;background:var(--blue-dark);display:flex;flex-direction:column;padding:28px 20px;z-index:100}
-  .logo{font-size:22px;font-weight:800;color:var(--white);margin-bottom:4px}.logo span{color:var(--orange)}
+  .logo{font-size:22px;font-weight:800;color:#fff;margin-bottom:4px}.logo span{color:var(--orange)}
   .logo-sub{font-size:11px;color:var(--gray-400);text-transform:uppercase;letter-spacing:1px;margin-bottom:32px}
   .nav-label{font-size:10px;color:var(--gray-400);text-transform:uppercase;letter-spacing:1.2px;margin:20px 0 8px}
   .nav-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;color:rgba(255,255,255,.65);font-size:14px;font-weight:500;text-decoration:none;margin-bottom:4px;transition:.2s}
-  .nav-link:hover,.nav-link.active{background:rgba(255,255,255,.1);color:var(--white)}
+  .nav-link:hover,.nav-link.active{background:rgba(255,255,255,.1);color:#fff}
   .nav-link.active{background:var(--blue-light)}
   .sidebar-bottom{margin-top:auto}
   .admin-badge{background:rgba(244,132,95,.2);color:var(--orange);border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600}
   .main{margin-left:240px;padding:36px 40px}
   .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
   .page-title{font-size:26px;font-weight:800;color:var(--blue-dark)}.page-title span{color:var(--blue-light)}
-  .btn-new{background:var(--orange);color:var(--white);border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;transition:.2s;box-shadow:0 4px 12px rgba(244,132,95,.35)}
+  .btn-new{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;transition:.2s;box-shadow:0 4px 12px rgba(244,132,95,.35)}
   .btn-new:hover{background:#e06d47;transform:translateY(-1px)}
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
-  .stat-card{background:var(--white);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:16px}
+  .stat-card{background:#fff;border-radius:var(--radius);padding:22px 24px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:16px}
   .stat-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px}
   .si-blue{background:var(--blue-pale)}.si-orange{background:var(--orange-soft)}.si-green{background:#e8f8f0}
   .stat-value{font-size:28px;font-weight:800;color:var(--blue-dark)}.stat-label{font-size:13px;color:var(--gray-400)}
-  .toolbar{background:var(--white);border-radius:var(--radius);padding:18px 24px;box-shadow:var(--shadow-sm);display:flex;gap:14px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+
+  /* ---- Toolbar ---- */
+  .toolbar{background:#fff;border-radius:var(--radius);padding:18px 24px;box-shadow:var(--shadow-sm);margin-bottom:24px}
+  .toolbar-row1{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+  .toolbar-row2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--gray-200);padding-top:14px}
+  .filter-label{font-size:12px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
   .search-wrap{position:relative;flex:1;min-width:200px}
   .search-wrap input{width:100%;padding:10px 14px 10px 40px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:.2s}
   .search-wrap input:focus{border-color:var(--blue-light)}
   .search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%)}
-  .filter-select{padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;color:var(--gray-700);outline:none;background:var(--white);cursor:pointer}
+  .filter-select{padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;color:var(--gray-700);outline:none;background:#fff;cursor:pointer;transition:.2s}
+  .filter-select:focus{border-color:var(--blue-light)}
   .btn-pdf{background:var(--blue-pale);color:var(--blue-light);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s}
-  .btn-pdf:hover{background:var(--blue-light);color:var(--white)}
-  .table-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+  .btn-pdf:hover{background:var(--blue-light);color:#fff}
+
+  /* ---- Filter chips (toggle buttons) ---- */
+  .chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-700);cursor:pointer;transition:.15s;user-select:none}
+  .chip:hover{border-color:var(--blue-light);color:var(--blue-light)}
+  .chip.active{background:var(--blue-light);color:#fff;border-color:var(--blue-light)}
+  .chip.active-orange{background:var(--orange);color:#fff;border-color:var(--orange)}
+  .chip.active-green{background:#27ae60;color:#fff;border-color:#27ae60}
+
+  /* ---- Active filters summary ---- */
+  .active-filters{display:none;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .active-filters.visible{display:flex}
+  .af-tag{display:inline-flex;align-items:center;gap:5px;background:var(--blue-pale);color:var(--blue-light);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600}
+  .af-tag button{background:none;border:none;cursor:pointer;color:inherit;font-size:14px;line-height:1;padding:0 0 0 2px}
+  .btn-clear-all{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray-400);text-decoration:underline;margin-left:4px}
+  .results-count{font-size:13px;color:var(--gray-400);margin-left:auto}
+
+  /* ---- Table ---- */
+  .table-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
   table{width:100%;border-collapse:collapse}
-  thead th{background:var(--blue-dark);color:rgba(255,255,255,.75);padding:14px 20px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+  thead th{background:var(--blue-dark);color:rgba(255,255,255,.75);padding:14px 20px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;cursor:pointer;user-select:none;white-space:nowrap}
+  thead th.sortable:hover{color:#fff}
+  thead th .sort-icon{margin-left:4px;opacity:.5;font-style:normal}
+  thead th.sort-asc .sort-icon::after{content:'↑'}
+  thead th.sort-desc .sort-icon::after{content:'↓'}
+  thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'↕'}
   tbody tr{border-bottom:1px solid var(--gray-200);transition:.15s}
   tbody tr:hover{background:var(--gray-100)}
   tbody td{padding:15px 20px;font-size:14px}
@@ -48,10 +71,23 @@
   .badge-blue{background:var(--blue-pale);color:var(--blue-light)}
   .badge-orange{background:var(--orange-soft);color:var(--orange)}
   .badge-green{background:#e8f8f0;color:#27ae60}
-  .actions{display:flex;gap:8px;align-items:center}
-  .btn-show{background:var(--blue-pale);color:var(--blue-light);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
-  .btn-edit{background:#fff8e1;color:#f59e0b;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
-  .btn-del{background:#fff0f0;color:#ef4444;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer}
+  .actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .btn-action{border:none;border-radius:8px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+  .btn-show{background:var(--blue-pale);color:var(--blue-light)}
+  .btn-edit{background:#fff8e1;color:#f59e0b}
+  .btn-quiz{background:#f0f4ff;color:#6366f1}
+  .btn-del{background:#fff0f0;color:#ef4444}
+  .flash{padding:14px 20px;border-radius:10px;margin-bottom:20px;font-weight:600}
+  .flash-success{background:#e8f8f0;color:#27ae60}
+
+  /* ---- Pagination ---- */
+  .pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:22px 0 6px}
+  .pg-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;font-size:14px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-700);text-decoration:none;transition:.15s}
+  .pg-btn:hover{border-color:var(--blue-light);color:var(--blue-light)}
+  .pg-btn.active{background:var(--blue-light);color:#fff;border-color:var(--blue-light)}
+  .pg-btn.disabled{opacity:.4;pointer-events:none}
+  .pg-info{font-size:13px;color:var(--gray-400);margin-left:8px}
+  .no-results-row{display:none;text-align:center;padding:40px;color:var(--gray-400)}
 </style>
 
 <div class="sidebar">
@@ -67,6 +103,10 @@
 </div>
 
 <div class="main">
+  {% for message in app.flashes('success') %}
+    <div class="flash flash-success">✅ {{ message }}</div>
+  {% endfor %}
+
   <div class="topbar">
     <div class="page-title">Gestion des <span>Formations</span></div>
     <a href="{{ path('app_formation_new') }}" class="btn-new">＋ Nouvelle Formation</a>
@@ -75,103 +115,331 @@
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-icon si-blue">📚</div>
-      <div><div class="stat-value">{{ formations|length }}</div><div class="stat-label">Total Formations</div></div>
+      <div><div class="stat-value">{{ total }}</div><div class="stat-label">Total Formations</div></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon si-orange">🎥</div>
-      <div><div class="stat-value">{{ formations|filter(f => f.videoUrl is not null)|length }}</div><div class="stat-label">Avec Vidéo</div></div>
+      <div><div class="stat-value">{{ formations|filter(f => f.videoUrl is not null)|length }}</div><div class="stat-label">Avec Vidéo (page)</div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon si-green">✅</div>
-      <div><div class="stat-value">{{ formations|length }}</div><div class="stat-label">Formations Actives</div></div>
+      <div class="stat-icon si-green">📄</div>
+      <div><div class="stat-value">{{ totalPages }}</div><div class="stat-label">Pages</div></div>
     </div>
   </div>
 
+  {# ======================================================
+     TOOLBAR — Row 1: search + category + sort + export
+     Row 2: quick-filter chips for Video & Quiz
+  ====================================================== #}
   <div class="toolbar">
-    <div class="search-wrap">
-      <input type="text" placeholder="Rechercher une formation..." id="searchInput" onkeyup="filterTable()">
+    <div class="toolbar-row1">
+      <div class="search-wrap">
+        <input type="text" placeholder="Rechercher titre, description, catégorie, coach…" id="searchInput">
+      </div>
+
+      {# Category dropdown #}
+      <select class="filter-select" id="catFilter" title="Filtrer par catégorie">
+        <option value="">Toutes les catégories</option>
+        {% set cats = [] %}
+        {% for f in formations %}
+          {% if f.category and f.category not in cats %}
+            {% set cats = cats|merge([f.category]) %}
+            <option value="{{ f.category|lower }}">{{ f.category }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+
+      {# Sort dropdown #}
+      <select class="filter-select" id="sortSelect" title="Trier par">
+        <option value="">Trier par…</option>
+        <option value="title-asc">Titre A → Z</option>
+        <option value="title-desc">Titre Z → A</option>
+        <option value="cat-asc">Catégorie A → Z</option>
+        <option value="cat-desc">Catégorie Z → A</option>
+      </select>
+
+      <button class="btn-pdf" onclick="exportPDF()">📄 Exporter PDF</button>
     </div>
-    <select class="filter-select" id="catFilter" onchange="filterTable()">
-      <option value="">Toutes les catégories</option>
-      {% set cats = [] %}
-      {% for f in formations %}
-        {% if f.category and f.category not in cats %}
-          {% set cats = cats|merge([f.category]) %}
-          <option value="{{ f.category }}">{{ f.category }}</option>
-        {% endif %}
-      {% endfor %}
-    </select>
-    <a href="{{ path('app_formation_index') }}?pdf=1" class="btn-pdf" id="pdfBtn">📄 Exporter PDF</a>
+
+    <div class="toolbar-row2">
+      <span class="filter-label">Filtres rapides :</span>
+
+      {# Video chips #}
+      <button class="chip" id="chip-video-yes" onclick="toggleChip('video','yes')">🎥 Avec vidéo</button>
+      <button class="chip" id="chip-video-no"  onclick="toggleChip('video','no')">🚫 Sans vidéo</button>
+
+      {# Quiz chips #}
+      <button class="chip" id="chip-quiz-yes" onclick="toggleChip('quiz','yes')">📝 Avec quiz</button>
+      <button class="chip" id="chip-quiz-no"  onclick="toggleChip('quiz','no')">📭 Sans quiz</button>
+
+      <span class="results-count" id="resultsCount"></span>
+    </div>
+  </div>
+
+  {# Active filter tags #}
+  <div class="active-filters" id="activeFilters">
+    <span style="font-size:12px;font-weight:600;color:var(--gray-400)">Filtres actifs :</span>
+    <span id="afTags"></span>
+    <button class="btn-clear-all" onclick="clearAllFilters()">Tout effacer</button>
   </div>
 
   <div class="table-card">
     <table id="formationTable">
       <thead>
         <tr>
-          <th>Titre</th>
+          <th class="sortable" data-col="0">Titre <i class="sort-icon"></i></th>
           <th>Description</th>
-          <th>Catégorie</th>
+          <th class="sortable" data-col="2">Catégorie <i class="sort-icon"></i></th>
+          <th class="sortable" data-col="3">Coach <i class="sort-icon"></i></th>
           <th>Vidéo</th>
-          <th>Coach</th>
+          <th>Quiz</th>
           <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="tableBody">
         {% for formation in formations %}
-        <tr data-title="{{ formation.title|lower }}" data-cat="{{ formation.category|lower }}">
+        <tr class="data-row"
+            data-title="{{ formation.title|lower }}"
+            data-desc="{{ formation.description|lower }}"
+            data-cat="{{ formation.category|lower }}"
+            data-coach="{{ (formation.coachId and coachMap[formation.coachId] is defined) ? coachMap[formation.coachId]|lower : '' }}"
+            data-video="{{ formation.videoUrl ? 'yes' : 'no' }}"
+            data-quiz="{{ formation.quizs|length > 0 ? 'yes' : 'no' }}">
           <td><strong>{{ formation.title }}</strong></td>
-          <td>{{ formation.description|slice(0,60) }}{% if formation.description|length > 60 %}...{% endif %}</td>
+          <td>{{ formation.description|slice(0,50) }}{% if formation.description|length > 50 %}…{% endif %}</td>
           <td>
-            {% if formation.category %}
-              <span class="badge badge-blue">{{ formation.category }}</span>
+            {% if formation.category %}<span class="badge badge-blue">{{ formation.category }}</span>
             {% else %}<span class="badge badge-orange">—</span>{% endif %}
           </td>
           <td>
-            {% if formation.videoUrl %}
-              <span class="badge badge-green">✓ Oui</span>
+            {% if formation.coachId is not null and coachMap[formation.coachId] is defined %}
+              {{ coachMap[formation.coachId] }}
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if formation.videoUrl %}<span class="badge badge-green">✓ Oui</span>
             {% else %}<span class="badge badge-orange">✗ Non</span>{% endif %}
           </td>
-          <td>{{ formation.coachId ?? '—' }}</td>
+          <td>
+            <a href="{{ path('app_formation_quiz', {'id': formation.id}) }}" class="btn-action btn-quiz">📝 Gérer Quiz</a>
+          </td>
           <td>
             <div class="actions">
-              <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-show">Voir</a>
-              <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn-edit">Modifier</a>
+              <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-action btn-show">Voir</a>
+              <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn-action btn-edit">Modifier</a>
               <form method="post" action="{{ path('app_formation_delete', {'id': formation.id}) }}" onsubmit="return confirm('Supprimer cette formation ?')">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ formation.id) }}">
-                <button class="btn-del">Supprimer</button>
+                <button class="btn-action btn-del">Supprimer</button>
               </form>
             </div>
           </td>
         </tr>
-        {% else %}
-        <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray-400)">Aucune formation trouvée</td></tr>
         {% endfor %}
       </tbody>
+      <tfoot>
+        <tr id="noResultsRow">
+          <td colspan="7" class="no-results-row" style="display:table-cell">Aucune formation trouvée</td>
+        </tr>
+      </tfoot>
     </table>
   </div>
+
+  {# ---- Pagination ---- #}
+  {% if totalPages > 1 %}
+  <div class="pagination">
+    <a href="{{ path('app_formation_index', {'page': max(1, page-1)}) }}"
+       class="pg-btn {% if page <= 1 %}disabled{% endif %}">‹</a>
+    {% for p in 1..totalPages %}
+      {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+        <a href="{{ path('app_formation_index', {'page': p}) }}"
+           class="pg-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+      {% elseif p == page - 3 or p == page + 3 %}
+        <span class="pg-btn" style="border:none;background:none;cursor:default">…</span>
+      {% endif %}
+    {% endfor %}
+    <a href="{{ path('app_formation_index', {'page': min(totalPages, page+1)}) }}"
+       class="pg-btn {% if page >= totalPages %}disabled{% endif %}">›</a>
+    <span class="pg-info">Page {{ page }} / {{ totalPages }} — {{ total }} formations</span>
+  </div>
+  {% endif %}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <script>
-function filterTable() {
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  const cat = document.getElementById('catFilter').value.toLowerCase();
-  document.querySelectorAll('#formationTable tbody tr[data-title]').forEach(row => {
-    const title = row.dataset.title || '';
-    const rowCat = row.dataset.cat || '';
-    row.style.display = (title.includes(search) && (cat === '' || rowCat === cat)) ? '' : 'none';
-  });
+// =====================================================================
+//  State
+// =====================================================================
+const state = {
+  search : '',
+  cat    : '',
+  video  : '',   // 'yes' | 'no' | ''
+  quiz   : '',   // 'yes' | 'no' | ''
+  sort   : ''    // 'title-asc' | 'title-desc' | 'cat-asc' | 'cat-desc' | ''
+};
+
+// =====================================================================
+//  Input listeners
+// =====================================================================
+document.getElementById('searchInput').addEventListener('input', e => {
+  state.search = e.target.value.toLowerCase().trim();
+  applyFilters();
+});
+
+document.getElementById('catFilter').addEventListener('change', e => {
+  state.cat = e.target.value.toLowerCase();
+  applyFilters();
+});
+
+document.getElementById('sortSelect').addEventListener('change', e => {
+  state.sort = e.target.value;
+  applyFilters();
+});
+
+// =====================================================================
+//  Chip toggle — only one value per group (video / quiz) at a time
+// =====================================================================
+function toggleChip(group, value) {
+  const current = state[group];
+  state[group] = current === value ? '' : value;   // toggle off if already active
+  updateChipStyles();
+  applyFilters();
 }
 
-document.getElementById('pdfBtn').addEventListener('click', function(e) {
-  e.preventDefault();
+function updateChipStyles() {
+  // Video chips
+  setChip('chip-video-yes', state.video === 'yes', 'active-green');
+  setChip('chip-video-no',  state.video === 'no',  'active-orange');
+  // Quiz chips
+  setChip('chip-quiz-yes', state.quiz === 'yes', 'active-green');
+  setChip('chip-quiz-no',  state.quiz === 'no',  'active-orange');
+}
+
+function setChip(id, on, cls) {
+  const el = document.getElementById(id);
+  el.classList.remove('active','active-green','active-orange');
+  if (on) el.classList.add(cls);
+}
+
+// =====================================================================
+//  Core filter + sort logic
+// =====================================================================
+function applyFilters() {
+  const tbody = document.getElementById('tableBody');
+  const rows  = Array.from(tbody.querySelectorAll('.data-row'));
+
+  // --- 1. Filter ---
+  let visible = 0;
+  rows.forEach(row => {
+    const match =
+      (!state.search || ['title','desc','cat','coach'].some(k => (row.dataset[k]||'').includes(state.search))) &&
+      (!state.cat    || row.dataset.cat   === state.cat)   &&
+      (!state.video  || row.dataset.video === state.video) &&
+      (!state.quiz   || row.dataset.quiz  === state.quiz);
+
+    row.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+
+  // --- 2. Sort visible rows ---
+  if (state.sort) {
+    const [field, dir] = state.sort.split('-');
+    const colIdx = field === 'title' ? 0 : 2;   // title=col0, cat=col2
+    const visibleRows = rows.filter(r => r.style.display !== 'none');
+
+    visibleRows.sort((a, b) => {
+      const aVal = a.querySelectorAll('td')[colIdx]?.innerText.toLowerCase() || '';
+      const bVal = b.querySelectorAll('td')[colIdx]?.innerText.toLowerCase() || '';
+      return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+    });
+
+    // Re-append in sorted order (hidden rows stay in place, sorted rows go on top)
+    visibleRows.forEach(r => tbody.appendChild(r));
+  }
+
+  // --- 3. No-results message ---
+  const noRow = document.getElementById('noResultsRow').querySelector('td');
+  noRow.style.display = visible === 0 ? 'table-cell' : 'none';
+
+  // --- 4. Result count badge ---
+  document.getElementById('resultsCount').textContent =
+    visible + (visible !== 1 ? ' résultats' : ' résultat');
+
+  // --- 5. Active filter tags ---
+  renderActiveFilterTags();
+}
+
+// =====================================================================
+//  Active filter tags bar
+// =====================================================================
+function sortLabel(v) {
+  if (v === 'title-asc')  return 'Titre A→Z';
+  if (v === 'title-desc') return 'Titre Z→A';
+  if (v === 'cat-asc')    return 'Catégorie A→Z';
+  if (v === 'cat-desc')   return 'Catégorie Z→A';
+  return v;
+}
+
+const tagLabels = {
+  search : v => 'Recherche : "' + v + '"',
+  cat    : v => 'Catégorie : ' + v,
+  video  : v => v === 'yes' ? 'Avec vidéo' : 'Sans vidéo',
+  quiz   : v => v === 'yes' ? 'Avec quiz'  : 'Sans quiz',
+  sort   : v => 'Tri : ' + sortLabel(v)
+};
+
+function renderActiveFilterTags() {
+  const container = document.getElementById('activeFilters');
+  const tagsEl    = document.getElementById('afTags');
+  const active    = Object.entries(state).filter(([,v]) => v !== '');
+
+  if (active.length === 0) {
+    container.classList.remove('visible');
+    tagsEl.innerHTML = '';
+    return;
+  }
+  container.classList.add('visible');
+  tagsEl.innerHTML = active.map(function(pair) {
+    var k = pair[0], v = pair[1];
+    return '<span class="af-tag">' + tagLabels[k](v) + '<button onclick="clearFilter(\'' + k + '\')" title="Retirer">&times;</button></span>';
+  }).join('');
+}
+
+function clearFilter(key) {
+  state[key] = '';
+  // Sync UI controls
+  if (key === 'search') document.getElementById('searchInput').value = '';
+  if (key === 'cat')    document.getElementById('catFilter').value   = '';
+  if (key === 'sort')   document.getElementById('sortSelect').value  = '';
+  if (key === 'video' || key === 'quiz') updateChipStyles();
+  applyFilters();
+}
+
+function clearAllFilters() {
+  Object.keys(state).forEach(k => state[k] = '');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value   = '';
+  document.getElementById('sortSelect').value  = '';
+  updateChipStyles();
+  applyFilters();
+}
+
+// Init count on load
+applyFilters();
+
+// =====================================================================
+//  PDF export (visible rows only)
+// =====================================================================
+function exportPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.text('EchoCare - Liste des Formations', 14, 15);
+  doc.setFontSize(18); doc.setTextColor(15, 42, 74);
+  doc.text('EchoCare — Liste des Formations', 14, 18);
+  doc.setFontSize(10); doc.setTextColor(148, 163, 184);
+  doc.text('Généré le ' + new Date().toLocaleDateString('fr-FR'), 14, 26);
+
   const rows = [];
-  document.querySelectorAll('#formationTable tbody tr[data-title]').forEach(row => {
+  document.querySelectorAll('#tableBody .data-row').forEach(row => {
     if (row.style.display !== 'none') {
       const cells = row.querySelectorAll('td');
       rows.push([
@@ -179,18 +447,19 @@ document.getElementById('pdfBtn').addEventListener('click', function(e) {
         cells[1]?.innerText || '',
         cells[2]?.innerText || '',
         cells[3]?.innerText || '',
-        cells[4]?.innerText || '',
+        cells[4]?.innerText || ''
       ]);
     }
   });
+
   doc.autoTable({
-    head: [['Titre', 'Description', 'Catégorie', 'Vidéo', 'Coach']],
+    head: [['Titre','Description','Catégorie','Coach','Vidéo']],
     body: rows,
-    startY: 25,
-    styles: { fontSize: 10 },
+    startY: 32,
+    styles: { fontSize: 9 },
     headStyles: { fillColor: [15, 42, 74] }
   });
   doc.save('formations-echocare.pdf');
-});
+}
 </script>
 {% endblock %}
