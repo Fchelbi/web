@@ -15,7 +15,6 @@ class Formation
     #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    // ---- Contrôles de saisie: titre ----
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire.")]
     #[Assert\Length(
@@ -23,14 +22,12 @@ class Formation
         minMessage: "Le titre doit avoir au moins {{ limit }} caractères.",
         maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères."
     )]
-    // Test logique: no special characters that could break HTML/DB
     #[Assert\Regex(
         pattern: '/^[\p{L}0-9\s\'\-\,\.\!\?\:\(\)\/]+$/u',
         message: "Le titre contient des caractères non autorisés."
     )]
     private string $title = '';
 
-    // ---- Contrôles de saisie: description ----
     #[ORM\Column(type: "text", nullable: true)]
     #[Assert\Length(
         max: 2000,
@@ -38,18 +35,12 @@ class Formation
     )]
     private ?string $description = null;
 
-    // ---- Contrôles de saisie: URL vidéo ----
     #[ORM\Column(type: "string", length: 500, nullable: true, name: "video_url")]
-    #[Assert\Url(
-        message: "L'URL de la vidéo n'est pas valide. Elle doit commencer par https://",
-        requireTld: true
-    )]
+    #[Assert\Url(message: "L'URL de la vidéo n'est pas valide. Elle doit commencer par https://")]
     private ?string $videoUrl = null;
 
-    // ---- Contrôles de saisie + test logique: catégorie ----
     #[ORM\Column(type: "string", length: 100, nullable: true)]
     #[Assert\NotBlank(message: "La catégorie est obligatoire.")]
-    // Test logique: value must be one of the allowed choices
     #[Assert\Choice(
         choices: ['Nutrition','Sport & Fitness','Santé Mentale','Méditation','Gestion du Stress','Autre'],
         message: "Catégorie invalide. Choisissez une valeur dans la liste."
@@ -59,8 +50,6 @@ class Formation
     #[ORM\Column(type: "integer", nullable: true, name: "coach_id")]
     private ?int $coachId = null;
 
-    // FIX: cascade persist+remove added — Doctrine now automatically
-    // persists/removes quizs when the formation is managed
     #[ORM\OneToMany(
         mappedBy: "formation_id",
         targetEntity: Quiz::class,
@@ -97,7 +86,6 @@ class Formation
 
     public function getQuizs(): Collection { return $this->quizs; }
 
-    // Both-sides sync — required when creating a quiz
     public function addQuiz(Quiz $quiz): self
     {
         if (!$this->quizs->contains($quiz)) {

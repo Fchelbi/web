@@ -13,18 +13,18 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Regex;  // ← Ajoute cette ligne si absente
-use Symfony\Component\Validator\Constraints\Url;   // ← Ajoute cette ligne si absente
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Url;
 
 class FormationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // Titre (inchangé)
             ->add('title', TextType::class, [
-                'label' => 'Titre de la formation',
-                'attr'  => [
+                'label'      => 'Titre de la formation',
+                'empty_data' => '',   // ← prevents null being passed into string property
+                'attr'       => [
                     'placeholder' => 'Ex: Nutrition et bien-être',
                     'maxlength'   => 255,
                 ],
@@ -42,11 +42,11 @@ class FormationType extends AbstractType
                 ],
             ])
 
-            // Description (inchangé)
             ->add('description', TextareaType::class, [
-                'label'    => 'Description',
-                'required' => false,
-                'attr'     => [
+                'label'      => 'Description',
+                'required'   => false,
+                'empty_data' => '',   // ← same fix for description
+                'attr'       => [
                     'placeholder' => 'Décrivez le contenu de la formation...',
                     'rows'        => 4,
                     'maxlength'   => 2000,
@@ -59,10 +59,10 @@ class FormationType extends AbstractType
                 ],
             ])
 
-            // Catégorie (inchangé)
             ->add('category', ChoiceType::class, [
                 'label'       => 'Catégorie',
                 'required'    => true,
+                'empty_data'  => '',   // ← prevents null on unselected placeholder
                 'placeholder' => '-- Choisir une catégorie --',
                 'choices'     => [
                     'Nutrition'         => 'Nutrition',
@@ -81,7 +81,6 @@ class FormationType extends AbstractType
                 ],
             ])
 
-            // ← ICI : Remplace ton ancien bloc 'videoUrl' par CELUI-CI
             ->add('videoUrl', UrlType::class, [
                 'label'    => 'URL de la vidéo (YouTube)',
                 'required' => false,
