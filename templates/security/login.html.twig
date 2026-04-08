@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Connexion · EchoCare</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -152,6 +155,7 @@
         .security-note span { color: #E8895A; }
     </style>
 </head>
+
 <body>
 <div class="container">
 
@@ -225,5 +229,12 @@
     </div>
 
 </div>
+    <script>
+        // Imna3 el retour lel pages protégées ba3d déconnexion
+        history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function() {
+            history.pushState(null, null, window.location.href);
+        });
+    </script>
 </body>
 </html>

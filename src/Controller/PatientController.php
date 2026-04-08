@@ -21,10 +21,10 @@ class PatientController extends AbstractController
             'last' => $last,
         ]);
 
-        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
-
+        $response->headers->set('Vary', 'Cookie');
         return $response;
     }
 }

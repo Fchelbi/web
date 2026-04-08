@@ -11,37 +11,36 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Dompdf\Dompdf;
 
 #[IsGranted('ROLE_ADMIN')]
 #[Route('/admin')]
 class AdminUserController extends AbstractController
 {
     #[Route('/dashboard', name: 'admin_dashboard')]
-    public function index(Request $request, UserRepository $repo): Response
-    {
-        $search = $request->query->get('search', '');
-        $role   = $request->query->get('role', '');
+public function index(Request $request, UserRepository $repo): Response
+{
+    $search = $request->query->get('search', '');
+    $role   = $request->query->get('role', '');
+    $page   = max(1, (int) $request->query->get('page', 1));
+    $limit  = 4;
 
-        $qb = $repo->createQueryBuilder('u');
+    [$users, $total] = $repo->searchPaginated($search, $role, $page, $limit);
 
-        if ($search) {
-            $qb->andWhere('u.nom LIKE :s OR u.prenom LIKE :s OR u.email LIKE :s')
-               ->setParameter('s', '%' . $search . '%');
-        }
+    $totalPages = (int) ceil($total / $limit);
 
-        if ($role) {
-            $qb->andWhere('u.role = :role')
-               ->setParameter('role', $role);
-        }
-
-        $users = $qb->getQuery()->getResult();
-
-        return $this->render('admin/index.html.twig', [
-            'users'  => $users,
-            'search' => $search,
-            'role'   => $role,
-        ]);
-    }
+    return $this->render('admin/index.html.twig', [
+        'users'         => $users,
+        'search'        => $search,
+        'role'          => $role,
+        'page'          => $page,
+        'totalPages'    => $totalPages,
+        'total'         => $total,
+        'totalAdmins'   => $repo->count(['role' => 'Admin']),
+        'totalCoachs'   => $repo->count(['role' => 'Coach']),
+        'totalPatients' => $repo->count(['role' => 'Patient']),
+    ]);
+}
 
     #[Route('/user/new', name: 'admin_user_new')]
     public function new(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): Response
@@ -92,5 +91,15 @@ class AdminUserController extends AbstractController
         $em->remove($user);
         $em->flush();
         return $this->redirectToRoute('admin_dashboard');
+    }
+    #[Route('/export-pdf', name: 'admin_export_pdf')]
+    public function exportPdf(UserRepository $repo): Response
+    {
+        $users = $repo->findBy([], ['nom' => 'ASC']);
+
+        return $this->render('admin/pdf_export.html.twig', [
+            'users' => $users,
+            'date'  => new \DateTime(),
+        ]);
     }
 }

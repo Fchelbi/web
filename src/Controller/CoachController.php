@@ -15,10 +15,10 @@ class CoachController extends AbstractController
     {
         $response = $this->render('coach/index.html.twig');
 
-        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
-
+        $response->headers->set('Vary', 'Cookie');
         return $response;
     }
 }
