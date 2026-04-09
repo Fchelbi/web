@@ -1,0 +1,34 @@
+consultation_list:
+    path: /consultations
+    controller: App\Controller\ConsultationController::index
+    methods: [GET]
+
+consultation_add:
+    path: /consultation/add
+    controller: App\Controller\ConsultationController::add
+    methods: [GET, POST]
+
+consultation_delete:
+    path: /consultation/delete/{id}
+    controller: App\Controller\ConsultationController::delete
+    methods: [POST]
+
+psy_consultations:
+    path: /psy/consultations
+    controller: App\Controller\ConsultationController::psyList
+    methods: [GET]
+
+psy_accept:
+    path: /psy/accept/{id}
+    controller: App\Controller\ConsultationController::accept
+    methods: [POST]
+
+psy_cancel:
+    path: /psy/cancel/{id}
+    controller: App\Controller\ConsultationController::cancel
+    methods: [POST]
+
+consultation_edit:
+    path: /consultation/edit/{id}
+    controller: App\Controller\ConsultationController::edit
+    methods: [GET, POST]

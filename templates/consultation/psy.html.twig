@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard psychologue{% endblock %}
+
+{% block body %}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1">Dashboard psychologue</h1>
+            <p class="text-muted mb-0">Consultez toutes les demandes et gérez les statuts.</p>
+        </div>
+        <a href="{{ path('consultation_list') }}" class="btn btn-outline-dark">Retour patient</a>
+    </div>
+
+    <div class="card page-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Lien</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultation in consultations %}
+                        <tr>
+                            <td>{{ consultation.id }}</td>
+                            <td>{{ consultation.user ? consultation.user.name : 'Non défini' }}</td>
+                            <td>{{ consultation.dateConsultation|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <span class="badge bg-{{ consultation.badgeClass }}">{{ consultation.statutLabel }}</span>
+                            </td>
+                            <td>
+                                {% if consultation.meetLink %}
+                                    <a href="{{ consultation.meetLink }}" target="_blank" rel="noopener noreferrer">Ouvrir</a>
+                                {% else %}
+                                    <span class="text-muted">Aucun lien</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-2 flex-wrap justify-content-end">
+                                    {% if consultation.statut == 'en_attente' %}
+                                        <form method="post" action="{{ path('psy_accept', {'id': consultation.id}) }}" class="d-inline">
+                                            <button class="btn btn-sm btn-success">Accepter</button>
+                                        </form>
+
+                                        <form method="post" action="{{ path('psy_cancel', {'id': consultation.id}) }}" class="d-inline">
+                                            <button class="btn btn-sm btn-outline-danger">Refuser</button>
+                                        </form>
+                                    {% endif %}
+
+                                    <a href="{{ path('consultation_edit', {'id': consultation.id}) }}" class="btn btn-sm btn-warning">Gérer</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Aucune consultation trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

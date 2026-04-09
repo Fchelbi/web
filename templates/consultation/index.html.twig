@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes consultations{% endblock %}
+
+{% block body %}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1">Mes consultations</h1>
+            <p class="text-muted mb-0">Suivez vos demandes de consultation en ligne.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('consultation_add') }}" class="btn btn-primary">Nouvelle consultation</a>
+            <a href="{{ path('psy_consultations') }}" class="btn btn-outline-dark">Espace psychologue</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card page-card bg-warning-subtle">
+                <div class="card-body">
+                    <div class="text-muted small">En attente</div>
+                    <div class="fs-3 fw-bold">{{ counts['en_attente'] }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card page-card bg-success-subtle">
+                <div class="card-body">
+                    <div class="text-muted small">Confirmées</div>
+                    <div class="fs-3 fw-bold">{{ counts['confirmée'] }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card page-card bg-danger-subtle">
+                <div class="card-body">
+                    <div class="text-muted small">Annulées</div>
+                    <div class="fs-3 fw-bold">{{ counts['annulée'] }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card page-card mb-4">
+        <div class="card-body">
+            {{ form_start(filterForm, {'attr': {'novalidate': 'novalidate', 'class': 'row g-3 align-items-end'}}) }}
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Filtrer par statut</label>
+                    {{ form_widget(filterForm.statut) }}
+                </div>
+                <div class="col-md-auto">
+                    <button class="btn btn-dark">Filtrer</button>
+                </div>
+                <div class="col-md-auto">
+                    <a href="{{ path('consultation_list') }}" class="btn btn-outline-secondary">Réinitialiser</a>
+                </div>
+            {{ form_end(filterForm) }}
+        </div>
+    </div>
+
+    <div class="card page-card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Lien Meet</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultation in consultations %}
+                        <tr>
+                            <td>{{ consultation.id }}</td>
+                            <td>{{ consultation.dateConsultation|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <span class="badge bg-{{ consultation.badgeClass }}">{{ consultation.statutLabel }}</span>
+                            </td>
+                            <td>
+                                {% if consultation.meetLink %}
+                                    <a href="{{ consultation.meetLink }}" class="btn btn-sm btn-success" target="_blank" rel="noopener noreferrer">Rejoindre</a>
+                                {% else %}
+                                    <span class="text-muted">Pas encore disponible</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <form method="post" action="{{ path('consultation_delete', {'id': consultation.id}) }}" class="d-inline" onsubmit="return confirm('Supprimer cette consultation ?');">
+                                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Aucune consultation trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

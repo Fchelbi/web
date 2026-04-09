@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gérer la consultation{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card page-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h1 class="h3 mb-1">Gérer la consultation #{{ consultation.id }}</h1>
+                            <p class="text-muted mb-0">Mettez à jour le statut et le lien Meet.</p>
+                        </div>
+                        <a href="{{ path('psy_consultations') }}" class="btn btn-outline-secondary">Retour</a>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="small text-muted">Patient</div>
+                                <div class="fw-semibold">{{ consultation.user ? consultation.user.name : 'Non défini' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="small text-muted">Date</div>
+                                <div class="fw-semibold">{{ consultation.dateConsultation|date('d/m/Y H:i') }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                        {{ form_errors(form) }}
+
+                        <div class="mb-3">
+                            {{ form_label(form.statut, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.statut) }}
+                            {{ form_errors(form.statut) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(form.meetLink, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.meetLink) }}
+                            {{ form_errors(form.meetLink) }}
+                            <div class="form-text">Le lien est demandé uniquement pour une consultation confirmée.</div>
+                        </div>
+
+                        <button class="btn btn-primary">Enregistrer</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

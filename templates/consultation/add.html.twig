@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une consultation{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card page-card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h1 class="h3 mb-1">Demande de consultation</h1>
+                            <p class="text-muted mb-0">Choisissez une date future pour votre rendez-vous.</p>
+                        </div>
+                        <a href="{{ path('consultation_list') }}" class="btn btn-outline-secondary">Retour</a>
+                    </div>
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                        {{ form_errors(form) }}
+
+                        <div class="mb-3">
+                            {{ form_label(form.dateConsultation, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.dateConsultation) }}
+                            {{ form_errors(form.dateConsultation) }}
+                            <div class="form-text">Exemple : 21/05/2026 à 15:00</div>
+                        </div>
+
+                        <button class="btn btn-primary">Envoyer la demande</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
