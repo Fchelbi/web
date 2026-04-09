@@ -3,21 +3,24 @@
 {% block title %}Mes consultations{% endblock %}
 
 {% block body %}
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-        <div>
-            <h1 class="h3 mb-1">Mes consultations</h1>
-            <p class="text-muted mb-0">Suivez vos demandes de consultation en ligne.</p>
+    <section class="page-card p-4 p-md-5 mb-4 overflow-hidden" style="background: linear-gradient(135deg, #4A6FA5 0%, #2C4F7C 100%); color: white;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <div class="text-uppercase small fw-semibold mb-2" style="letter-spacing: 0.08em; color: rgba(255,255,255,0.75);">Espace patient</div>
+                <h1 class="h2 mb-2">Mes consultations</h1>
+                <p class="mb-0" style="color: rgba(255,255,255,0.82);">Retrouvez vos demandes, choisissez un psychologue et suivez l'evolution de vos rendez-vous.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ path('psychologue_list') }}" class="btn btn-light" style="color: #2C4F7C;">Voir les psychologues</a>
+                <a href="{{ path('consultation_add') }}" class="btn btn-primary">Nouvelle consultation</a>
+                <a href="{{ path('psy_consultations') }}" class="btn btn-outline-light">Espace psychologue</a>
+            </div>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ path('psychologue_list') }}" class="btn btn-outline-primary">Voir les psychologues</a>
-            <a href="{{ path('consultation_add') }}" class="btn btn-primary">Nouvelle consultation</a>
-            <a href="{{ path('psy_consultations') }}" class="btn btn-outline-dark">Espace psychologue</a>
-        </div>
-    </div>
+    </section>
 
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card page-card bg-warning-subtle">
+            <div class="card page-card" style="background: #FFF6D9;">
                 <div class="card-body">
                     <div class="text-muted small">En attente</div>
                     <div class="fs-3 fw-bold">{{ countEnAttente }}</div>
@@ -25,7 +28,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card page-card bg-success-subtle">
+            <div class="card page-card" style="background: #DFF5E8;">
                 <div class="card-body">
                     <div class="text-muted small">Confirmees</div>
                     <div class="fs-3 fw-bold">{{ countConfirmee }}</div>
@@ -33,7 +36,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card page-card bg-danger-subtle">
+            <div class="card page-card" style="background: #FBE1DE;">
                 <div class="card-body">
                     <div class="text-muted small">Annulees</div>
                     <div class="fs-3 fw-bold">{{ countAnnulee }}</div>
@@ -53,7 +56,7 @@
                     <button class="btn btn-dark">Filtrer</button>
                 </div>
                 <div class="col-md-auto">
-                    <a href="{{ path('consultation_list') }}" class="btn btn-outline-secondary">Reinitialiser</a>
+                    <a href="{{ path('consultation_list') }}" class="btn btn-outline-dark">Reinitialiser</a>
                 </div>
             {{ form_end(filterForm) }}
         </div>

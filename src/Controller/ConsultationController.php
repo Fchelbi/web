@@ -68,7 +68,7 @@ class ConsultationController extends AbstractController
                     $entityManager->persist($consultation);
                     $entityManager->flush();
 
-                    $this->addFlash('success', 'La demande de consultation a ete ajoutee avec succes.');
+                    $this->addFlash('success', 'Votre demande de consultation a ete envoyee avec succes.');
 
                     return $this->redirectToRoute('consultation_list');
                 }

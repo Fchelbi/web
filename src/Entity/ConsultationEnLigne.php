@@ -5,14 +5,15 @@ namespace App\Entity;
 use App\Repository\ConsultationEnLigneRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ConsultationEnLigneRepository::class)]
 #[ORM\Table(name: 'consultation_en_ligne')]
 class ConsultationEnLigne
 {
     public const STATUT_EN_ATTENTE = 'en_attente';
-    public const STATUT_CONFIRMEE = 'confirmée';
-    public const STATUT_ANNULEE = 'annulée';
+    public const STATUT_CONFIRMEE = 'confirmÃ©e';
+    public const STATUT_ANNULEE = 'annulÃ©e';
 
     public const STATUTS = [
         self::STATUT_EN_ATTENTE,
@@ -27,8 +28,18 @@ class ConsultationEnLigne
 
     #[ORM\Column(name: 'date_consultation', type: 'datetime')]
     #[Assert\NotNull(message: 'La date de consultation est obligatoire.')]
-    #[Assert\GreaterThan('now', message: 'La date de consultation doit être dans le futur.')]
+    #[Assert\GreaterThan('now', message: 'La date de consultation doit etre dans le futur.')]
     private ?\DateTimeInterface $dateConsultation = null;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\NotBlank(message: 'Le motif de consultation est obligatoire.')]
+    #[Assert\Length(
+        min: 5,
+        max: 255,
+        minMessage: 'Le motif doit contenir au moins {{ limit }} caracteres.',
+        maxMessage: 'Le motif ne doit pas depasser {{ limit }} caracteres.'
+    )]
+    private ?string $motif = null;
 
     #[ORM\Column(type: 'string', length: 50)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
@@ -38,7 +49,7 @@ class ConsultationEnLigne
     #[ORM\Column(name: 'meet_link', type: 'string', length: 255, nullable: true)]
     #[Assert\Length(
         max: 255,
-        maxMessage: 'Le lien Meet ne doit pas dépasser {{ limit }} caractères.'
+        maxMessage: 'Le lien Meet ne doit pas depasser {{ limit }} caracteres.'
     )]
     #[Assert\Url(message: 'Veuillez saisir une URL valide pour le lien Meet.')]
     private ?string $meetLink = null;
@@ -65,6 +76,18 @@ class ConsultationEnLigne
     public function setDateConsultation(?\DateTimeInterface $dateConsultation): self
     {
         $this->dateConsultation = $dateConsultation;
+
+        return $this;
+    }
+
+    public function getMotif(): ?string
+    {
+        return $this->motif;
+    }
+
+    public function setMotif(?string $motif): self
+    {
+        $this->motif = $motif !== null ? trim($motif) : null;
 
         return $this;
     }
@@ -124,11 +147,11 @@ class ConsultationEnLigne
     public function getStatutLabel(): string
     {
         if ($this->statut === self::STATUT_CONFIRMEE) {
-            return 'Confirmée';
+            return 'Confirmee';
         }
 
         if ($this->statut === self::STATUT_ANNULEE) {
-            return 'Annulée';
+            return 'Annulee';
         }
 
         return 'En attente';
@@ -145,5 +168,29 @@ class ConsultationEnLigne
         }
 
         return 'warning text-dark';
+    }
+
+    #[Assert\Callback]
+    public function validateDateConsultation(ExecutionContextInterface $context): void
+    {
+        if (!$this->dateConsultation instanceof \DateTimeInterface) {
+            return;
+        }
+
+        $minimumDate = new \DateTimeImmutable('+1 hour');
+
+        if ($this->dateConsultation < $minimumDate) {
+            $context->buildViolation('La consultation doit etre reservee au moins 1 heure a l avance.')
+                ->atPath('dateConsultation')
+                ->addViolation();
+        }
+
+        $time = $this->dateConsultation->format('H:i');
+
+        if ($time < '08:00' || $time > '20:00') {
+            $context->buildViolation('Les consultations sont disponibles uniquement entre 08:00 et 20:00.')
+                ->atPath('dateConsultation')
+                ->addViolation();
+        }
     }
 }
