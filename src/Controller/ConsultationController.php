@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\ConsultationEnLigne;
+use App\Entity\Psychologue;
 use App\Entity\User;
 use App\Form\ConsultationFilterType;
 use App\Form\ConsultationGestionType;
@@ -17,11 +18,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ConsultationController extends AbstractController
 {
-    /**
-     * @Route("/consultations", name="consultation_list", methods={"GET"})
-     */
+    #[Route('/consultations', name: 'consultation_list', methods: ['GET'])]
     public function index(Request $request, ConsultationEnLigneRepository $repository): Response
     {
+        $counts = $repository->getStatutCounts();
+
         $filterForm = $this->createForm(ConsultationFilterType::class, null, [
             'method' => 'GET',
         ]);
@@ -30,26 +31,30 @@ class ConsultationController extends AbstractController
         $statut = null;
         if ($filterForm->isSubmitted() && $filterForm->isValid()) {
             $data = $filterForm->getData();
-            $statut = isset($data['statut']) ? $data['statut'] : null;
+            $statut = $data['statut'] ?? null;
         }
 
         return $this->render('consultation/index.html.twig', [
             'consultations' => $repository->findByStatut($statut),
-            'counts' => $repository->getStatutCounts(),
+            'counts' => $counts,
+            'countEnAttente' => $counts[ConsultationEnLigne::STATUT_EN_ATTENTE] ?? 0,
+            'countConfirmee' => $counts[ConsultationEnLigne::STATUT_CONFIRMEE] ?? 0,
+            'countAnnulee' => $counts[ConsultationEnLigne::STATUT_ANNULEE] ?? 0,
             'filterForm' => $filterForm->createView(),
         ]);
     }
 
-    /**
-     * @Route("/consultation/add", name="consultation_add", methods={"GET","POST"})
-     */
+    #[Route('/consultation/add/{psychologue}', name: 'consultation_add_with_psychologue', methods: ['GET', 'POST'], requirements: ['psychologue' => '\d+'])]
+    #[Route('/consultation/add', name: 'consultation_add', methods: ['GET', 'POST'])]
     public function add(
         Request $request,
         EntityManagerInterface $entityManager,
-        ConsultationEnLigneRepository $repository
+        ConsultationEnLigneRepository $repository,
+        ?Psychologue $psychologue = null
     ): Response {
         $consultation = new ConsultationEnLigne();
         $consultation->setStatut(ConsultationEnLigne::STATUT_EN_ATTENTE);
+        $consultation->setPsychologue($psychologue);
 
         $form = $this->createForm(ConsultationType::class, $consultation);
         $form->handleRequest($request);
@@ -57,13 +62,13 @@ class ConsultationController extends AbstractController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 if ($repository->isDateAlreadyUsed($consultation->getDateConsultation())) {
-                    $form->get('dateConsultation')->addError(new FormError('Ce créneau est déjà réservé.'));
+                    $form->get('dateConsultation')->addError(new FormError('Ce creneau est deja reserve.'));
                 } else {
                     $consultation->setUser($this->getOrCreateUser($entityManager));
                     $entityManager->persist($consultation);
                     $entityManager->flush();
 
-                    $this->addFlash('success', 'La demande de consultation a été ajoutée avec succès.');
+                    $this->addFlash('success', 'La demande de consultation a ete ajoutee avec succes.');
 
                     return $this->redirectToRoute('consultation_list');
                 }
@@ -74,12 +79,11 @@ class ConsultationController extends AbstractController
 
         return $this->render('consultation/add.html.twig', [
             'form' => $form->createView(),
+            'psychologueSelectionne' => $psychologue,
         ]);
     }
 
-    /**
-     * @Route("/consultation/delete/{id}", name="consultation_delete", methods={"POST"})
-     */
+    #[Route('/consultation/delete/{id}', name: 'consultation_delete', methods: ['POST'])]
     public function delete(
         ConsultationEnLigne $consultation,
         EntityManagerInterface $entityManager
@@ -87,14 +91,12 @@ class ConsultationController extends AbstractController
         $entityManager->remove($consultation);
         $entityManager->flush();
 
-        $this->addFlash('success', 'La consultation a été supprimée.');
+        $this->addFlash('success', 'La consultation a ete supprimee.');
 
         return $this->redirectToRoute('consultation_list');
     }
 
-    /**
-     * @Route("/psy/consultations", name="psy_consultations", methods={"GET"})
-     */
+    #[Route('/psy/consultations', name: 'psy_consultations', methods: ['GET'])]
     public function psyList(ConsultationEnLigneRepository $repository): Response
     {
         return $this->render('consultation/psy.html.twig', [
@@ -102,9 +104,7 @@ class ConsultationController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/psy/accept/{id}", name="psy_accept", methods={"POST"})
-     */
+    #[Route('/psy/accept/{id}', name: 'psy_accept', methods: ['POST'])]
     public function accept(
         ConsultationEnLigne $consultation,
         EntityManagerInterface $entityManager
@@ -112,14 +112,12 @@ class ConsultationController extends AbstractController
         $consultation->setStatut(ConsultationEnLigne::STATUT_CONFIRMEE);
         $entityManager->flush();
 
-        $this->addFlash('success', 'La consultation a été confirmée.');
+        $this->addFlash('success', 'La consultation a ete confirmee.');
 
         return $this->redirectToRoute('psy_consultations');
     }
 
-    /**
-     * @Route("/psy/cancel/{id}", name="psy_cancel", methods={"POST"})
-     */
+    #[Route('/psy/cancel/{id}', name: 'psy_cancel', methods: ['POST'])]
     public function cancel(
         ConsultationEnLigne $consultation,
         EntityManagerInterface $entityManager
@@ -128,14 +126,12 @@ class ConsultationController extends AbstractController
         $consultation->setMeetLink(null);
         $entityManager->flush();
 
-        $this->addFlash('success', 'La consultation a été annulée.');
+        $this->addFlash('success', 'La consultation a ete annulee.');
 
         return $this->redirectToRoute('psy_consultations');
     }
 
-    /**
-     * @Route("/consultation/edit/{id}", name="consultation_edit", methods={"GET","POST"})
-     */
+    #[Route('/consultation/edit/{id}', name: 'consultation_edit', methods: ['GET', 'POST'])]
     public function edit(
         ConsultationEnLigne $consultation,
         Request $request,
@@ -150,11 +146,11 @@ class ConsultationController extends AbstractController
                     $consultation->getStatut() === ConsultationEnLigne::STATUT_CONFIRMEE
                     && $consultation->getMeetLink() === null
                 ) {
-                    $form->get('meetLink')->addError(new FormError('Ajoutez un lien Meet pour une consultation confirmée.'));
+                    $form->get('meetLink')->addError(new FormError('Ajoutez un lien Meet pour une consultation confirmee.'));
                 } else {
                     $entityManager->flush();
 
-                    $this->addFlash('success', 'La consultation a été mise à jour.');
+                    $this->addFlash('success', 'La consultation a ete mise a jour.');
 
                     return $this->redirectToRoute('psy_consultations');
                 }
@@ -171,7 +167,7 @@ class ConsultationController extends AbstractController
 
     private function getOrCreateUser(EntityManagerInterface $entityManager): User
     {
-        $user = $entityManager->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
+        $user = $entityManager->getRepository(User::class)->findOneBy(['name' => 'Patient Demo']);
 
         if ($user instanceof User) {
             return $user;

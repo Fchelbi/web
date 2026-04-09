@@ -10,7 +10,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h1 class="h3 mb-1">Demande de consultation</h1>
-                            <p class="text-muted mb-0">Choisissez une date future pour votre rendez-vous.</p>
+                            <p class="text-muted mb-0">Choisissez votre psychologue puis une date future pour votre rendez-vous.</p>
                         </div>
                         <a href="{{ path('consultation_list') }}" class="btn btn-outline-secondary">Retour</a>
                     </div>
@@ -19,10 +19,22 @@
                         {{ form_errors(form) }}
 
                         <div class="mb-3">
+                            {{ form_label(form.psychologue, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                            {{ form_widget(form.psychologue) }}
+                            {{ form_errors(form.psychologue) }}
+                            <div class="form-text">
+                                <a href="{{ path('psychologue_list') }}">Voir la liste des psychologues</a>
+                                {% if psychologueSelectionne %}
+                                    <span class="ms-2">Psychologue preselectionne : {{ psychologueSelectionne.nomComplet }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             {{ form_label(form.dateConsultation, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                             {{ form_widget(form.dateConsultation) }}
                             {{ form_errors(form.dateConsultation) }}
-                            <div class="form-text">Exemple : 21/05/2026 à 15:00</div>
+                            <div class="form-text">Exemple : 21/05/2026 a 15:00</div>
                         </div>
 
                         <button class="btn btn-primary">Envoyer la demande</button>

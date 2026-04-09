@@ -8,6 +8,11 @@ consultation_add:
     controller: App\Controller\ConsultationController::add
     methods: [GET, POST]
 
+consultation_add_with_psychologue:
+    path: /consultation/add/{psychologue}
+    controller: App\Controller\ConsultationController::add
+    methods: [GET, POST]
+
 consultation_delete:
     path: /consultation/delete/{id}
     controller: App\Controller\ConsultationController::delete
@@ -32,3 +37,8 @@ consultation_edit:
     path: /consultation/edit/{id}
     controller: App\Controller\ConsultationController::edit
     methods: [GET, POST]
+
+psychologue_list:
+    path: /psychologues
+    controller: App\Controller\PsychologueController::index
+    methods: [GET]

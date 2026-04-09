@@ -18,6 +18,10 @@ class ConsultationEnLigneRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c')
             ->leftJoin('c.user', 'u')
             ->addSelect('u')
+            ->leftJoin('c.psychologue', 'p')
+            ->addSelect('p')
+            ->leftJoin('p.user', 'pu')
+            ->addSelect('pu')
             ->orderBy('c.dateConsultation', 'ASC');
 
         if ($statut !== null && $statut !== '') {

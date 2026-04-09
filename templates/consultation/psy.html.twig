@@ -6,7 +6,7 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="h3 mb-1">Dashboard psychologue</h1>
-            <p class="text-muted mb-0">Consultez toutes les demandes et gérez les statuts.</p>
+            <p class="text-muted mb-0">Consultez toutes les demandes et gerez les statuts.</p>
         </div>
         <a href="{{ path('consultation_list') }}" class="btn btn-outline-dark">Retour patient</a>
     </div>
@@ -16,8 +16,8 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>ID</th>
                         <th>Patient</th>
+                        <th>Psychologue</th>
                         <th>Date</th>
                         <th>Statut</th>
                         <th>Lien</th>
@@ -27,8 +27,15 @@
                 <tbody>
                     {% for consultation in consultations %}
                         <tr>
-                            <td>{{ consultation.id }}</td>
-                            <td>{{ consultation.user ? consultation.user.name : 'Non défini' }}</td>
+                            <td>{{ consultation.user ? consultation.user.name : 'Non defini' }}</td>
+                            <td>
+                                {% if consultation.psychologue %}
+                                    <div class="fw-semibold">{{ consultation.psychologue.nomComplet }}</div>
+                                    <div class="small text-muted">{{ consultation.psychologue.specialite }}</div>
+                                {% else %}
+                                    <span class="text-muted">Non attribue</span>
+                                {% endif %}
+                            </td>
                             <td>{{ consultation.dateConsultation|date('d/m/Y H:i') }}</td>
                             <td>
                                 <span class="badge bg-{{ consultation.badgeClass }}">{{ consultation.statutLabel }}</span>
@@ -52,13 +59,13 @@
                                         </form>
                                     {% endif %}
 
-                                    <a href="{{ path('consultation_edit', {'id': consultation.id}) }}" class="btn btn-sm btn-warning">Gérer</a>
+                                    <a href="{{ path('consultation_edit', {'id': consultation.id}) }}" class="btn btn-sm btn-warning">Gerer</a>
                                 </div>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">Aucune consultation trouvée.</td>
+                            <td colspan="6" class="text-center py-4 text-muted">Aucune consultation trouvee.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

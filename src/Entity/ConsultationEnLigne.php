@@ -35,7 +35,7 @@ class ConsultationEnLigne
     #[Assert\Choice(choices: self::STATUTS, message: 'Le statut choisi est invalide.')]
     private string $statut = self::STATUT_EN_ATTENTE;
 
-    #[ORM\Column(name: 'meet_link', type: 'string', length: 255, nullable: true, columnDefinition: 'VARCHAR(255) DEFAULT NULL')]
+    #[ORM\Column(name: 'meet_link', type: 'string', length: 255, nullable: true)]
     #[Assert\Length(
         max: 255,
         maxMessage: 'Le lien Meet ne doit pas dépasser {{ limit }} caractères.'
@@ -46,6 +46,11 @@ class ConsultationEnLigne
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
     private ?User $user = null;
+
+    #[ORM\ManyToOne(targetEntity: Psychologue::class)]
+    #[ORM\JoinColumn(name: 'psychologue_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[Assert\NotNull(message: 'Veuillez choisir un psychologue.')]
+    private ?Psychologue $psychologue = null;
 
     public function getId(): ?int
     {
@@ -100,6 +105,18 @@ class ConsultationEnLigne
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getPsychologue(): ?Psychologue
+    {
+        return $this->psychologue;
+    }
+
+    public function setPsychologue(?Psychologue $psychologue): self
+    {
+        $this->psychologue = $psychologue;
 
         return $this;
     }
