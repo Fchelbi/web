@@ -18,7 +18,7 @@ final class FormationController extends AbstractController
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
         // Hardcode role for testing — replace with $this->getUser()->getRole() later
-        $role = 'Admin'; // Change to 'Coach', 'Admin', or 'Patient' to test
+        $role = 'Coach'; // Change to 'Coach', 'Admin', or 'Patient' to test
 
         // --- Pagination setup ---
         $page    = max(1, (int) $request->query->get('page', 1));
