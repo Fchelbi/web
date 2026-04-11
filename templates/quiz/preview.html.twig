@@ -1,100 +1,72 @@
 {% extends 'base.html.twig' %}
-{% block title %}Aperçu — {{ quiz.title }} | EchoCare{% endblock %}
+{% block title %}Aperçu Quiz — {{ formation.title }} | EchoCare{% endblock %}
 {% block body %}
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px 20px}
-  .page-wrap{max-width:700px;margin:0 auto}
+  .page-wrap{max-width:760px;margin:0 auto}
   .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--blue-light);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:24px}
-  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:20px}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px}
   .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:24px 30px}
-  .card-title{font-size:22px;font-weight:800;color:#fff}
-  .card-sub{font-size:13px;color:rgba(255,255,255,.6);margin-bottom:4px}
+  .card-header small{color:rgba(255,255,255,.6);font-size:13px}
+  .card-title{font-size:22px;font-weight:800;color:#fff;margin-top:4px}
   .card-body{padding:30px}
-  .q-card{background:var(--gray-100);border-radius:12px;padding:20px;margin-bottom:16px;border:1.5px solid var(--gray-200)}
-  .q-text{font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:14px}
-  .q-points{font-size:12px;color:var(--gray-400);font-weight:600;margin-bottom:10px}
-  .reponse-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;margin-bottom:8px;font-size:14px;font-weight:600}
-  .reponse-item.correct{background:#f0fdf4;color:#166534;border:2px solid #bbf7d0}
-  .reponse-item.wrong{background:var(--gray-100);color:var(--gray-700);border:2px solid var(--gray-200)}
-  .badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:700}
-  .badge-correct{background:#dcfce7;color:#16a34a}
-  .badge-wrong{background:var(--gray-200);color:var(--gray-400)}
-  .score-info{display:flex;align-items:center;gap:12px;background:var(--blue-pale);border-radius:10px;padding:16px 20px;margin-bottom:24px}
-  .btn{border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:.2s}
-  .btn-secondary{background:var(--gray-200);color:var(--gray-700)}.btn-secondary:hover{background:var(--gray-400);color:#fff}
-  .btn-purple{background:#f0f4ff;color:#6366f1}.btn-purple:hover{background:#6366f1;color:#fff}
-  .empty{color:var(--gray-400);font-size:14px;font-style:italic}
+  .info-row{display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap}
+  .info-pill{background:var(--blue-pale);color:var(--blue-light);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600}
+  .question-card{background:var(--gray-100);border-radius:12px;padding:20px;margin-bottom:16px}
+  .q-title{font-size:15px;font-weight:700;color:var(--blue-dark);margin-bottom:12px}
+  .q-points{font-size:12px;color:var(--gray-400);font-weight:600;margin-left:8px}
+  .answer-item{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;margin-bottom:6px;font-size:14px}
+  .answer-correct{background:#e8f8f0;color:#27ae60;font-weight:600}
+  .answer-wrong{background:#fff;color:var(--gray-700)}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot-green{background:#27ae60}
+  .dot-gray{background:var(--gray-400)}
+  .actions-row{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--orange);color:#fff}.btn-primary:hover{background:#e06d47}
+  .btn-secondary{background:var(--gray-100);color:var(--gray-700)}.btn-secondary:hover{background:var(--gray-200)}
 </style>
 
 <div class="page-wrap">
-  <a href="{{ path('app_quiz_manage', {'id': formation.id}) }}" class="back-link">← Retour</a>
+  <a href="{{ path('app_formation_quiz', {'id': formation.id}) }}" class="back-link">← Retour</a>
 
   <div class="card">
     <div class="card-header">
-      <div class="card-sub">📚 {{ formation.title }}</div>
-      <div class="card-title">👁️ {{ quiz.title }}</div>
+      <small>📚 {{ formation.title }}</small>
+      <div class="card-title">👁️ Aperçu : {{ quiz.title }}</div>
     </div>
     <div class="card-body">
+      <div class="info-row">
+        <div class="info-pill">📝 {{ quiz.questions|length }} question{{ quiz.questions|length > 1 ? 's' : '' }}</div>
+        <div class="info-pill">🎯 Score de passage : {{ quiz.passingScore }}%</div>
+        {% set totalPts = 0 %}
+        {% for q in quiz.questions %}{% set totalPts = totalPts + q.points %}{% endfor %}
+        <div class="info-pill">⭐ Total : {{ totalPts }} point{{ totalPts > 1 ? 's' : '' }}</div>
+      </div>
 
-      <div class="score-info">
-        <span style="font-size:28px">🎯</span>
-        <div>
-          {#
-            FIXED: was quiz.passing_score (snake_case) — Twig calls getPassingScore()
-            which exists. Twig tries getPassing_score() first, then getPassingScore(),
-            so both would work, but camelCase is cleaner and avoids deprecation notices.
-          #}
-          <div style="font-size:15px;font-weight:800;color:var(--blue-dark)">
-            Score de passage : {{ quiz.passingScore }}%
+      {% for question in quiz.questions %}
+        <div class="question-card">
+          <div class="q-title">
+            {{ loop.index }}. {{ question.questionText }}
+            <span class="q-points">({{ question.points }} pt{{ question.points > 1 ? 's' : '' }})</span>
           </div>
-          <div style="font-size:13px;color:var(--gray-400)">
-            {{ quiz.questions|length }} question(s)
-          </div>
+          {% for reponse in question.reponses %}
+            <div class="answer-item {{ reponse.isCorrect ? 'answer-correct' : 'answer-wrong' }}">
+              <span class="dot {{ reponse.isCorrect ? 'dot-green' : 'dot-gray' }}"></span>
+              {{ reponse.optionText }}
+              {% if reponse.isCorrect %} ✓{% endif %}
+            </div>
+          {% endfor %}
         </div>
+      {% endfor %}
+
+      <div class="actions-row">
+        <a href="{{ path('app_quiz_edit', {'id': formation.id}) }}" class="btn btn-primary">✏️ Modifier</a>
+        <a href="{{ path('app_formation_quiz', {'id': formation.id}) }}" class="btn btn-secondary">← Gestion Quiz</a>
       </div>
-
-      {% if quiz.questions|length == 0 %}
-        <p class="empty">Ce quiz n'a encore aucune question.</p>
-      {% else %}
-        {% for q in quiz.questions %}
-          <div class="q-card">
-            <div class="q-points">{{ q.points }} pt(s)</div>
-            {#
-              FIXED: was q.question_text — Twig calls getQuestionText() (camelCase getter)
-              Entity property is $questionText, getter is getQuestionText()
-            #}
-            <div class="q-text">{{ loop.index }}. {{ q.questionText }}</div>
-
-            {% if q.reponses|length == 0 %}
-              <p class="empty" style="font-size:13px">Aucune réponse définie.</p>
-            {% else %}
-              {% for r in q.reponses %}
-                {#
-                  FIXED: was r.is_correct and r.option_text (snake_case)
-                  Entity properties are $isCorrect and $optionText (camelCase)
-                  Twig calls getIsCorrect() and getOptionText()
-                #}
-                <div class="reponse-item {{ r.isCorrect ? 'correct' : 'wrong' }}">
-                  <span>{{ r.isCorrect ? '✅' : '○' }}</span>
-                  <span style="flex:1">{{ r.optionText }}</span>
-                  <span class="badge {{ r.isCorrect ? 'badge-correct' : 'badge-wrong' }}">
-                    {{ r.isCorrect ? 'Correcte' : 'Fausse' }}
-                  </span>
-                </div>
-              {% endfor %}
-            {% endif %}
-          </div>
-        {% endfor %}
-      {% endif %}
-
-      <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
-        <a href="{{ path('app_quiz_edit', {'id': formation.id}) }}" class="btn btn-purple">✏️ Modifier</a>
-        <a href="{{ path('app_quiz_manage', {'id': formation.id}) }}" class="btn btn-secondary">← Retour</a>
-      </div>
-
     </div>
   </div>
 </div>

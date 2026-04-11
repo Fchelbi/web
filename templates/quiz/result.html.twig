@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+{% block title %}Résultat Quiz — {{ formation.title }} | EchoCare{% endblock %}
+{% block body %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--green:#27ae60;--red:#ef4444;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px 20px}
+  .page-wrap{max-width:760px;margin:0 auto}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px}
+  .card-header{padding:32px 30px;text-align:center}
+  .card-header.pass{background:linear-gradient(135deg,#1a7a4a,var(--green))}
+  .card-header.fail{background:linear-gradient(135deg,#c0392b,var(--red))}
+  .result-icon{font-size:56px;margin-bottom:12px}
+  .result-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px}
+  .result-sub{color:rgba(255,255,255,.8);font-size:15px}
+  .card-body{padding:30px}
+  .score-row{display:flex;justify-content:center;gap:30px;margin-bottom:28px;flex-wrap:wrap}
+  .score-box{text-align:center}
+  .score-value{font-size:36px;font-weight:800;color:var(--blue-dark)}
+  .score-label{font-size:12px;color:var(--gray-400);text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+  .detail-title{font-size:16px;font-weight:800;color:var(--blue-dark);margin-bottom:16px}
+  .detail-row{border:1.5px solid var(--gray-200);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+  .detail-row.correct{border-left:4px solid var(--green);background:#f8fdf9}
+  .detail-row.wrong{border-left:4px solid var(--red);background:#fffafa}
+  .detail-q{font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:8px}
+  .detail-info{font-size:13px;color:var(--gray-400);line-height:1.6}
+  .detail-info strong{color:var(--gray-700)}
+  .actions-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--gray-200)}
+  .btn{border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+  .btn-primary{background:var(--blue-light);color:#fff}.btn-primary:hover{background:var(--blue-dark)}
+  .btn-orange{background:var(--orange);color:#fff}.btn-orange:hover{background:#e06d47}
+  .btn-secondary{background:var(--gray-100);color:var(--gray-700)}.btn-secondary:hover{background:var(--gray-200)}
+</style>
+
+<div class="page-wrap">
+  <div class="card">
+    <div class="card-header {{ passed ? 'pass' : 'fail' }}">
+      <div class="result-icon">{{ passed ? '🎉' : '😔' }}</div>
+      <div class="result-title">{{ passed ? 'Félicitations !' : 'Pas encore…' }}</div>
+      <div class="result-sub">
+        {{ passed ? 'Vous avez réussi le quiz !' : 'Vous n\'avez pas atteint le score de passage.' }}
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="score-row">
+        <div class="score-box">
+          <div class="score-value">{{ percentage }}%</div>
+          <div class="score-label">Score</div>
+        </div>
+        <div class="score-box">
+          <div class="score-value">{{ score }} / {{ totalPoints }}</div>
+          <div class="score-label">Points</div>
+        </div>
+        <div class="score-box">
+          <div class="score-value">{{ quiz.passingScore }}%</div>
+          <div class="score-label">Minimum requis</div>
+        </div>
+      </div>
+
+      <div class="detail-title">📋 Détail des réponses</div>
+      {% for d in details %}
+        <div class="detail-row {{ d.correct ? 'correct' : 'wrong' }}">
+          <div class="detail-q">{{ d.correct ? '✓' : '✗' }} {{ d.question }}</div>
+          <div class="detail-info">
+            Votre réponse : <strong>{{ d.selected ?: '(aucune)' }}</strong><br>
+            {% if not d.correct %}
+              Bonne réponse : <strong>{{ d.correctText }}</strong><br>
+            {% endif %}
+            Points : {{ d.correct ? d.points : 0 }} / {{ d.points }}
+          </div>
+        </div>
+      {% endfor %}
+
+      <div class="actions-row">
+        {% if not passed %}
+          <a href="{{ path('app_quiz_take', {'id': formation.id}) }}" class="btn btn-orange">🔄 Réessayer</a>
+        {% endif %}
+        <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn btn-primary">📚 Retour à la formation</a>
+        <a href="{{ path('app_formation_index') }}" class="btn btn-secondary">← Toutes les formations</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

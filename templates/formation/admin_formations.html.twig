@@ -26,7 +26,6 @@
   .si-blue{background:var(--blue-pale)}.si-orange{background:var(--orange-soft)}.si-green{background:#e8f8f0}
   .stat-value{font-size:28px;font-weight:800;color:var(--blue-dark)}.stat-label{font-size:13px;color:var(--gray-400)}
 
-  /* ---- Toolbar ---- */
   .toolbar{background:#fff;border-radius:var(--radius);padding:18px 24px;box-shadow:var(--shadow-sm);margin-bottom:24px}
   .toolbar-row1{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
   .toolbar-row2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--gray-200);padding-top:14px}
@@ -40,14 +39,11 @@
   .btn-pdf{background:var(--blue-pale);color:var(--blue-light);border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px;transition:.2s}
   .btn-pdf:hover{background:var(--blue-light);color:#fff}
 
-  /* ---- Filter chips (toggle buttons) ---- */
   .chip{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-700);cursor:pointer;transition:.15s;user-select:none}
   .chip:hover{border-color:var(--blue-light);color:var(--blue-light)}
-  .chip.active{background:var(--blue-light);color:#fff;border-color:var(--blue-light)}
   .chip.active-orange{background:var(--orange);color:#fff;border-color:var(--orange)}
   .chip.active-green{background:#27ae60;color:#fff;border-color:#27ae60}
 
-  /* ---- Active filters summary ---- */
   .active-filters{display:none;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
   .active-filters.visible{display:flex}
   .af-tag{display:inline-flex;align-items:center;gap:5px;background:var(--blue-pale);color:var(--blue-light);border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600}
@@ -55,15 +51,9 @@
   .btn-clear-all{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray-400);text-decoration:underline;margin-left:4px}
   .results-count{font-size:13px;color:var(--gray-400);margin-left:auto}
 
-  /* ---- Table ---- */
   .table-card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
   table{width:100%;border-collapse:collapse}
-  thead th{background:var(--blue-dark);color:rgba(255,255,255,.75);padding:14px 20px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;cursor:pointer;user-select:none;white-space:nowrap}
-  thead th.sortable:hover{color:#fff}
-  thead th .sort-icon{margin-left:4px;opacity:.5;font-style:normal}
-  thead th.sort-asc .sort-icon::after{content:'↑'}
-  thead th.sort-desc .sort-icon::after{content:'↓'}
-  thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'↕'}
+  thead th{background:var(--blue-dark);color:rgba(255,255,255,.75);padding:14px 20px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;white-space:nowrap}
   tbody tr{border-bottom:1px solid var(--gray-200);transition:.15s}
   tbody tr:hover{background:var(--gray-100)}
   tbody td{padding:15px 20px;font-size:14px}
@@ -80,7 +70,6 @@
   .flash{padding:14px 20px;border-radius:10px;margin-bottom:20px;font-weight:600}
   .flash-success{background:#e8f8f0;color:#27ae60}
 
-  /* ---- Pagination ---- */
   .pagination{display:flex;align-items:center;justify-content:center;gap:8px;padding:22px 0 6px}
   .pg-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;font-size:14px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-700);text-decoration:none;transition:.15s}
   .pg-btn:hover{border-color:var(--blue-light);color:var(--blue-light)}
@@ -127,35 +116,20 @@
     </div>
   </div>
 
-  {# ======================================================
-     TOOLBAR — Row 1: search + category + sort + export
-     Row 2: quick-filter chips for Video & Quiz
-  ====================================================== #}
   <div class="toolbar">
     <div class="toolbar-row1">
       <div class="search-wrap">
         <input type="text" placeholder="Rechercher titre, description, catégorie, coach…" id="searchInput">
       </div>
 
-      {# Category dropdown #}
       <select class="filter-select" id="catFilter" title="Filtrer par catégorie">
         <option value="">Toutes les catégories</option>
-        {% set cats = [] %}
-        {% for f in formations %}
-          {% if f.category and f.category not in cats %}
-            {% set cats = cats|merge([f.category]) %}
-            <option value="{{ f.category|lower }}">{{ f.category }}</option>
-          {% endif %}
-        {% endfor %}
-      </select>
-
-      {# Sort dropdown #}
-      <select class="filter-select" id="sortSelect" title="Trier par">
-        <option value="">Trier par…</option>
-        <option value="title-asc">Titre A → Z</option>
-        <option value="title-desc">Titre Z → A</option>
-        <option value="cat-asc">Catégorie A → Z</option>
-        <option value="cat-desc">Catégorie Z → A</option>
+        <option value="nutrition">Nutrition</option>
+        <option value="sport & fitness">Sport & Fitness</option>
+        <option value="santé mentale">Santé Mentale</option>
+        <option value="méditation">Méditation</option>
+        <option value="gestion du stress">Gestion du Stress</option>
+        <option value="autre">Autre</option>
       </select>
 
       <button class="btn-pdf" onclick="exportPDF()">📄 Exporter PDF</button>
@@ -163,20 +137,14 @@
 
     <div class="toolbar-row2">
       <span class="filter-label">Filtres rapides :</span>
-
-      {# Video chips #}
       <button class="chip" id="chip-video-yes" onclick="toggleChip('video','yes')">🎥 Avec vidéo</button>
       <button class="chip" id="chip-video-no"  onclick="toggleChip('video','no')">🚫 Sans vidéo</button>
-
-      {# Quiz chips #}
       <button class="chip" id="chip-quiz-yes" onclick="toggleChip('quiz','yes')">📝 Avec quiz</button>
       <button class="chip" id="chip-quiz-no"  onclick="toggleChip('quiz','no')">📭 Sans quiz</button>
-
       <span class="results-count" id="resultsCount"></span>
     </div>
   </div>
 
-  {# Active filter tags #}
   <div class="active-filters" id="activeFilters">
     <span style="font-size:12px;font-weight:600;color:var(--gray-400)">Filtres actifs :</span>
     <span id="afTags"></span>
@@ -187,10 +155,10 @@
     <table id="formationTable">
       <thead>
         <tr>
-          <th class="sortable" data-col="0">Titre <i class="sort-icon"></i></th>
+          <th>Titre</th>
           <th>Description</th>
-          <th class="sortable" data-col="2">Catégorie <i class="sort-icon"></i></th>
-          <th class="sortable" data-col="3">Coach <i class="sort-icon"></i></th>
+          <th>Catégorie</th>
+          <th>Coach</th>
           <th>Vidéo</th>
           <th>Quiz</th>
           <th>Actions</th>
@@ -199,6 +167,7 @@
       <tbody id="tableBody">
         {% for formation in formations %}
         <tr class="data-row"
+            data-id="{{ formation.id }}"
             data-title="{{ formation.title|lower }}"
             data-desc="{{ formation.description|lower }}"
             data-cat="{{ formation.category|lower }}"
@@ -244,9 +213,8 @@
     </table>
   </div>
 
-  {# ---- Pagination ---- #}
   {% if totalPages > 1 %}
-  <div class="pagination">
+  <div class="pagination" id="paginationBar">
     <a href="{{ path('app_formation_index', {'page': max(1, page-1)}) }}"
        class="pg-btn {% if page <= 1 %}disabled{% endif %}">‹</a>
     {% for p in 1..totalPages %}
@@ -268,124 +236,192 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <script>
 // =====================================================================
-//  State
+//  State — no sort anymore
 // =====================================================================
 const state = {
   search : '',
   cat    : '',
-  video  : '',   // 'yes' | 'no' | ''
-  quiz   : '',   // 'yes' | 'no' | ''
-  sort   : ''    // 'title-asc' | 'title-desc' | 'cat-asc' | 'cat-desc' | ''
+  video  : '',
+  quiz   : ''
 };
 
+// Track whether we are in AJAX search mode
+let isAjaxSearch = false;
+
 // =====================================================================
-//  Input listeners
+//  AJAX Search — searches ALL formations in database
 // =====================================================================
-document.getElementById('searchInput').addEventListener('input', e => {
-  state.search = e.target.value.toLowerCase().trim();
-  applyFilters();
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', function(e) {
+  const q = e.target.value.trim();
+  clearTimeout(searchTimeout);
+
+  if (q.length < 2) {
+    // Clear search: restore original page rows
+    isAjaxSearch = false;
+    state.search = q.toLowerCase();
+    document.querySelectorAll('#tableBody .search-row').forEach(r => r.remove());
+    document.querySelectorAll('#tableBody .data-row').forEach(r => r.style.display = '');
+    const pg = document.getElementById('paginationBar');
+    if (pg) pg.style.display = '';
+    applyFilters();
+    return;
+  }
+
+  searchTimeout = setTimeout(() => {
+    fetch('/formation/search/ajax?q=' + encodeURIComponent(q))
+      .then(r => r.json())
+      .then(data => {
+        isAjaxSearch = true;
+        const tbody = document.getElementById('tableBody');
+
+        // Remove old search rows
+        tbody.querySelectorAll('.search-row').forEach(r => r.remove());
+
+        // Hide all original rows
+        tbody.querySelectorAll('.data-row:not(.search-row)').forEach(r => r.style.display = 'none');
+
+        // Hide pagination during search
+        const pg = document.getElementById('paginationBar');
+        if (pg) pg.style.display = 'none';
+
+        // Get IDs already in DOM
+        const existingIds = [];
+        tbody.querySelectorAll('.data-row:not(.search-row)').forEach(r => {
+          existingIds.push(parseInt(r.dataset.id));
+        });
+
+        let visible = 0;
+
+        // Show matching rows already on this page
+        tbody.querySelectorAll('.data-row:not(.search-row)').forEach(r => {
+          if (data.some(d => d.id === parseInt(r.dataset.id))) {
+            r.style.display = '';
+            visible++;
+          }
+        });
+
+        // Build rows for results from OTHER pages
+        data.forEach(item => {
+          if (!existingIds.includes(item.id)) {
+            const tr = document.createElement('tr');
+            tr.className = 'data-row search-row';
+            tr.dataset.id = item.id;
+            tr.dataset.cat = (item.category || '').toLowerCase();
+            tr.dataset.video = item.hasVideo ? 'yes' : 'no';
+            tr.dataset.quiz = item.hasQuiz ? 'yes' : 'no';
+            tr.innerHTML =
+              '<td><strong>' + item.title + '</strong></td>' +
+              '<td>' + (item.description || '') + '…</td>' +
+              '<td><span class="badge badge-blue">' + (item.category || '—') + '</span></td>' +
+              '<td>' + (item.coach || '—') + '</td>' +
+              '<td><span class="badge ' + (item.hasVideo ? 'badge-green' : 'badge-orange') + '">' + (item.hasVideo ? '✓ Oui' : '✗ Non') + '</span></td>' +
+              '<td><span class="badge ' + (item.hasQuiz ? 'badge-green' : 'badge-orange') + '">' + (item.hasQuiz ? '✓ Oui' : '✗ Non') + '</span></td>' +
+              '<td><div class="actions">' +
+                '<a href="/formation/' + item.id + '" class="btn-action btn-show">Voir</a>' +
+                '<a href="/formation/' + item.id + '/edit" class="btn-action btn-edit">Modifier</a>' +
+              '</div></td>';
+            tbody.appendChild(tr);
+            visible++;
+          }
+        });
+
+        // Now apply category/video/quiz filters on the visible results
+        applyFilters();
+      });
+  }, 300);
 });
 
-document.getElementById('catFilter').addEventListener('change', e => {
+// =====================================================================
+//  Category filter
+// =====================================================================
+document.getElementById('catFilter').addEventListener('change', function(e) {
   state.cat = e.target.value.toLowerCase();
   applyFilters();
 });
 
-document.getElementById('sortSelect').addEventListener('change', e => {
-  state.sort = e.target.value;
-  applyFilters();
-});
-
 // =====================================================================
-//  Chip toggle — only one value per group (video / quiz) at a time
+//  Chip toggle
 // =====================================================================
 function toggleChip(group, value) {
-  const current = state[group];
-  state[group] = current === value ? '' : value;   // toggle off if already active
+  state[group] = state[group] === value ? '' : value;
   updateChipStyles();
   applyFilters();
 }
 
 function updateChipStyles() {
-  // Video chips
   setChip('chip-video-yes', state.video === 'yes', 'active-green');
   setChip('chip-video-no',  state.video === 'no',  'active-orange');
-  // Quiz chips
-  setChip('chip-quiz-yes', state.quiz === 'yes', 'active-green');
-  setChip('chip-quiz-no',  state.quiz === 'no',  'active-orange');
+  setChip('chip-quiz-yes',  state.quiz  === 'yes', 'active-green');
+  setChip('chip-quiz-no',   state.quiz  === 'no',  'active-orange');
 }
 
 function setChip(id, on, cls) {
   const el = document.getElementById(id);
-  el.classList.remove('active','active-green','active-orange');
+  el.classList.remove('active-green','active-orange');
   if (on) el.classList.add(cls);
 }
 
 // =====================================================================
-//  Core filter + sort logic
+//  Apply filters — works on both original rows AND ajax search rows
 // =====================================================================
 function applyFilters() {
   const tbody = document.getElementById('tableBody');
   const rows  = Array.from(tbody.querySelectorAll('.data-row'));
 
-  // --- 1. Filter ---
   let visible = 0;
   rows.forEach(row => {
-    const match =
-      (!state.search || ['title','desc','cat','coach'].some(k => (row.dataset[k]||'').includes(state.search))) &&
-      (!state.cat    || row.dataset.cat   === state.cat)   &&
-      (!state.video  || row.dataset.video === state.video) &&
-      (!state.quiz   || row.dataset.quiz  === state.quiz);
+    // If in AJAX mode, skip rows already hidden by search (original non-matching rows)
+    if (isAjaxSearch && !row.classList.contains('search-row')) {
+      // Check if this original row was shown by AJAX match
+      if (row.style.display === 'none') return;
+    }
 
-    row.style.display = match ? '' : 'none';
-    if (match) visible++;
+    const matchCat   = !state.cat   || (row.dataset.cat || '') === state.cat;
+    const matchVideo = !state.video || (row.dataset.video || '') === state.video;
+    const matchQuiz  = !state.quiz  || (row.dataset.quiz || '') === state.quiz;
+
+    // For non-AJAX mode, also apply text search on current page
+    let matchSearch = true;
+    if (!isAjaxSearch && state.search) {
+      matchSearch = ['title','desc','cat','coach'].some(k =>
+        (row.dataset[k] || '').includes(state.search)
+      );
+    }
+
+    const match = matchSearch && matchCat && matchVideo && matchQuiz;
+
+    if (isAjaxSearch) {
+      // Don't re-hide rows that were already hidden by AJAX
+      if (row.style.display !== 'none') {
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+      }
+    } else {
+      row.style.display = match ? '' : 'none';
+      if (match) visible++;
+    }
   });
 
-  // --- 2. Sort visible rows ---
-  if (state.sort) {
-    const [field, dir] = state.sort.split('-');
-    const colIdx = field === 'title' ? 0 : 2;   // title=col0, cat=col2
-    const visibleRows = rows.filter(r => r.style.display !== 'none');
-
-    visibleRows.sort((a, b) => {
-      const aVal = a.querySelectorAll('td')[colIdx]?.innerText.toLowerCase() || '';
-      const bVal = b.querySelectorAll('td')[colIdx]?.innerText.toLowerCase() || '';
-      return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-    });
-
-    // Re-append in sorted order (hidden rows stay in place, sorted rows go on top)
-    visibleRows.forEach(r => tbody.appendChild(r));
-  }
-
-  // --- 3. No-results message ---
+  // No-results message
   const noRow = document.getElementById('noResultsRow').querySelector('td');
   noRow.style.display = visible === 0 ? 'table-cell' : 'none';
 
-  // --- 4. Result count badge ---
+  // Result count
   document.getElementById('resultsCount').textContent =
     visible + (visible !== 1 ? ' résultats' : ' résultat');
 
-  // --- 5. Active filter tags ---
   renderActiveFilterTags();
 }
 
 // =====================================================================
-//  Active filter tags bar
+//  Active filter tags
 // =====================================================================
-function sortLabel(v) {
-  if (v === 'title-asc')  return 'Titre A→Z';
-  if (v === 'title-desc') return 'Titre Z→A';
-  if (v === 'cat-asc')    return 'Catégorie A→Z';
-  if (v === 'cat-desc')   return 'Catégorie Z→A';
-  return v;
-}
-
 const tagLabels = {
   search : v => 'Recherche : "' + v + '"',
   cat    : v => 'Catégorie : ' + v,
   video  : v => v === 'yes' ? 'Avec vidéo' : 'Sans vidéo',
-  quiz   : v => v === 'yes' ? 'Avec quiz'  : 'Sans quiz',
-  sort   : v => 'Tri : ' + sortLabel(v)
+  quiz   : v => v === 'yes' ? 'Avec quiz'  : 'Sans quiz'
 };
 
 function renderActiveFilterTags() {
@@ -407,10 +443,16 @@ function renderActiveFilterTags() {
 
 function clearFilter(key) {
   state[key] = '';
-  // Sync UI controls
-  if (key === 'search') document.getElementById('searchInput').value = '';
-  if (key === 'cat')    document.getElementById('catFilter').value   = '';
-  if (key === 'sort')   document.getElementById('sortSelect').value  = '';
+  if (key === 'search') {
+    document.getElementById('searchInput').value = '';
+    // Restore original rows
+    isAjaxSearch = false;
+    document.querySelectorAll('#tableBody .search-row').forEach(r => r.remove());
+    document.querySelectorAll('#tableBody .data-row').forEach(r => r.style.display = '');
+    const pg = document.getElementById('paginationBar');
+    if (pg) pg.style.display = '';
+  }
+  if (key === 'cat') document.getElementById('catFilter').value = '';
   if (key === 'video' || key === 'quiz') updateChipStyles();
   applyFilters();
 }
@@ -419,16 +461,20 @@ function clearAllFilters() {
   Object.keys(state).forEach(k => state[k] = '');
   document.getElementById('searchInput').value = '';
   document.getElementById('catFilter').value   = '';
-  document.getElementById('sortSelect').value  = '';
+  isAjaxSearch = false;
+  document.querySelectorAll('#tableBody .search-row').forEach(r => r.remove());
+  document.querySelectorAll('#tableBody .data-row').forEach(r => r.style.display = '');
+  const pg = document.getElementById('paginationBar');
+  if (pg) pg.style.display = '';
   updateChipStyles();
   applyFilters();
 }
 
-// Init count on load
+// Init on load
 applyFilters();
 
 // =====================================================================
-//  PDF export (visible rows only)
+//  PDF export
 // =====================================================================
 function exportPDF() {
   const { jsPDF } = window.jspdf;

@@ -224,7 +224,56 @@ final class FormationController extends AbstractController
             'quiz'      => $quiz,
         ]);
     }
+    // -------------------------------------------------------------------------
+// AJAX Search — recherche dynamique across ALL formations
+// -------------------------------------------------------------------------
+#[Route('/search/ajax', name: 'app_formation_search', methods: ['GET'], priority: 10)]
+public function ajaxSearch(Request $request, EntityManagerInterface $entityManager): \Symfony\Component\HttpFoundation\JsonResponse
+{
+    $q = trim($request->query->get('q', ''));
 
+    if (strlen($q) < 2) {
+        return $this->json([]);
+    }
+
+    // Build query to search across title, description, category
+    $qb = $entityManager->createQueryBuilder();
+    $formations = $qb->select('f')
+        ->from(Formation::class, 'f')
+        ->where(
+            $qb->expr()->orX(
+                $qb->expr()->like('LOWER(f.title)', ':search'),
+                $qb->expr()->like('LOWER(f.description)', ':search'),
+                $qb->expr()->like('LOWER(f.category)', ':search')
+            )
+        )
+        ->setParameter('search', '%' . strtolower($q) . '%')
+        ->setMaxResults(20)
+        ->getQuery()
+        ->getResult();
+
+    // Get coach names
+    $users = $entityManager->getRepository(\App\Entity\User::class)->findAll();
+    $coachMap = [];
+    foreach ($users as $user) {
+        $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
+    }
+
+    $data = [];
+    foreach ($formations as $f) {
+        $data[] = [
+            'id'          => $f->getId(),
+            'title'       => $f->getTitle(),
+            'category'    => $f->getCategory() ?? '—',
+            'description' => mb_substr($f->getDescription() ?? '', 0, 50),
+            'coach'       => ($f->getCoachId() && isset($coachMap[$f->getCoachId()])) ? $coachMap[$f->getCoachId()] : '—',
+            'hasVideo'    => $f->getVideoUrl() !== null,
+            'hasQuiz'     => $f->getQuizs()->count() > 0,
+        ];
+    }
+
+    return $this->json($data);
+}
     // -------------------------------------------------------------------------
     // Helper: convert any YouTube URL → embed URL
     // Accepts: youtu.be/ID, watch?v=ID, /shorts/ID, already embed URLs
