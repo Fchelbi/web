@@ -6,223 +6,98 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #F0E6D8; min-height: 100vh; }
-
         .navbar {
-            background: #4A6FA5;
-            padding: 16px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
+            background: #4A6FA5; padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center; color: white;
         }
         .navbar h1 { font-size: 20px; font-weight: 700; }
         .navbar h1 span { color: #E8895A; }
+        .navbar-right { display: flex; gap: 10px; align-items: center; }
         .navbar a {
-            color: white;
-            text-decoration: none;
+            color: white; text-decoration: none;
             background: rgba(255,255,255,0.15);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            transition: background 0.2s;
+            padding: 8px 16px; border-radius: 8px; font-size: 13px; transition: background 0.2s;
         }
         .navbar a:hover { background: rgba(255,255,255,0.25); }
-
         .content { padding: 30px 40px; }
-
         .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-            gap: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
         }
         .top-bar h2 { font-size: 22px; color: #2C3E50; }
-
         .btn-add {
-            background: #E8895A;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.2s;
+            background: #E8895A; color: white; padding: 10px 20px;
+            border-radius: 10px; text-decoration: none; font-size: 14px;
+            font-weight: 600; transition: background 0.2s;
         }
         .btn-add:hover { background: #d4784a; }
-
         .filters {
-            background: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            background: white; padding: 16px 20px; border-radius: 12px;
+            display: flex; gap: 12px; margin-bottom: 20px;
+            flex-wrap: wrap; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
         .filters input, .filters select {
-            padding: 10px 14px;
-            border: 1.5px solid #E8E0D5;
-            border-radius: 8px;
-            background: #F5EFE6;
-            font-size: 14px;
-            outline: none;
-            flex: 1;
-            min-width: 160px;
+            padding: 10px 14px; border: 1.5px solid #E8E0D5;
+            border-radius: 8px; background: #F5EFE6;
+            font-size: 14px; outline: none; flex: 1; min-width: 160px;
         }
         .filters input:focus, .filters select:focus { border-color: #4A6FA5; }
         .filters button {
-            padding: 10px 20px;
-            background: #4A6FA5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
+            padding: 10px 20px; background: #4A6FA5; color: white;
+            border: none; border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 600;
         }
         .filters button:hover { background: #3a5f95; }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            text-align: center;
-        }
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); text-align: center; }
         .stat-card .number { font-size: 28px; font-weight: 700; color: #4A6FA5; }
         .stat-card .label { font-size: 12px; color: #999; margin-top: 4px; }
-
-        table {
-            width: 100%;
-            background: white;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            border-collapse: collapse;
-        }
+        table { width: 100%; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-collapse: collapse; }
         thead { background: #4A6FA5; color: white; }
         thead th { padding: 14px 16px; text-align: left; font-size: 13px; font-weight: 600; }
         tbody tr { border-bottom: 1px solid #F0EAE0; transition: background 0.15s; }
         tbody tr:hover { background: #FDF8F3; }
         tbody td { padding: 14px 16px; font-size: 14px; color: #333; }
-
-        .badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-admin   { background: #fde8d8; color: #E8895A; }
-        .badge-coach   { background: #d8eafd; color: #4A6FA5; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-admin { background: #fde8d8; color: #E8895A; }
+        .badge-coach { background: #d8eafd; color: #4A6FA5; }
         .badge-patient { background: #d8fde8; color: #27ae60; }
-
         .actions { display: flex; gap: 8px; }
-        .btn-edit {
-            padding: 6px 14px;
-            background: #4A6FA5;
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
+        .btn-edit { padding: 6px 14px; background: #4A6FA5; color: white; border-radius: 8px; text-decoration: none; font-size: 13px; transition: background 0.2s; }
         .btn-edit:hover { background: #3a5f95; }
-        .btn-delete {
-            padding: 6px 14px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+        .btn-delete { padding: 6px 14px; background: #e74c3c; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s; }
         .btn-delete:hover { background: #c0392b; }
-
         .empty { text-align: center; padding: 40px; color: #999; font-size: 15px; }
+        .pagination-wrap { margin-top: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .pagination { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .pagination a, .pagination span { display: inline-flex; align-items: center; justify-content: center; min-width: 38px; height: 38px; padding: 0 12px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+        .pagination a { background: white; color: #4A6FA5; border: 1.5px solid #E8E0D5; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        .pagination a:hover { background: #4A6FA5; color: white; border-color: #4A6FA5; transform: translateY(-1px); }
+        .pagination .current { background: #4A6FA5; color: white; border: 1.5px solid #4A6FA5; }
+        .pagination .disabled { background: #f5f5f5; color: #ccc; border: 1.5px solid #eee; cursor: default; }
+        .pagination .dots { background: none; border: none; color: #aaa; box-shadow: none; cursor: default; }
+        .pagination-info { font-size: 13px; color: #999; }
+        .pagination-info strong { color: #4A6FA5; }
 
-        /* ── Pagination ── */
-        .pagination-wrap {
-            margin-top: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
+        /* Modal Face ID */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
-        .pagination {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
+        .modal-box {
+            background: white; border-radius: 20px; padding: 40px;
+            max-width: 440px; width: 100%; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s ease;
         }
-        .pagination a,
-        .pagination span {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 38px;
-            height: 38px;
-            padding: 0 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        .pagination a {
-            background: white;
-            color: #4A6FA5;
-            border: 1.5px solid #E8E0D5;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        }
-        .pagination a:hover {
-            background: #4A6FA5;
-            color: white;
-            border-color: #4A6FA5;
-            box-shadow: 0 4px 12px rgba(74,111,165,0.25);
-            transform: translateY(-1px);
-        }
-        .pagination .current {
-            background: #4A6FA5;
-            color: white;
-            border: 1.5px solid #4A6FA5;
-            box-shadow: 0 4px 12px rgba(74,111,165,0.3);
-        }
-        .pagination .disabled {
-            background: #f5f5f5;
-            color: #ccc;
-            border: 1.5px solid #eee;
-            cursor: default;
-        }
-        .pagination .dots {
-            background: none;
-            border: none;
-            color: #aaa;
-            box-shadow: none;
-            cursor: default;
-            padding: 0 4px;
-        }
-        .pagination-info {
-            font-size: 13px;
-            color: #999;
-        }
-        .pagination-info strong {
-            color: #4A6FA5;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
+
 <script>
-// Recherche dynamique (filtre côté client sur la page courante)
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('searchInput')?.addEventListener('input', filterTable);
     document.getElementById('roleFilter')?.addEventListener('change', filterTable);
@@ -232,43 +107,74 @@ function filterTable() {
     const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
     const role   = document.getElementById('roleFilter')?.value.toLowerCase() || '';
     const rows   = document.querySelectorAll('tbody tr.data-row');
-
     rows.forEach(row => {
         const text     = row.textContent.toLowerCase();
         const roleCell = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
-        const matchSearch = text.includes(search);
-        const matchRole   = !role || roleCell.includes(role);
-        row.style.display = matchSearch && matchRole ? '' : 'none';
+        row.style.display = text.includes(search) && (!role || roleCell.includes(role)) ? '' : 'none';
     });
 }
+
+function closeFaceModal() {
+    document.getElementById('faceIdModal').style.display = 'none';
+    fetch('/clear-face-prompt');
+}
 </script>
+
 <body>
+
+{% if app.session.get('show_face_id_prompt') %}
+<div class="modal-overlay" id="faceIdModal">
+    <div class="modal-box">
+        <div style="font-size:60px;margin-bottom:16px;">👁️</div>
+        <h2 style="font-size:22px;color:#2C3E50;margin-bottom:10px;">Configurer votre Face ID</h2>
+        <p style="font-size:14px;color:#999;margin-bottom:28px;line-height:1.6;">
+            Vous n'avez pas encore enregistré votre visage.<br>
+            Voulez-vous le faire maintenant pour une connexion plus rapide ?
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <a href="{{ path('face_register') }}"
+               style="padding:12px 28px;background:#E8895A;color:white;
+                      border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;">
+                ✅ Oui, configurer
+            </a>
+            <button onclick="closeFaceModal()"
+                    style="padding:12px 28px;background:#F5EFE6;color:#4A6FA5;
+                           border:1.5px solid #4A6FA5;border-radius:10px;
+                           font-weight:600;font-size:14px;cursor:pointer;">
+                ⏭️ Plus tard
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <nav class="navbar">
     <h1>Echo<span>Care</span> · Admin</h1>
-    <a href="{{ path('app_logout') }}">🚪 Déconnexion</a>
+    <div class="navbar-right">
+        <a href="{{ path('face_register') }}">👁️ Mon Face ID</a>
+        <a href="{{ path('app_logout') }}">🚪 Déconnexion</a>
+    </div>
 </nav>
 
 <div class="content">
-
     <div class="top-bar">
         <h2>👥 Gestion des Utilisateurs</h2>
-        <div style="display:flex; gap:10px; align-items:center;">
-            <a href="{{ path('admin_dashboard') }}"
-               title="Actualiser"
-               style="background:white; border:1.5px solid #E8E0D5; color:#4A6FA5; padding:10px 14px; border-radius:10px; text-decoration:none; font-size:18px; transition:all 0.2s; display:flex; align-items:center;"
+        <div style="display:flex;gap:10px;align-items:center;">
+            <a href="{{ path('admin_dashboard') }}" title="Actualiser"
+               style="background:white;border:1.5px solid #E8E0D5;color:#4A6FA5;
+                      padding:10px 14px;border-radius:10px;text-decoration:none;
+                      font-size:18px;display:flex;align-items:center;"
                onmouseover="this.style.background='#4A6FA5';this.style.color='white'"
-               onmouseout="this.style.background='white';this.style.color='#4A6FA5'"
-            >🔄</a>
+               onmouseout="this.style.background='white';this.style.color='#4A6FA5'">🔄</a>
             <a href="{{ path('admin_user_new') }}" class="btn-add">+ Ajouter un utilisateur</a>
             <a href="{{ path('admin_export_pdf') }}"
-            style="background:#27ae60; color:white; padding:10px 20px; border-radius:10px; text-decoration:none; font-size:14px; font-weight:600;">
-            📄 Exporter PDF
+               style="background:#27ae60;color:white;padding:10px 20px;
+                      border-radius:10px;text-decoration:none;font-size:14px;font-weight:600;">
+                📄 Exporter PDF
             </a>
         </div>
     </div>
 
-    <!-- Stats — basées sur le total réel, pas seulement la page courante -->
     <div class="stats">
         <div class="stat-card">
             <div class="number">{{ total }}</div>
@@ -288,12 +194,10 @@ function filterTable() {
         </div>
     </div>
 
-    <!-- Filtres -->
     <form method="get" class="filters">
         <input type="text" id="searchInput" name="search"
-            placeholder="🔍 Rechercher par nom, prénom ou email..."
-            value="{{ search }}">
-
+               placeholder="🔍 Rechercher par nom, prénom ou email..."
+               value="{{ search }}">
         <select id="roleFilter" name="role">
             <option value="">Tous les rôles</option>
             <option value="Admin"   {{ role == 'Admin'   ? 'selected' : '' }}>👑 Admin</option>
@@ -303,7 +207,6 @@ function filterTable() {
         <button type="submit">Filtrer</button>
     </form>
 
-    <!-- Tableau -->
     <table>
         <thead>
             <tr>
@@ -317,9 +220,7 @@ function filterTable() {
         </thead>
         <tbody>
             {% if users is empty %}
-                <tr>
-                    <td colspan="6" class="empty">Aucun utilisateur trouvé</td>
-                </tr>
+                <tr><td colspan="6" class="empty">Aucun utilisateur trouvé</td></tr>
             {% else %}
                 {% for user in users %}
                 <tr class="data-row">
@@ -352,32 +253,23 @@ function filterTable() {
         </tbody>
     </table>
 
-    <!-- ══════════════ PAGINATION ══════════════ -->
     {% if totalPages > 1 %}
     <div class="pagination-wrap">
-
         <div class="pagination">
-
-            {# Bouton ← Précédent #}
             {% if page > 1 %}
                 <a href="?page={{ page - 1 }}&search={{ search|url_encode }}&role={{ role|url_encode }}">← Préc.</a>
             {% else %}
                 <span class="disabled">← Préc.</span>
             {% endif %}
 
-            {# Pages numérotées avec "..." #}
             {% set pStart = max(1, page - 2) %}
             {% set pEnd   = min(totalPages, page + 2) %}
 
-            {# Première page + "..." si besoin #}
             {% if pStart > 1 %}
                 <a href="?page=1&search={{ search|url_encode }}&role={{ role|url_encode }}">1</a>
-                {% if pStart > 2 %}
-                    <span class="dots">…</span>
-                {% endif %}
+                {% if pStart > 2 %}<span class="dots">…</span>{% endif %}
             {% endif %}
 
-            {# Pages du milieu #}
             {% for p in pStart..pEnd %}
                 {% if p == page %}
                     <span class="current">{{ p }}</span>
@@ -386,31 +278,22 @@ function filterTable() {
                 {% endif %}
             {% endfor %}
 
-            {# "..." + dernière page si besoin #}
             {% if pEnd < totalPages %}
-                {% if pEnd < totalPages - 1 %}
-                    <span class="dots">…</span>
-                {% endif %}
+                {% if pEnd < totalPages - 1 %}<span class="dots">…</span>{% endif %}
                 <a href="?page={{ totalPages }}&search={{ search|url_encode }}&role={{ role|url_encode }}">{{ totalPages }}</a>
             {% endif %}
 
-            {# Bouton Suivant → #}
             {% if page < totalPages %}
                 <a href="?page={{ page + 1 }}&search={{ search|url_encode }}&role={{ role|url_encode }}">Suiv. →</a>
             {% else %}
                 <span class="disabled">Suiv. →</span>
             {% endif %}
-
         </div>
-
         <div class="pagination-info">
             <strong>{{ total }}</strong> utilisateur(s) — Page <strong>{{ page }}</strong> / <strong>{{ totalPages }}</strong>
         </div>
-
     </div>
     {% endif %}
-    {# ══════════════════════════════════════════ #}
-
 </div>
 
 </body>

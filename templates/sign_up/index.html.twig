@@ -222,7 +222,7 @@
         <h2>Créer un compte</h2>
         <p class="subtitle">Remplissez les informations ci-dessous</p>
 
-        {% if error %}
+        {% if error is defined and error %}
             <div class="server-error">❌ {{ error }}</div>
         {% endif %}
 

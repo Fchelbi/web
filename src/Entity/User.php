@@ -75,6 +75,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $deviceToken = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $faceDescriptor = null;
+
     public function getId(): ?int { return $this->id; }
     public function getNom(): ?string { return $this->nom; }
     public function setNom(string $nom): static { $this->nom = $nom; return $this; }
@@ -104,6 +107,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTwoFactorExpiresAt(?\DateTimeImmutable $t): static { $this->twoFactorExpiresAt = $t; return $this; }
     public function getDeviceToken(): ?string { return $this->deviceToken; }
     public function setDeviceToken(?string $t): static { $this->deviceToken = $t; return $this; }
+    public function getFaceDescriptor(): ?string { return $this->faceDescriptor; }
+    public function setFaceDescriptor(?string $f): static { $this->faceDescriptor = $f; return $this; }
 
     public function getRoles(): array
     {

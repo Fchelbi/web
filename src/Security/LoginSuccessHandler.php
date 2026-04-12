@@ -25,10 +25,9 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 
         // Vérifie si l'appareil est déjà enregistré
         $deviceToken = $request->cookies->get('device_token_' . $user->getId());
-        
+
         if ($deviceToken && $deviceToken === $user->getDeviceToken()) {
-            // Appareil reconnu → accès direct
-            return $this->redirectByRole($user);
+            return $this->redirectByRole($user, $request);
         }
 
         // Génère le code 2FA
@@ -44,10 +43,15 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         return new RedirectResponse($this->router->generate('app_2fa'));
     }
 
-    public function redirectByRole(User $user): RedirectResponse
+    public function redirectByRole(User $user, Request $request = null): RedirectResponse
     {
         $role = $user->getRole();
+
         if ($role === 'Admin') {
+            // Vérifie si l'admin a déjà un Face ID
+            if ($request && !$user->getFaceDescriptor()) {
+                $request->getSession()->set('show_face_id_prompt', true);
+            }
             return new RedirectResponse($this->router->generate('admin_dashboard'));
         } elseif ($role === 'Coach') {
             return new RedirectResponse($this->router->generate('coach_dashboard'));
