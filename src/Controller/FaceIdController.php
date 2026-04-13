@@ -18,6 +18,12 @@ class FaceIdController extends AbstractController
     {
         return $this->render('face_id/register.html.twig');
     }
+    
+    #[Route('/admin/face-prompt', name: 'face_id_prompt')]
+    public function prompt(): Response
+    {
+        return $this->render('face_id/prompt.html.twig');
+    }
 
     #[Route('/admin/face-register/save', name: 'face_register_save', methods: ['POST'])]
     public function saveDescriptor(
@@ -50,6 +56,7 @@ class FaceIdController extends AbstractController
     }
 
     #[Route('/login/face/verify', name: 'face_login_verify', methods: ['POST'])]
+    #[Route('/login/face/verify', name: 'face_login_verify', methods: ['POST'])]
     public function verifyFace(
         Request $request,
         UserRepository $repo,
@@ -63,7 +70,6 @@ class FaceIdController extends AbstractController
 
         $inputDescriptor = $data['descriptor'];
 
-        // Cherche tous les admins avec face descriptor
         $admins = $repo->createQueryBuilder('u')
             ->where('u.role = :role')
             ->andWhere('u.faceDescriptor IS NOT NULL')
@@ -73,13 +79,19 @@ class FaceIdController extends AbstractController
 
         foreach ($admins as $admin) {
             $savedDescriptor = json_decode($admin->getFaceDescriptor(), true);
-
-            // Calcule la distance euclidienne
             $distance = $this->euclideanDistance($inputDescriptor, $savedDescriptor);
 
             if ($distance < 0.5) {
-                // Match trouvé — créer la session
-                $request->getSession()->set('face_authenticated_user_id', $admin->getId());
+                // ✅ Crée la session Symfony correctement
+                $token = new \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken(
+                    $admin,
+                    'main',
+                    $admin->getRoles()
+                );
+                $this->container->get('security.token_storage')->setToken($token);
+                $request->getSession()->set('_security_main', serialize($token));
+                $request->getSession()->save();
+
                 return new JsonResponse([
                     'success' => true,
                     'redirect' => '/admin/dashboard'

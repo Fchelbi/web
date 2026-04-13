@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Enregistrer Face ID · EchoCare</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/face-api.js/0.22.2/face-api.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #F0E6D8; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
@@ -102,7 +102,7 @@ const status = document.getElementById('status');
 const captureBtn = document.getElementById('captureBtn');
 
 async function loadModels() {
-    const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights';
+    const MODEL_URL = '/models';
     await Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
         faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),

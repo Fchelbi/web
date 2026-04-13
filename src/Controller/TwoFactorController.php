@@ -58,7 +58,11 @@ class TwoFactorController extends AbstractController
                 // Redirect selon rôle
                 $role = $user->getRole();
                 if ($role === 'Admin') {
-                    $route = 'admin_dashboard';
+                    if (!$user->getFaceDescriptor()) {
+                        $route = 'face_id_prompt';
+                    } else {
+                        $route = 'admin_dashboard';
+                    }
                 } elseif ($role === 'Coach') {
                     $route = 'coach_dashboard';
                 } else {
