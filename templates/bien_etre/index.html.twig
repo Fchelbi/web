@@ -15,100 +15,77 @@
         .navbar-logo { font-size: 22px; font-weight: 700; color: #4A6FA5; }
         .navbar-logo span { color: #E8895A; }
         .navbar-links { display: flex; gap: 32px; }
-        .navbar-links a {
-            color: #555; text-decoration: none; font-size: 14px;
-            font-weight: 500; transition: color 0.2s;
-        }
+        .navbar-links a { color: #555; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
         .navbar-links a:hover, .navbar-links a.active { color: #4A6FA5; font-weight: 600; }
         .navbar-right { display: flex; align-items: center; gap: 16px; }
-        .user-pill {
-            display: flex; align-items: center; gap: 10px;
-            background: #F5EFE6; padding: 8px 16px; border-radius: 30px;
-        }
-        .user-pill .avatar {
-            width: 32px; height: 32px; background: #4A6FA5; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 14px; font-weight: 700;
-        }
-        .btn-logout {
-            padding: 8px 18px; background: #E8895A; color: white;
-            border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;
-        }
-        .back-btn {
-            padding: 8px 18px; background: #4A6FA5; color: white;
-            border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600;
-        }
-        .content { padding: 40px 60px; max-width: 900px; margin: 0 auto; }
+        .user-pill { display: flex; align-items: center; gap: 10px; background: #F5EFE6; padding: 8px 16px; border-radius: 30px; }
+        .user-pill .avatar { width: 32px; height: 32px; background: #4A6FA5; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; }
+        .user-pill span { font-size: 13px; color: #2C3E50; font-weight: 600; }
+        .btn-logout { padding: 8px 18px; background: #E8895A; color: white; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+        .back-btn { padding: 8px 18px; background: #4A6FA5; color: white; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+
+        .content { padding: 40px 60px; max-width: 1100px; margin: 0 auto; }
         .page-header { margin-bottom: 28px; }
         .page-header h2 { font-size: 24px; font-weight: 700; color: #2C3E50; }
         .page-header p { font-size: 14px; color: #999; margin-top: 4px; }
 
-        .success-msg {
-            background: #d8fde8; color: #27ae60;
-            padding: 14px 20px; border-radius: 10px;
-            font-size: 14px; margin-bottom: 20px;
-        }
+        .success-msg { background: #d8fde8; color: #27ae60; padding: 14px 20px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; }
+        .error-msg { background: #ffe0e0; color: #c0392b; padding: 14px 20px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; }
+        .info-msg { background: #d8eafd; color: #4A6FA5; padding: 14px 20px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; }
 
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
 
-        .panel {
-            background: white; border-radius: 16px; padding: 28px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-        }
+        .panel { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 15px rgba(0,0,0,0.06); }
         .panel h3 { font-size: 16px; font-weight: 700; color: #2C3E50; margin-bottom: 20px; }
 
-        .slider-group { margin-bottom: 24px; }
-        .slider-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
+        /* Mood Emojis */
+        .mood-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 20px; }
+        .mood-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            padding: 14px 8px; border: 2px solid #E8E0D5; border-radius: 12px;
+            background: #F5EFE6; cursor: pointer; transition: all 0.2s; font-size: 12px; color: #555;
         }
-        .slider-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #2C3E50; }
-        .slider-value {
-            font-size: 20px; font-weight: 700;
-            min-width: 50px; text-align: right;
-        }
-        input[type="range"] {
-            width: 100%; height: 6px; border-radius: 3px;
-            outline: none; cursor: pointer; appearance: none;
-            border: none; background: transparent;
-        }
-        input[type="range"]::-webkit-slider-runnable-track {
-            height: 6px; border-radius: 3px; background: #F0EAE0;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none; width: 20px; height: 20px;
-            border-radius: 50%; margin-top: -7px; cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        .mood-hint { font-size: 11px; color: #aaa; margin-top: 6px; text-align: center; }
+        .mood-btn .emoji { font-size: 32px; }
+        .mood-btn:hover { border-color: #4A6FA5; background: white; transform: translateY(-2px); }
+        .mood-btn.selected { border-color: #4A6FA5; background: #4A6FA5; color: white; }
+        input[type="radio"] { display: none; }
 
-        .btn-save {
-            width: 100%; padding: 14px; background: #E8895A;
-            color: white; border: none; border-radius: 10px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            transition: background 0.2s; margin-top: 8px;
-        }
+        /* Sliders */
+        .slider-group { margin-bottom: 20px; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .slider-label { font-size: 13px; font-weight: 600; color: #2C3E50; }
+        .slider-value { font-size: 15px; font-weight: 700; }
+        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer; border: none; }
+
+        .btn-save { width: 100%; padding: 14px; background: #E8895A; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .btn-save:hover { background: #d4784a; }
 
-        /* Current values */
-        .current-panel { }
-        .current-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 16px 0; border-bottom: 1px solid #F5EFE6;
+        /* Calendrier */
+        .calendar { background: white; border-radius: 16px; padding: 28px; box-shadow: 0 2px 15px rgba(0,0,0,0.06); margin-bottom: 24px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-header h3 { font-size: 18px; font-weight: 700; color: #2C3E50; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-name { text-align: center; font-size: 12px; font-weight: 700; color: #999; padding: 8px 0; }
+        .day-cell {
+            aspect-ratio: 1; border-radius: 10px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; font-size: 13px; font-weight: 600;
+            background: #F5EFE6; color: #999; position: relative;
         }
-        .current-item:last-child { border-bottom: none; }
-        .c-icon { font-size: 32px; }
-        .c-info { flex: 1; }
-        .c-info h4 { font-size: 14px; font-weight: 600; color: #2C3E50; margin-bottom: 6px; }
-        .c-bar { height: 8px; background: #F0EAE0; border-radius: 4px; overflow: hidden; }
-        .c-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
-        .c-value { font-size: 16px; font-weight: 700; min-width: 40px; text-align: right; }
+        .day-cell.empty { background: transparent; }
+        .day-cell.today { border: 2px solid #4A6FA5; color: #4A6FA5; }
+        .day-cell.has-data { color: white; cursor: pointer; }
+        .day-cell.mood-excellent { background: #27ae60; }
+        .day-cell.mood-bien { background: #2ecc71; }
+        .day-cell.mood-neutre { background: #f39c12; }
+        .day-cell.mood-fatigue { background: #3498db; }
+        .day-cell.mood-triste { background: #e74c3c; }
+        .day-cell .day-emoji { font-size: 16px; }
+        .day-cell .day-num { font-size: 11px; }
 
-        .no-data {
-            text-align: center; padding: 40px 20px; color: #999;
-        }
-        .no-data .icon { font-size: 48px; margin-bottom: 12px; }
-        .no-data p { font-size: 14px; }
+        /* Légende */
+        .legend { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -117,8 +94,6 @@
     <div class="navbar-logo">Echo<span>Care</span></div>
     <div class="navbar-links">
         <a href="{{ path('patient_dashboard') }}">Accueil</a>
-        <a href="#">Mes séances</a>
-        <a href="#">Messages</a>
         <a href="{{ path('patient_rapports') }}">Rapports</a>
         <a href="{{ path('patient_bien_etre') }}" class="active">Bien-être</a>
         <a href="{{ path('patient_profile') }}">Mon profil</a>
@@ -135,147 +110,244 @@
 
 <div class="content">
     <div class="page-header">
-        <h2>🌿 Mon Bien-être</h2>
-        <p>Évaluez votre état quotidien pour suivre votre progression</p>
+        <h2>🌿 Mon Bien-être quotidien</h2>
+        <p>Enregistrez votre humeur chaque jour pour suivre votre progression</p>
     </div>
 
     {% if success %}
         <div class="success-msg">✅ {{ success }}</div>
     {% endif %}
+    {% if error %}
+        <div class="error-msg">❌ {{ error }}</div>
+    {% endif %}
+    {% if alreadyToday and not success %}
+        <div class="info-msg">ℹ️ Vous avez déjà enregistré votre humeur aujourd'hui. Revenez demain !</div>
+    {% endif %}
 
     <div class="grid-2">
         <!-- Formulaire -->
         <div class="panel">
-            <h3>📝 Évaluation du jour</h3>
+            <h3>📝 Comment vous sentez-vous aujourd'hui ?</h3>
 
+            {% if not alreadyToday or success %}
             <form method="post" id="bienEtreForm">
 
-                <!-- Sommeil -->
-                <div class="slider-group">
-                    <div class="slider-header">
-                        <span class="slider-label">😴 Sommeil</span>
-                        <span class="slider-value" id="sommeilVal" style="color:#4A6FA5;">50%</span>
-                    </div>
-                    <input type="range" name="sommeil" id="sommeil"
-                           min="0" max="100" value="50"
-                           oninput="updateSlider('sommeil', this.value, '#4A6FA5')"
-                           style="--thumb-color:#4A6FA5;">
-                    <div class="mood-hint" id="sommeilHint">Moyen</div>
+                <p style="font-size:13px;color:#999;margin-bottom:16px;">Choisissez votre humeur :</p>
+
+                <div class="mood-grid">
+                    <label class="mood-btn" id="btn-excellent">
+                        <input type="radio" name="mood" value="excellent">
+                        <span class="emoji">😄</span>
+                        <span>Excellent</span>
+                    </label>
+                    <label class="mood-btn" id="btn-bien">
+                        <input type="radio" name="mood" value="bien">
+                        <span class="emoji">🙂</span>
+                        <span>Bien</span>
+                    </label>
+                    <label class="mood-btn" id="btn-neutre">
+                        <input type="radio" name="mood" value="neutre">
+                        <span class="emoji">😐</span>
+                        <span>Neutre</span>
+                    </label>
+                    <label class="mood-btn" id="btn-fatigue">
+                        <input type="radio" name="mood" value="fatigue">
+                        <span class="emoji">😴</span>
+                        <span>Fatigué</span>
+                    </label>
+                    <label class="mood-btn" id="btn-triste">
+                        <input type="radio" name="mood" value="triste">
+                        <span class="emoji">😟</span>
+                        <span>Triste</span>
+                    </label>
                 </div>
 
-                <!-- Stress -->
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="slider-label">😴 Qualité du sommeil</span>
+                        <span class="slider-value" id="sommeilVal" style="color:#4A6FA5;">50%</span>
+                    </div>
+                    <input type="range" name="sommeil" id="sommeil" min="0" max="100" value="50"
+                           oninput="updateSlider('sommeil', this.value, '#4A6FA5')"
+                           style="accent-color:#4A6FA5;">
+                </div>
+
                 <div class="slider-group">
                     <div class="slider-header">
                         <span class="slider-label">🧘 Niveau de stress</span>
                         <span class="slider-value" id="stressVal" style="color:#E8895A;">50%</span>
                     </div>
-                    <input type="range" name="stress" id="stress"
-                           min="0" max="100" value="50"
+                    <input type="range" name="stress" id="stress" min="0" max="100" value="50"
                            oninput="updateSlider('stress', this.value, '#E8895A')"
-                           style="--thumb-color:#E8895A;">
-                    <div class="mood-hint" id="stressHint">Moyen</div>
+                           style="accent-color:#E8895A;">
                 </div>
 
-                <!-- Humeur -->
                 <div class="slider-group">
                     <div class="slider-header">
-                        <span class="slider-label">😊 Humeur</span>
+                        <span class="slider-label">😊 Humeur générale</span>
                         <span class="slider-value" id="humeurVal" style="color:#27ae60;">50%</span>
                     </div>
-                    <input type="range" name="humeur" id="humeur"
-                           min="0" max="100" value="50"
+                    <input type="range" name="humeur" id="humeur" min="0" max="100" value="50"
                            oninput="updateSlider('humeur', this.value, '#27ae60')"
-                           style="--thumb-color:#27ae60;">
-                    <div class="mood-hint" id="humeurHint">Moyen</div>
+                           style="accent-color:#27ae60;">
                 </div>
 
-                <button type="submit" class="btn-save">💾 Enregistrer mon état</button>
+                <button type="submit" class="btn-save">💾 Enregistrer mon humeur du jour</button>
             </form>
+            {% else %}
+            <div style="text-align:center;padding:30px;">
+                <div style="font-size:60px;margin-bottom:16px;">
+                    {% if alreadyToday.mood == 'excellent' %}😄
+                    {% elseif alreadyToday.mood == 'bien' %}🙂
+                    {% elseif alreadyToday.mood == 'neutre' %}😐
+                    {% elseif alreadyToday.mood == 'fatigue' %}😴
+                    {% else %}😟{% endif %}
+                </div>
+                <h4 style="font-size:18px;color:#2C3E50;margin-bottom:8px;">Humeur d'aujourd'hui : {{ alreadyToday.mood|capitalize }}</h4>
+                <p style="font-size:13px;color:#999;">Revenez demain pour enregistrer votre humeur !</p>
+                <div style="margin-top:20px;display:flex;gap:16px;justify-content:center;">
+                    <div style="text-align:center;">
+                        <div style="font-size:20px;font-weight:700;color:#4A6FA5;">{{ alreadyToday.sommeil }}%</div>
+                        <div style="font-size:12px;color:#999;">Sommeil</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:20px;font-weight:700;color:#E8895A;">{{ alreadyToday.stress }}%</div>
+                        <div style="font-size:12px;color:#999;">Stress</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:20px;font-weight:700;color:#27ae60;">{{ alreadyToday.humeur }}%</div>
+                        <div style="font-size:12px;color:#999;">Humeur</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
-        <!-- Dernières valeurs -->
-        <div class="panel current-panel">
-            <h3>📊 Dernière évaluation</h3>
+        <!-- Stats rapides -->
+        <div class="panel">
+            <h3>📊 Ce mois-ci</h3>
+            {% set total = calendarData|length %}
+            <div style="text-align:center;padding:20px 0;">
+                <div style="font-size:48px;font-weight:700;color:#4A6FA5;">{{ total }}</div>
+                <div style="font-size:14px;color:#999;margin-bottom:24px;">jours enregistrés</div>
 
-            {% if last %}
-                <p style="font-size:12px;color:#999;margin-bottom:16px;">
-                    📅 {{ last.createdAt|date('d/m/Y à H:i') }}
-                </p>
-                <div class="current-item">
-                    <span class="c-icon">😴</span>
-                    <div class="c-info">
-                        <h4>Sommeil</h4>
-                        <div class="c-bar">
-                            <div class="c-fill" style="width:{{ last.sommeil }}%;background:#4A6FA5;"></div>
+                {% if total > 0 %}
+                {% set excellent = calendarData|filter(d => d.mood == 'excellent')|length %}
+                {% set bien = calendarData|filter(d => d.mood == 'bien')|length %}
+                {% set neutre = calendarData|filter(d => d.mood == 'neutre')|length %}
+                {% set fatigue = calendarData|filter(d => d.mood == 'fatigue')|length %}
+                {% set triste = calendarData|filter(d => d.mood == 'triste')|length %}
+
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>😄 Excellent</span>
+                        <div style="flex:1;height:8px;background:#F0EAE0;border-radius:4px;margin:0 10px;overflow:hidden;">
+                            <div style="height:100%;width:{{ total > 0 ? (excellent/total*100)|round : 0 }}%;background:#27ae60;border-radius:4px;"></div>
                         </div>
+                        <span style="font-weight:700;color:#27ae60;">{{ excellent }}</span>
                     </div>
-                    <span class="c-value" style="color:#4A6FA5;">{{ last.sommeil }}%</span>
-                </div>
-                <div class="current-item">
-                    <span class="c-icon">🧘</span>
-                    <div class="c-info">
-                        <h4>Stress</h4>
-                        <div class="c-bar">
-                            <div class="c-fill" style="width:{{ last.stress }}%;background:#E8895A;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>🙂 Bien</span>
+                        <div style="flex:1;height:8px;background:#F0EAE0;border-radius:4px;margin:0 10px;overflow:hidden;">
+                            <div style="height:100%;width:{{ total > 0 ? (bien/total*100)|round : 0 }}%;background:#2ecc71;border-radius:4px;"></div>
                         </div>
+                        <span style="font-weight:700;color:#2ecc71;">{{ bien }}</span>
                     </div>
-                    <span class="c-value" style="color:#E8895A;">{{ last.stress }}%</span>
-                </div>
-                <div class="current-item">
-                    <span class="c-icon">😊</span>
-                    <div class="c-info">
-                        <h4>Humeur</h4>
-                        <div class="c-bar">
-                            <div class="c-fill" style="width:{{ last.humeur }}%;background:#27ae60;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>😐 Neutre</span>
+                        <div style="flex:1;height:8px;background:#F0EAE0;border-radius:4px;margin:0 10px;overflow:hidden;">
+                            <div style="height:100%;width:{{ total > 0 ? (neutre/total*100)|round : 0 }}%;background:#f39c12;border-radius:4px;"></div>
                         </div>
+                        <span style="font-weight:700;color:#f39c12;">{{ neutre }}</span>
                     </div>
-                    <span class="c-value" style="color:#27ae60;">{{ last.humeur }}%</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>😴 Fatigué</span>
+                        <div style="flex:1;height:8px;background:#F0EAE0;border-radius:4px;margin:0 10px;overflow:hidden;">
+                            <div style="height:100%;width:{{ total > 0 ? (fatigue/total*100)|round : 0 }}%;background:#3498db;border-radius:4px;"></div>
+                        </div>
+                        <span style="font-weight:700;color:#3498db;">{{ fatigue }}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>😟 Triste</span>
+                        <div style="flex:1;height:8px;background:#F0EAE0;border-radius:4px;margin:0 10px;overflow:hidden;">
+                            <div style="height:100%;width:{{ total > 0 ? (triste/total*100)|round : 0 }}%;background:#e74c3c;border-radius:4px;"></div>
+                        </div>
+                        <span style="font-weight:700;color:#e74c3c;">{{ triste }}</span>
+                    </div>
                 </div>
-            {% else %}
-                <div class="no-data">
-                    <div class="icon">📋</div>
-                    <p>Aucune évaluation encore.<br>Remplissez le formulaire !</p>
+                {% else %}
+                    <p style="color:#999;font-size:14px;">Aucune donnée ce mois-ci</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendrier -->
+    <div class="calendar">
+        <div class="calendar-header">
+            <h3>🗓️ Calendrier du mois</h3>
+            <span style="font-size:14px;color:#999;">{{ "now"|date("F Y") }}</span>
+        </div>
+
+        <div class="calendar-grid">
+            <div class="day-name">Lun</div>
+            <div class="day-name">Mar</div>
+            <div class="day-name">Mer</div>
+            <div class="day-name">Jeu</div>
+            <div class="day-name">Ven</div>
+            <div class="day-name">Sam</div>
+            <div class="day-name">Dim</div>
+
+            {# Jours vides avant le 1er #}
+            {% for i in 1..(firstDayOfMonth - 1) %}
+                <div class="day-cell empty"></div>
+            {% endfor %}
+
+            {# Jours du mois #}
+            {% for day in 1..daysInMonth %}
+                {% set entry = calendarData[day] ?? null %}
+                {% set isToday = day == "now"|date("j") %}
+                <div class="day-cell
+                    {{ isToday ? 'today' : '' }}
+                    {{ entry ? 'has-data mood-' ~ entry.mood : '' }}"
+                    title="{{ entry ? entry.mood|capitalize ~ ' - Sommeil: ' ~ entry.sommeil ~ '% Stress: ' ~ entry.stress ~ '%' : '' }}">
+                    {% if entry %}
+                        <span class="day-emoji">
+                            {% if entry.mood == 'excellent' %}😄
+                            {% elseif entry.mood == 'bien' %}🙂
+                            {% elseif entry.mood == 'neutre' %}😐
+                            {% elseif entry.mood == 'fatigue' %}😴
+                            {% else %}😟{% endif %}
+                        </span>
+                    {% endif %}
+                    <span class="day-num">{{ day }}</span>
                 </div>
-            {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#27ae60;"></div> Excellent</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#2ecc71;"></div> Bien</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#f39c12;"></div> Neutre</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3498db;"></div> Fatigué</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e74c3c;"></div> Triste</div>
         </div>
     </div>
 </div>
 
 <script>
-    function getHint(val, type) {
-        if (type === 'stress') {
-            if (val < 25) return '😌 Très faible';
-            if (val < 50) return '🙂 Faible';
-            if (val < 75) return '😟 Moyen';
-            return '😰 Élevé';
-        }
-        if (val < 25) return '😞 Très mauvais';
-        if (val < 50) return '😐 Faible';
-        if (val < 75) return '🙂 Moyen';
-        return '😊 Excellent';
-    }
+function updateSlider(name, val, color) {
+    document.getElementById(name + 'Val').textContent = val + '%';
+}
 
-    function updateSlider(name, val, color) {
-        document.getElementById(name + 'Val').textContent = val + '%';
-        const hints = { sommeil: 'sommeil', stress: 'stress', humeur: 'humeur' };
-        document.getElementById(name + 'Hint').textContent = getHint(parseInt(val), name);
-
-        // Update thumb color
-        const input = document.getElementById(name);
-        input.style.setProperty('--thumb-color', color);
-    }
-
-    // Style sliders
-    document.querySelectorAll('input[type="range"]').forEach(input => {
-        const color = input.style.getPropertyValue('--thumb-color') || '#4A6FA5';
-        input.style.cssText += `
-            background: linear-gradient(to right, ${color} 0%, ${color} 50%, #F0EAE0 50%, #F0EAE0 100%);
-        `;
-        input.addEventListener('input', function() {
-            const pct = (this.value - this.min) / (this.max - this.min) * 100;
-            this.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, #F0EAE0 ${pct}%, #F0EAE0 100%)`;
-        });
+// Mood selection
+document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input[type="radio"]').checked = true;
     });
+});
 </script>
 </body>
 </html>

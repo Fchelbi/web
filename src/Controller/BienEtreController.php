@@ -21,32 +21,73 @@ class BienEtreController extends AbstractController
         BienEtreRepository $repo
     ): Response {
         $user = $this->getUser();
+
+        // Vérifie si déjà rempli aujourd'hui
+        $today = new \DateTime();
+        $todayStr = $today->format('Y-m-d');
+
+        $alreadyToday = $repo->createQueryBuilder('b')
+            ->where('b.user = :user')
+            ->andWhere('b.createdAt >= :start')
+            ->andWhere('b.createdAt <= :end')
+            ->setParameter('user', $user)
+            ->setParameter('start', new \DateTimeImmutable($todayStr . ' 00:00:00'))
+            ->setParameter('end', new \DateTimeImmutable($todayStr . ' 23:59:59'))
+            ->getQuery()
+            ->getOneOrNullResult();
+
         $success = null;
+        $error = null;
 
-        // Récupère la dernière entrée
-        $last = $repo->findOneBy(
-            ['user' => $user],
-            ['createdAt' => 'DESC']
-        );
-
-        if ($request->isMethod('POST')) {
+        if ($request->isMethod('POST') && !$alreadyToday) {
             $bienEtre = new BienEtre();
             $bienEtre->setUser($user);
             $bienEtre->setSommeil((int) $request->request->get('sommeil'));
             $bienEtre->setStress((int) $request->request->get('stress'));
             $bienEtre->setHumeur((int) $request->request->get('humeur'));
+            $bienEtre->setMood($request->request->get('mood'));
             $bienEtre->setCreatedAt(new \DateTimeImmutable());
 
             $em->persist($bienEtre);
             $em->flush();
 
-            $success = 'Données enregistrées avec succès !';
-            $last = $bienEtre;
+            $success = 'Humeur enregistrée ! ✅';
+            $alreadyToday = $bienEtre;
+        } elseif ($request->isMethod('POST') && $alreadyToday) {
+            $error = 'Vous avez déjà enregistré votre humeur aujourd\'hui !';
+        }
+
+        // Données du mois pour le calendrier
+        $startOfMonth = new \DateTimeImmutable('first day of this month 00:00:00');
+        $endOfMonth   = new \DateTimeImmutable('last day of this month 23:59:59');
+
+        $monthData = $repo->createQueryBuilder('b')
+            ->where('b.user = :user')
+            ->andWhere('b.createdAt >= :start')
+            ->andWhere('b.createdAt <= :end')
+            ->setParameter('user', $user)
+            ->setParameter('start', $startOfMonth)
+            ->setParameter('end', $endOfMonth)
+            ->orderBy('b.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        // Organise par jour
+        $calendarData = [];
+        foreach ($monthData as $entry) {
+            $day = $entry->getCreatedAt()->format('d');
+            $calendarData[(int)$day] = $entry;
         }
 
         return $this->render('bien_etre/index.html.twig', [
-            'last' => $last,
-            'success' => $success,
+            'alreadyToday' => $alreadyToday,
+            'success'      => $success,
+            'error'        => $error,
+            'calendarData' => $calendarData,
+            'currentMonth' => $today->format('m'),
+            'currentYear'  => $today->format('Y'),
+            'daysInMonth'  => (int)$today->format('t'),
+            'firstDayOfMonth' => (int)(new \DateTime('first day of this month'))->format('N'),
         ]);
     }
 }

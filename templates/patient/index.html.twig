@@ -74,7 +74,7 @@
         }
         .stats-bar {
             background: white; margin: -24px 60px 0; border-radius: 16px;
-            padding: 24px 32px; display: grid; grid-template-columns: repeat(4, 1fr);
+            padding: 24px 32px; display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.1);
             position: relative; z-index: 10; animation: fadeInUp 0.6s ease 0.3s both;
         }
@@ -92,7 +92,7 @@
             content: ''; flex: 1; height: 2px;
             background: linear-gradient(to right, #E8E0D5, transparent); margin-left: 10px;
         }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        .grid-2-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 40px; }
         .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 40px; }
         .service-card {
             background: white; border-radius: 16px; padding: 28px;
@@ -193,7 +193,6 @@
         <a href="{{ path('patient_dashboard') }}" class="active">Accueil</a>
         <a href="#">Mes séances</a>
         <a href="#">Messages</a>
-        <a href="{{ path('patient_rapports') }}">Rapports</a>
         <a href="{{ path('patient_bien_etre') }}">Bien-être</a>
         <a href="{{ path('patient_profile') }}">Mon profil</a>
     </div>
@@ -227,11 +226,6 @@
         <div class="label">Messages</div>
     </div>
     <div class="stat-item">
-        <div class="icon">📋</div>
-        <div class="number">0</div>
-        <div class="label">Rapports</div>
-    </div>
-    <div class="stat-item">
         <div class="icon">⭐</div>
         <div class="number">{% if last is defined and last %}{{ ((last.sommeil + last.humeur + (100 - last.stress)) / 3)|round }}%{% else %}—{% endif %}</div>
         <div class="label">Score bien-être</div>
@@ -241,23 +235,17 @@
 <div class="content">
 
     <div class="section-title animate">🎯 Mes services</div>
-    <div class="grid-3">
+    <div class="grid-2-cards">
         <a href="#" class="service-card animate delay-1">
             <div class="icon">🧘</div>
             <h3>Séances de thérapie</h3>
             <p>Planifiez et suivez vos séances avec votre coach personnel.</p>
             <span class="arrow">Voir mes séances →</span>
         </a>
-        <a href="{{ path('patient_rapports') }}" class="service-card animate delay-2">
-            <div class="icon">📊</div>
-            <h3>Suivi de progression</h3>
-            <p>Visualisez votre évolution et vos progrès au fil du temps.</p>
-            <span class="arrow">Voir mes rapports →</span>
-        </a>
-        <a href="{{ path('patient_bien_etre') }}" class="service-card animate delay-3">
+        <a href="{{ path('patient_bien_etre') }}" class="service-card animate delay-2">
             <div class="icon">🌿</div>
             <h3>Mon bien-être</h3>
-            <p>Évaluez votre état quotidien et suivez votre progression.</p>
+            <p>Évaluez votre humeur quotidienne et suivez votre progression.</p>
             <span class="arrow">Évaluer mon état →</span>
         </a>
     </div>
@@ -268,7 +256,7 @@
             <div class="wellbeing-panel animate delay-1" style="margin-bottom:20px;">
                 <div class="wellbeing-header">
                     <h4>🌿 Dernière évaluation</h4>
-                    {% if last %}
+                    {% if last is defined and last %}
                         <span style="font-size:11px;color:#999;">{{ last.createdAt|date('d/m/Y') }}</span>
                     {% endif %}
                 </div>
@@ -277,11 +265,9 @@
                     <div class="w-info"><h4>Sommeil</h4><p>Qualité du sommeil</p></div>
                     <div class="w-bar-wrap">
                         <div class="w-bar">
-                            <div class="w-fill" id="sleep"
-                                 style="width:{% if last %}{{ last.sommeil }}{% else %}0{% endif %}%;background:#4A6FA5;">
-                            </div>
+                            <div class="w-fill" style="width:{% if last is defined and last %}{{ last.sommeil }}{% else %}0{% endif %}%;background:#4A6FA5;"></div>
                         </div>
-                        <div class="w-pct">{% if last %}{{ last.sommeil }}%{% else %}—{% endif %}</div>
+                        <div class="w-pct">{% if last is defined and last %}{{ last.sommeil }}%{% else %}—{% endif %}</div>
                     </div>
                 </div>
                 <div class="wellbeing-item">
@@ -289,11 +275,9 @@
                     <div class="w-info"><h4>Stress</h4><p>Niveau de stress</p></div>
                     <div class="w-bar-wrap">
                         <div class="w-bar">
-                            <div class="w-fill" id="stress"
-                                 style="width:{% if last %}{{ last.stress }}{% else %}0{% endif %}%;background:#E8895A;">
-                            </div>
+                            <div class="w-fill" style="width:{% if last is defined and last %}{{ last.stress }}{% else %}0{% endif %}%;background:#E8895A;"></div>
                         </div>
-                        <div class="w-pct">{% if last %}{{ last.stress }}%{% else %}—{% endif %}</div>
+                        <div class="w-pct">{% if last is defined and last %}{{ last.stress }}%{% else %}—{% endif %}</div>
                     </div>
                 </div>
                 <div class="wellbeing-item">
@@ -301,11 +285,9 @@
                     <div class="w-info"><h4>Humeur</h4><p>Humeur générale</p></div>
                     <div class="w-bar-wrap">
                         <div class="w-bar">
-                            <div class="w-fill" id="mood"
-                                 style="width:{% if last %}{{ last.humeur }}{% else %}0{% endif %}%;background:#27ae60;">
-                            </div>
+                            <div class="w-fill" style="width:{% if last is defined and last %}{{ last.humeur }}{% else %}0{% endif %}%;background:#27ae60;"></div>
                         </div>
-                        <div class="w-pct">{% if last %}{{ last.humeur }}%{% else %}—{% endif %}</div>
+                        <div class="w-pct">{% if last is defined and last %}{{ last.humeur }}%{% else %}—{% endif %}</div>
                     </div>
                 </div>
                 <a href="{{ path('patient_bien_etre') }}" class="btn-evaluer">✏️ Évaluer mon état aujourd'hui</a>

@@ -42,6 +42,11 @@ class BienEtre
     #[ORM\Column]
     #[Assert\NotNull(message: 'La date est requise')]
     private ?\DateTimeImmutable $createdAt = null;
+
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $mood = null;
+
     public function getId(): ?int { return $this->id; }
     public function getUser(): ?User { return $this->user; }
     public function setUser(?User $user): static { $this->user = $user; return $this; }
@@ -53,4 +58,6 @@ class BienEtre
     public function setHumeur(int $h): static { $this->humeur = $h; return $this; }
     public function getCreatedAt(): ?\DateTimeImmutable { return $this->createdAt; }
     public function setCreatedAt(\DateTimeImmutable $d): static { $this->createdAt = $d; return $this; }
+    public function getMood(): ?string { return $this->mood; }
+    public function setMood(?string $mood): static { $this->mood = $mood; return $this; }
 }

@@ -102,4 +102,35 @@ public function index(Request $request, UserRepository $repo): Response
             'date'  => new \DateTime(),
         ]);
     }
+    #[Route('/analytics', name: 'admin_analytics')]
+    public function analytics(
+        UserRepository $repo,
+        EntityManagerInterface $em
+    ): Response {
+        // Répartition par rôle
+        $totalAdmins   = $repo->count(['role' => 'Admin']);
+        $totalCoachs   = $repo->count(['role' => 'Coach']);
+        $totalPatients = $repo->count(['role' => 'Patient']);
+        $total         = $repo->count([]);
+
+        // Score bien-être moyen
+        $avgBienEtre = $em->createQuery("
+            SELECT AVG(b.sommeil) as avgSommeil,
+                AVG(b.stress) as avgStress,
+                AVG(b.humeur) as avgHumeur
+            FROM App\Entity\BienEtre b
+        ")->getSingleResult();
+
+        // Dernières inscriptions
+        $lastUsers = $repo->findBy([], ['id' => 'DESC'], 5);
+
+        return $this->render('admin/analytics.html.twig', [
+            'totalAdmins'   => $totalAdmins,
+            'totalCoachs'   => $totalCoachs,
+            'totalPatients' => $totalPatients,
+            'total'         => $total,
+            'avgBienEtre'   => $avgBienEtre,
+            'lastUsers'     => $lastUsers,
+        ]);
+    }
 }
