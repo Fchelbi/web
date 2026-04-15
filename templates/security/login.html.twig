@@ -3,162 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>Connexion · EchoCare</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', sans-serif;
-            background: #F0E6D8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #0D1B2A;
+            display: flex; justify-content: center; align-items: center;
             min-height: 100vh;
         }
         .container {
-            display: flex;
-            width: 820px;
-            min-height: 560px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            display: flex; width: 860px; min-height: 560px;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
         }
         .left-panel {
-            background: #4A6FA5;
-            width: 45%;
-            padding: 50px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            color: white;
+            background: linear-gradient(160deg, #162232 0%, #0D1B2A 100%);
+            width: 45%; padding: 50px 40px;
+            display: flex; flex-direction: column;
+            justify-content: space-between; color: white;
+            border-right: 1px solid rgba(255,255,255,0.05);
         }
-        .logo-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            gap: 16px;
-        }
+        .logo-area { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
         .logo-icon {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
+            width: 80px; height: 80px;
+            background: rgba(232,137,90,0.15);
+            border: 2px solid rgba(232,137,90,0.3);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 36px;
         }
-        .logo-area h1 { font-size: 28px; font-weight: 700; }
+        .logo-area h1 { font-size: 28px; font-weight: 700; color: white; }
         .logo-area h1 span { color: #E8895A; }
-        .logo-area p { font-size: 13px; opacity: 0.7; letter-spacing: 1px; }
+        .logo-area p { font-size: 13px; color: #8899AA; letter-spacing: 1px; }
         .features { display: flex; flex-direction: column; gap: 20px; }
         .feature-item { border-left: 3px solid #E8895A; padding-left: 14px; }
-        .feature-item h3 { font-size: 14px; font-weight: 600; }
-        .feature-item p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
-        .version { text-align: center; font-size: 11px; opacity: 0.4; }
+        .feature-item h3 { font-size: 14px; font-weight: 600; color: white; }
+        .feature-item p { font-size: 12px; color: #8899AA; margin-top: 2px; }
+        .version { text-align: center; font-size: 11px; color: #4A5568; }
+
         .right-panel {
-            background: #FAF7F2;
-            width: 55%;
-            padding: 50px 45px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background: #162232;
+            width: 55%; padding: 50px 45px;
+            display: flex; flex-direction: column; justify-content: center;
         }
         .dots { display: flex; gap: 6px; margin-bottom: 30px; }
         .dot { width: 28px; height: 4px; border-radius: 2px; }
         .dot:nth-child(1) { background: #E8895A; }
-        .dot:nth-child(2) { background: #E8C99A; }
-        .dot:nth-child(3) { background: #4A6FA5; }
-        .right-panel h2 { font-size: 28px; font-weight: 700; color: #2C3E50; margin-bottom: 6px; }
-        .right-panel .subtitle { font-size: 13px; color: #999; margin-bottom: 30px; }
+        .dot:nth-child(2) { background: rgba(232,137,90,0.4); }
+        .dot:nth-child(3) { background: rgba(232,137,90,0.2); }
+        .right-panel h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 6px; }
+        .right-panel .subtitle { font-size: 13px; color: #8899AA; margin-bottom: 30px; }
         .error-msg {
-            background: #ffe0e0;
-            color: #c0392b;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
+            background: rgba(231,76,60,0.15); color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.3);
+            padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px;
         }
         .field-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #4A6FA5;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 6px;
-            display: block;
+            font-size: 11px; font-weight: 700; color: #8899AA;
+            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; display: block;
         }
-        input[type="email"],
-        input[type="password"] {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1.5px solid #E8E0D5;
-            border-radius: 10px;
-            background: #F5EFE6;
-            font-size: 14px;
-            color: #333;
-            outline: none;
-            transition: border-color 0.2s;
-            margin-bottom: 20px;
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 14px 16px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px; background: rgba(255,255,255,0.05);
+            font-size: 14px; color: white; outline: none;
+            transition: border-color 0.2s; margin-bottom: 20px;
         }
-        input:focus { border-color: #4A6FA5; background: white; }
+        input[type="email"]::placeholder, input[type="password"]::placeholder { color: #4A5568; }
+        input:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
+        .row-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .forgot { font-size: 12px; color: #E8895A; text-decoration: none; }
+        .forgot:hover { text-decoration: underline; }
+        .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .remember-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: #E8895A; margin: 0; }
+        .remember-row label { font-size: 13px; color: #8899AA; cursor: pointer; }
         .btn-login {
-            width: 100%;
-            padding: 15px;
-            background: #E8895A;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
+            width: 100%; padding: 15px; background: #E8895A;
+            color: white; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; letter-spacing: 0.5px;
         }
-        .btn-login:hover { background: #d4784a; }
+        .btn-login:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(232,137,90,0.3); }
         .separator {
-            text-align: center;
-            color: #ccc;
-            font-size: 13px;
-            margin: 16px 0;
-            position: relative;
+            text-align: center; color: #4A5568; font-size: 13px;
+            margin: 16px 0; position: relative;
         }
         .separator::before, .separator::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 42%;
-            height: 1px;
-            background: #E8E0D5;
+            content: ''; position: absolute; top: 50%; width: 42%; height: 1px;
+            background: rgba(255,255,255,0.06);
         }
         .separator::before { left: 0; }
         .separator::after { right: 0; }
         .btn-signup {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            color: #4A6FA5;
-            border: 1.5px solid #4A6FA5;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            transition: all 0.2s;
+            width: 100%; padding: 14px; background: transparent;
+            color: #E8895A; border: 1.5px solid rgba(232,137,90,0.4);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; text-decoration: none; display: block;
+            text-align: center; transition: all 0.2s;
         }
-        .btn-signup:hover { background: #4A6FA5; color: white; }
-        .security-note { text-align: center; font-size: 11px; color: #bbb; margin-top: 20px; }
+        .btn-signup:hover { background: rgba(232,137,90,0.1); border-color: #E8895A; }
+        .btn-face {
+            width: 100%; padding: 13px; background: rgba(255,255,255,0.05);
+            color: white; border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; text-decoration: none; display: block;
+            text-align: center; transition: all 0.2s; margin-top: 10px;
+        }
+        .btn-face:hover { background: rgba(255,255,255,0.08); }
+        .security-note { text-align: center; font-size: 11px; color: #4A5568; margin-top: 20px; }
         .security-note span { color: #E8895A; }
     </style>
 </head>
-
 <body>
 <div class="container">
-
     <div class="left-panel">
         <div class="logo-area">
             <div class="logo-icon">🧠</div>
@@ -169,16 +126,16 @@
         </div>
         <div class="features">
             <div class="feature-item">
-                <h3>Suivi personnalisé</h3>
-                <p>Rapports automatisés</p>
+                <h3>Suivi personnalise</h3>
+                <p>Rapports automatises</p>
             </div>
             <div class="feature-item">
-                <h3>Communication facilitée</h3>
+                <h3>Communication facilitee</h3>
                 <p>Coach · Patient · Admin</p>
             </div>
             <div class="feature-item">
-                <h3>Sécurité renforcée</h3>
-                <p>Données protégées</p>
+                <h3>Securite renforcee</h3>
+                <p>Donnees protegees</p>
             </div>
         </div>
         <div class="version">EchoCare v2.0</div>
@@ -190,30 +147,25 @@
             <div class="dot"></div>
             <div class="dot"></div>
         </div>
-
         <h2>Bon retour</h2>
-        <p class="subtitle">Connectez-vous à votre espace</p>
+        <p class="subtitle">Connectez-vous a votre espace</p>
 
         {% if error %}
             <div class="error-msg">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
 
         <form method="post">
-
             <label class="field-label">Adresse Email</label>
             <input type="email" name="_username" placeholder="vous@exemple.com"
                    value="{{ last_username }}" autocomplete="email" required>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div class="row-between">
                 <label class="field-label" style="margin-bottom:0;">Mot de passe</label>
-                <a href="{{ path('app_forgot_password') }}"
-                   style="font-size:12px; color:#E8895A; text-decoration:none;">
-                    Oublié ?
-                </a>
+                <a href="{{ path('app_forgot_password') }}" class="forgot">Oublie ?</a>
             </div>
             <input type="password" name="_password" placeholder="••••••••"
                    autocomplete="current-password" required>
-                   
+
             <input type="hidden" name="_csrf_token"
                    data-controller="csrf-protection"
                    value="{{ csrf_token('authenticate') }}">
@@ -222,25 +174,11 @@
         </form>
 
         <div class="separator">ou</div>
-
-        <a href="{{ path('face_login') }}" class="btn-signup" style="background:#4A6FA5;border-color:#4A6FA5;color:white;margin-bottom:10px;">
-            👁️ Connexion Face ID (Admin)
-        </a>
-
+        <a href="{{ path('face_login') }}" class="btn-face">👁️ Connexion Face ID (Admin)</a>
         <div class="separator">ou</div>
-
-        <a href="{{ path('app_signup') }}" class="btn-signup">Créer un compte</a>
-
-        <p class="security-note"><span>●</span> SSL · Données protégées · RGPD</p>
+        <a href="{{ path('app_signup') }}" class="btn-signup">Creer un compte</a>
+        <p class="security-note"><span>●</span> SSL · Donnees protegees · RGPD</p>
     </div>
-
 </div>
-    <script>
-        // Imna3 el retour lel pages protégées ba3d déconnexion
-        history.pushState(null, null, window.location.href);
-        window.addEventListener('popstate', function() {
-            history.pushState(null, null, window.location.href);
-        });
-    </script>
 </body>
 </html>

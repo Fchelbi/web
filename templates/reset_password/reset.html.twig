@@ -6,103 +6,135 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #F0E6D8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif; background: #0D1B2A;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
         .card {
-            background: white;
-            border-radius: 20px;
-            padding: 50px 40px;
-            max-width: 460px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            background: #162232; border-radius: 24px; padding: 50px 40px;
+            max-width: 460px; width: 100%; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease;
         }
-        .icon { font-size: 50px; text-align: center; margin-bottom: 16px; }
-        h2 { color: #2C3E50; font-size: 24px; font-weight: 700; margin-bottom: 6px; text-align: center; }
-        .subtitle { color: #999; font-size: 13px; text-align: center; margin-bottom: 28px; }
-        .error-box {
-            background: #ffe0e0; color: #c0392b;
-            padding: 12px; border-radius: 10px;
-            font-size: 13px; margin-bottom: 16px; text-align: center;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .logo { font-size: 20px; font-weight: 700; color: white; margin-bottom: 28px; }
+        .logo span { color: #E8895A; }
+        .icon-wrap {
+            width: 90px; height: 90px;
+            background: rgba(39,174,96,0.1);
+            border: 2px solid rgba(39,174,96,0.3);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 40px; margin: 0 auto 24px;
+        }
+        h1 { font-size: 24px; font-weight: 700; color: white; margin-bottom: 10px; }
+        p { font-size: 14px; color: #8899AA; line-height: 1.6; margin-bottom: 28px; }
+
+        .error-msg {
+            background: rgba(231,76,60,0.1); color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.2);
+            padding: 14px 16px; border-radius: 10px;
+            font-size: 14px; margin-bottom: 20px;
+        }
+        .field-group { margin-bottom: 20px; text-align: left; }
         .field-label {
-            font-size: 11px; font-weight: 700; color: #4A6FA5;
-            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; display: block;
+            font-size: 11px; font-weight: 700; color: #8899AA;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 8px; display: block;
         }
-        .password-wrapper { position: relative; margin-bottom: 20px; }
-        .password-wrapper input { width: 100%; padding: 13px 44px 13px 16px; border: 1.5px solid #E8E0D5; border-radius: 10px; background: #F5EFE6; font-size: 14px; color: #333; outline: none; }
-        .password-wrapper input:focus { border-color: #4A6FA5; background: white; }
-        .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 16px; }
-        .strength-bar { height: 4px; border-radius: 2px; background: #E8E0D5; margin-top: 6px; overflow: hidden; }
+        .password-wrapper { position: relative; }
+        input[type="password"] {
+            width: 100%; padding: 14px 44px 14px 16px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px; background: rgba(255,255,255,0.05);
+            font-size: 14px; color: white; outline: none; transition: border-color 0.2s;
+        }
+        input[type="password"]::placeholder { color: #4A5568; }
+        input[type="password"]:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
+        .toggle-pw {
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%); cursor: pointer; font-size: 16px;
+        }
+        .strength-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.1); margin-top: 8px; overflow: hidden; }
         .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
-        .strength-text { font-size: 11px; color: #999; margin-top: 4px; }
-        .btn {
-            width: 100%; padding: 14px;
-            background: #4A6FA5; color: white; border: none;
-            border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer;
+        .strength-text { font-size: 11px; color: #8899AA; margin-top: 4px; }
+
+        .btn-reset {
+            width: 100%; padding: 15px; background: #E8895A; color: white;
+            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
         }
-        .btn:hover { background: #3a5f95; }
+        .btn-reset:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(232,137,90,0.3); }
+        .btn-back {
+            width: 100%; padding: 13px; background: transparent;
+            color: #8899AA; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; display: block; transition: all 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.05); color: white; }
     </style>
 </head>
 <body>
 <div class="card">
-    <div class="icon">🔐</div>
-    <h2>Nouveau mot de passe</h2>
-    <p class="subtitle">Choisissez un mot de passe fort</p>
+    <div class="logo">Echo<span>Care</span></div>
+    <div class="icon-wrap">🔒</div>
+    <h1>Nouveau mot de passe</h1>
+    <p>Choisissez un mot de passe fort pour securiser votre compte.</p>
 
-    {% if error %}
-        <div class="error-box">{{ error }}</div>
+    {% if error is defined and error %}
+        <div class="error-msg">❌ {{ error }}</div>
     {% endif %}
 
     <form method="post">
-        <label class="field-label">Nouveau mot de passe</label>
-        <div class="password-wrapper">
-            <input type="password" name="password" id="password" placeholder="••••••••" required>
-            <span class="toggle-pw" onclick="togglePw('password', this)">👁️</span>
+        <div class="field-group">
+            <label class="field-label">Nouveau mot de passe</label>
+            <div class="password-wrapper">
+                <input type="password" name="password" id="password" placeholder="••••••••" required>
+                <span class="toggle-pw" onclick="togglePw('password', this)">👁️</span>
+            </div>
+            <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+            <span class="strength-text" id="strength-text"></span>
         </div>
-        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-        <span class="strength-text" id="strength-text"></span>
-
-        <br>
-        <label class="field-label">Confirmer mot de passe</label>
-        <div class="password-wrapper">
-            <input type="password" name="confirm_password" id="confirm" placeholder="••••••••" required>
-            <span class="toggle-pw" onclick="togglePw('confirm', this)">👁️</span>
+        <div class="field-group">
+            <label class="field-label">Confirmer mot de passe</label>
+            <div class="password-wrapper">
+                <input type="password" name="confirm" id="confirm" placeholder="••••••••" required>
+                <span class="toggle-pw" onclick="togglePw('confirm', this)">👁️</span>
+            </div>
         </div>
-
-        <button type="submit" class="btn" style="margin-top:16px;">✅ Enregistrer</button>
+        <button type="submit" class="btn-reset">🔒 Reinitialiser le mot de passe</button>
     </form>
+    <a href="{{ path('app_login') }}" class="btn-back">← Retour a la connexion</a>
 </div>
+
 <script>
-    function togglePw(id, el) {
-        const input = document.getElementById(id);
-        input.type = input.type === 'password' ? 'text' : 'password';
-        el.textContent = input.type === 'password' ? '👁️' : '🙈';
-    }
-    document.getElementById('password').addEventListener('input', function () {
-        const val = this.value;
-        const fill = document.getElementById('strength-fill');
-        const text = document.getElementById('strength-text');
-        let score = 0;
-        if (val.length >= 8) score++;
-        if (/[A-Z]/.test(val)) score++;
-        if (/[0-9]/.test(val)) score++;
-        if (/[^A-Za-z0-9]/.test(val)) score++;
-        const levels = [
-            { w: '0%', c: 'transparent', t: '' },
-            { w: '25%', c: '#e74c3c', t: '🔴 Très faible' },
-            { w: '50%', c: '#e67e22', t: '🟠 Faible' },
-            { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
-            { w: '100%', c: '#2ecc71', t: '🟢 Fort' },
-        ];
-        fill.style.width = levels[score].w;
-        fill.style.background = levels[score].c;
-        text.textContent = levels[score].t;
-    });
+function togglePw(id, el) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    el.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+document.getElementById('password').addEventListener('input', function() {
+    const val = this.value;
+    const fill = document.getElementById('strength-fill');
+    const text = document.getElementById('strength-text');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+        { w: '0%', c: 'transparent', t: '' },
+        { w: '25%', c: '#e74c3c', t: '🔴 Tres faible' },
+        { w: '50%', c: '#e67e22', t: '🟠 Faible' },
+        { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
+        { w: '100%', c: '#2ecc71', t: '🟢 Fort' },
+    ];
+    fill.style.width = levels[score].w;
+    fill.style.background = levels[score].c;
+    text.textContent = levels[score].t;
+});
 </script>
 </body>
 </html>
