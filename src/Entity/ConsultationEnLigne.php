@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class ConsultationEnLigne
 {
     public const STATUT_EN_ATTENTE = 'en_attente';
-    public const STATUT_CONFIRMEE = 'confirmÃ©e';
-    public const STATUT_ANNULEE = 'annulÃ©e';
+    public const STATUT_CONFIRMEE = 'confirmée';
+    public const STATUT_ANNULEE = 'annulée';
 
     public const STATUTS = [
         self::STATUT_EN_ATTENTE,
@@ -55,13 +55,13 @@ class ConsultationEnLigne
     private ?string $meetLink = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Psychologue::class)]
-    #[ORM\JoinColumn(name: 'psychologue_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'psychologue_id', referencedColumnName: 'id_user', nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull(message: 'Veuillez choisir un psychologue.')]
-    private ?Psychologue $psychologue = null;
+    private ?User $psychologue = null;
 
     public function getId(): ?int
     {
@@ -132,12 +132,12 @@ class ConsultationEnLigne
         return $this;
     }
 
-    public function getPsychologue(): ?Psychologue
+    public function getPsychologue(): ?User
     {
         return $this->psychologue;
     }
 
-    public function setPsychologue(?Psychologue $psychologue): self
+    public function setPsychologue(?User $psychologue): self
     {
         $this->psychologue = $psychologue;
 
@@ -147,11 +147,11 @@ class ConsultationEnLigne
     public function getStatutLabel(): string
     {
         if ($this->statut === self::STATUT_CONFIRMEE) {
-            return 'Confirmee';
+            return 'Confirmée';
         }
 
         if ($this->statut === self::STATUT_ANNULEE) {
-            return 'Annulee';
+            return 'Annulée';
         }
 
         return 'En attente';

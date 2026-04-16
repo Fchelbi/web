@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\ConsultationEnLigne;
-use App\Entity\Psychologue;
 use App\Entity\User;
 use App\Form\ConsultationFilterType;
 use App\Form\ConsultationGestionType;
 use App\Form\ConsultationType;
 use App\Repository\ConsultationEnLigneRepository;
+use App\Service\SmsService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +20,11 @@ use Symfony\Component\Routing\Attribute\Route;
 class ConsultationController extends AbstractController
 {
     #[Route('/consultations', name: 'consultation_list', methods: ['GET'])]
-    public function index(Request $request, ConsultationEnLigneRepository $repository): Response
+    public function index(
+        Request $request,
+        ConsultationEnLigneRepository $repository,
+        PaginatorInterface $paginator
+    ): Response
     {
         $counts = $repository->getStatutCounts();
 
@@ -34,8 +39,28 @@ class ConsultationController extends AbstractController
             $statut = $data['statut'] ?? null;
         }
 
+        $queryBuilder = $repository->createQueryBuilder('c')
+            ->leftJoin('c.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('c.psychologue', 'p')
+            ->addSelect('p')
+            ->orderBy('c.dateConsultation', 'ASC');
+
+        if ($statut !== null && $statut !== '') {
+            $queryBuilder
+                ->andWhere('c.statut = :statut')
+                ->setParameter('statut', $statut);
+        }
+
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            5
+        );
+
         return $this->render('consultation/index.html.twig', [
-            'consultations' => $repository->findByStatut($statut),
+            'consultations' => $pagination,
+            'pagination' => $pagination,
             'counts' => $counts,
             'countEnAttente' => $counts[ConsultationEnLigne::STATUT_EN_ATTENTE] ?? 0,
             'countConfirmee' => $counts[ConsultationEnLigne::STATUT_CONFIRMEE] ?? 0,
@@ -50,8 +75,12 @@ class ConsultationController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         ConsultationEnLigneRepository $repository,
-        ?Psychologue $psychologue = null
+        ?User $psychologue = null
     ): Response {
+        if ($psychologue !== null && $psychologue->getRole() !== User::ROLE_COACH) {
+            throw $this->createNotFoundException('Psychologue introuvable.');
+        }
+
         $consultation = new ConsultationEnLigne();
         $consultation->setStatut(ConsultationEnLigne::STATUT_EN_ATTENTE);
         $consultation->setPsychologue($psychologue);
@@ -107,10 +136,21 @@ class ConsultationController extends AbstractController
     #[Route('/psy/accept/{id}', name: 'psy_accept', methods: ['POST'])]
     public function accept(
         ConsultationEnLigne $consultation,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SmsService $smsService
     ): Response {
         $consultation->setStatut(ConsultationEnLigne::STATUT_CONFIRMEE);
         $entityManager->flush();
+
+        $message = sprintf(
+            'Votre consultation du %s est confirmee.%s',
+            $consultation->getDateConsultation()?->format('d/m/Y H:i') ?? '',
+            $consultation->getMeetLink() ? ' Lien Meet : ' . $consultation->getMeetLink() : ''
+        );
+
+        if (!$smsService->send($consultation->getUser()?->getNumTel(), $message)) {
+            $this->addFlash('error', 'La consultation est confirmee, mais le SMS n a pas pu etre envoye.');
+        }
 
         $this->addFlash('success', 'La consultation a ete confirmee.');
 
@@ -120,11 +160,21 @@ class ConsultationController extends AbstractController
     #[Route('/psy/cancel/{id}', name: 'psy_cancel', methods: ['POST'])]
     public function cancel(
         ConsultationEnLigne $consultation,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SmsService $smsService
     ): Response {
         $consultation->setStatut(ConsultationEnLigne::STATUT_ANNULEE);
         $consultation->setMeetLink(null);
         $entityManager->flush();
+
+        $message = sprintf(
+            'Votre consultation du %s doit etre replanifiee. Merci de choisir une nouvelle date.',
+            $consultation->getDateConsultation()?->format('d/m/Y H:i') ?? ''
+        );
+
+        if (!$smsService->send($consultation->getUser()?->getNumTel(), $message)) {
+            $this->addFlash('error', 'La consultation est annulee, mais le SMS n a pas pu etre envoye.');
+        }
 
         $this->addFlash('success', 'La consultation a ete annulee.');
 
@@ -167,14 +217,21 @@ class ConsultationController extends AbstractController
 
     private function getOrCreateUser(EntityManagerInterface $entityManager): User
     {
-        $user = $entityManager->getRepository(User::class)->findOneBy(['name' => 'Patient Demo']);
+        $repository = $entityManager->getRepository(User::class);
+        $user = $repository->findOneBy(['role' => User::ROLE_PATIENT]) ?? $repository->find(1);
 
         if ($user instanceof User) {
             return $user;
         }
 
         $user = new User();
-        $user->setName('Patient Demo');
+        $user
+            ->setNom('Patient')
+            ->setPrenom('Demo')
+            ->setEmail('patient.demo@example.com')
+            ->setMdp('1234')
+            ->setRole(User::ROLE_PATIENT)
+            ->setNumTel('00000000');
 
         $entityManager->persist($user);
         $entityManager->flush();

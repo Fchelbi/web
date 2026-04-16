@@ -80,7 +80,7 @@
                             <td>
                                 {% if consultation.psychologue %}
                                     <div class="fw-semibold">{{ consultation.psychologue.nomComplet }}</div>
-                                    <div class="small text-muted">{{ consultation.psychologue.specialite }}</div>
+                                    <div class="small text-muted">{{ consultation.psychologue.email }}</div>
                                 {% else %}
                                     <span class="text-muted">Non choisi</span>
                                 {% endif %}
@@ -109,6 +109,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="card-body border-top d-flex justify-content-center">
+            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
         </div>
     </div>
 {% endblock %}

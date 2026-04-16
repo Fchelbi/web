@@ -20,9 +20,9 @@
                 <div class="card page-card h-100">
                     <div class="card-body d-flex flex-column">
                         <h2 class="h5 mb-1">{{ psychologue.nomComplet }}</h2>
-                        <div class="fw-semibold mb-3" style="color: #E8895A;">{{ psychologue.specialite }}</div>
-                        <p class="text-muted mb-3">{{ psychologue.description }}</p>
-                        <div class="small text-muted mb-4">Telephone : {{ psychologue.telephone }}</div>
+                        <div class="fw-semibold mb-3" style="color: #E8895A;">Coach</div>
+                        <p class="text-muted mb-3">{{ psychologue.email }}</p>
+                        <div class="small text-muted mb-4">Telephone : {{ psychologue.numTel ?: 'Non renseigne' }}</div>
 
                         <div class="mt-auto">
                             <a href="{{ path('consultation_add_with_psychologue', {'psychologue': psychologue.id}) }}" class="btn btn-primary w-100">

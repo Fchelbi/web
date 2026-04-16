@@ -3,8 +3,8 @@
 namespace App\Form;
 
 use App\Entity\ConsultationEnLigne;
-use App\Entity\Psychologue;
-use App\Repository\PsychologueRepository;
+use App\Entity\User;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -18,21 +18,18 @@ class ConsultationType extends AbstractType
     {
         $builder
             ->add('psychologue', EntityType::class, [
-                'class' => Psychologue::class,
+                'class' => User::class,
                 'label' => 'Psychologue',
                 'placeholder' => 'Choisir un psychologue',
-                'choice_label' => static function (Psychologue $psychologue): string {
-                    return sprintf(
-                        '%s - %s',
-                        $psychologue->getNomComplet(),
-                        $psychologue->getSpecialite()
-                    );
+                'choice_label' => static function (User $psychologue): string {
+                    return sprintf('%s - %s', $psychologue->getNomComplet(), $psychologue->getEmail());
                 },
-                'query_builder' => static function (PsychologueRepository $repository) {
-                    return $repository->createQueryBuilder('p')
-                        ->leftJoin('p.user', 'u')
-                        ->addSelect('u')
-                        ->orderBy('u.name', 'ASC');
+                'query_builder' => static function (EntityRepository $repository) {
+                    return $repository->createQueryBuilder('u')
+                        ->andWhere('u.role = :role')
+                        ->setParameter('role', User::ROLE_COACH)
+                        ->orderBy('u.nom', 'ASC')
+                        ->addOrderBy('u.prenom', 'ASC');
                 },
                 'attr' => [
                     'class' => 'form-select',
