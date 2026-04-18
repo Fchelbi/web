@@ -117,4 +117,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string { return (string) $this->email; }
     public function eraseCredentials(): void {}
+
+    public function __toString(): string
+    {
+        return $this->prenom . ' ' . $this->nom;
+    }
 }
