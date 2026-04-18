@@ -36,7 +36,7 @@ class BienEtreController extends AbstractController
             ->getQuery()
             ->getOneOrNullResult();
 
-        $success = null;
+        $success = $request->query->get('success') ? 'Humeur enregistree avec succes ! ✅' : null;
         $error = null;
 
         if ($request->isMethod('POST') && !$alreadyToday) {
@@ -51,8 +51,7 @@ class BienEtreController extends AbstractController
             $em->persist($bienEtre);
             $em->flush();
 
-            $success = 'Humeur enregistrée ! ✅';
-            $alreadyToday = $bienEtre;
+            return $this->redirectToRoute('patient_bien_etre', ['success' => 1]);
         } elseif ($request->isMethod('POST') && $alreadyToday) {
             $error = 'Vous avez déjà enregistré votre humeur aujourd\'hui !';
         }
