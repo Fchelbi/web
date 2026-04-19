@@ -2,30 +2,56 @@
 
 namespace App\Controller;
 
+use App\Repository\LoginAttemptRepository;
+use App\Service\BruteForceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
-    {
-        
+    public function __construct(
+        private BruteForceService $bruteForce,
+    ) {}
 
+    #[Route(path: '/login', name: 'app_login')]
+    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
+    {
+        $ip           = $request->getClientIp();
         $error        = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
+
+        // Enregistre tentative echouee
+        if ($error && $lastUsername) {
+            $this->bruteForce->recordFailedAttempt($ip, $lastUsername);
+        }
+
+        // Verifie si l'email est bloque
+        $blocked   = $lastUsername ? $this->bruteForce->isBlocked($lastUsername) : false;
+        $remaining = $blocked ? $this->bruteForce->getRemainingTime($lastUsername) : 0;
+        $attempts  = $lastUsername ? $this->bruteForce->getAttempts($lastUsername) : 0;
+
+        if ($this->getUser()) {
+            $this->bruteForce->recordSuccessfulLogin($this->getUser()->getUserIdentifier());
+            $roles = $this->getUser()->getRoles();
+            if (in_array('ROLE_ADMIN', $roles)) return $this->redirectToRoute('admin_dashboard');
+            elseif (in_array('ROLE_COACH', $roles)) return $this->redirectToRoute('coach_dashboard');
+            else return $this->redirectToRoute('patient_dashboard');
+        }
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
         $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error'         => $error,
+            'blocked'       => $blocked,
+            'remaining'     => $remaining,
+            'attempts'      => $attempts,
         ], $response);
     }
 
@@ -35,11 +61,22 @@ class SecurityController extends AbstractController
         throw new \LogicException('This method can be blank.');
     }
 
-    #[Route(path: '/check-auth', name: 'check_auth')]
+    #[Route('/check-auth', name: 'check_auth')]
     public function checkAuth(): JsonResponse
     {
+        return new JsonResponse(['authenticated' => $this->getUser() !== null]);
+    }
+
+    #[Route('/check-blocked', name: 'check_blocked')]
+    public function checkBlocked(Request $request): JsonResponse
+    {
+        $email     = $request->query->get('email', '');
+        $blocked   = $email ? $this->bruteForce->isBlocked($email) : false;
+        $remaining = $blocked ? $this->bruteForce->getRemainingTime($email) : 0;
+
         return new JsonResponse([
-            'authenticated' => $this->getUser() !== null
+            'blocked'   => $blocked,
+            'remaining' => $remaining, // Secondes exactes !
         ]);
     }
 }

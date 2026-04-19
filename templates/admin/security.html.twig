@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Securite · EchoCare Admin</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .navbar h1 { font-size: 20px; font-weight: 700; color: white; }
+        .navbar h1 span { color: #E8895A; }
+        .navbar-right { display: flex; gap: 10px; }
+        .navbar a {
+            color: #8899AA; text-decoration: none;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px; border-radius: 8px; font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s;
+        }
+        .navbar a:hover { background: rgba(232,137,90,0.15); color: #E8895A; }
+        .content { padding: 30px 40px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h2 { font-size: 24px; font-weight: 700; color: white; }
+        .page-header p { font-size: 14px; color: #8899AA; margin-top: 4px; }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: #162232; border-radius: 14px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05); text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+        .stat-card.red::after { background: #e74c3c; }
+        .stat-card.orange::after { background: #E8895A; }
+        .stat-card.green::after { background: #27ae60; }
+        .stat-card .icon { font-size: 32px; margin-bottom: 10px; }
+        .stat-card .number { font-size: 32px; font-weight: 700; }
+        .stat-card.red .number { color: #e74c3c; }
+        .stat-card.orange .number { color: #E8895A; }
+        .stat-card.green .number { color: #27ae60; }
+        .stat-card .label { font-size: 12px; color: #8899AA; margin-top: 4px; }
+
+        .section-title { font-size: 18px; font-weight: 700; color: white; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+
+        table { width: 100%; background: #162232; border-radius: 14px; overflow: hidden; border-collapse: collapse; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 28px; }
+        thead { background: rgba(231,76,60,0.1); }
+        thead th { padding: 14px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #e74c3c; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s; }
+        tbody tr:hover { background: rgba(255,255,255,0.02); }
+        tbody td { padding: 14px 16px; font-size: 14px; color: #CBD5E0; }
+
+        .badge-blocked { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-suspicious { background: rgba(232,137,90,0.2); color: #E8895A; border: 1px solid rgba(232,137,90,0.3); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+        .btn-unblock {
+            padding: 6px 14px; background: rgba(39,174,96,0.15); color: #27ae60;
+            border: 1px solid rgba(39,174,96,0.3); border-radius: 8px;
+            font-size: 13px; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-unblock:hover { background: rgba(39,174,96,0.3); color: white; }
+        .empty { text-align: center; padding: 40px; color: #4A5568; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>Echo<span>Care</span> · Securite</h1>
+    <div class="navbar-right">
+        <a href="{{ path('admin_dashboard') }}">← Dashboard</a>
+        <a href="{{ path('app_logout') }}">🚪 Deconnexion</a>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="page-header">
+        <h2>🔐 Tableau de Bord Securite</h2>
+        <p>Detection et gestion des tentatives de connexion suspectes</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card red">
+            <div class="icon">🚫</div>
+            <div class="number">{{ blocked|length }}</div>
+            <div class="label">IPs bloquees actuellement</div>
+        </div>
+        <div class="stat-card orange">
+            <div class="icon">⚠️</div>
+            <div class="number">{{ suspicious|length }}</div>
+            <div class="label">Tentatives suspectes</div>
+        </div>
+        <div class="stat-card green">
+            <div class="icon">🛡️</div>
+            <div class="number">5</div>
+            <div class="label">Max tentatives avant blocage</div>
+        </div>
+    </div>
+
+    <div class="section-title">🚫 IPs Bloquees</div>
+    <table>
+        <thead>
+            <tr>
+                <th>IP</th>
+                <th>Email cible</th>
+                <th>Tentatives</th>
+                <th>Bloquee jusqu'a</th>
+                <th>Statut</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if blocked is empty %}
+                <tr><td colspan="6" class="empty">✅ Aucune IP bloquee actuellement</td></tr>
+            {% else %}
+                {% for attempt in blocked %}
+                <tr>
+                    <td style="color:white;font-weight:600;">{{ attempt.ip }}</td>
+                    <td>{{ attempt.email ?? '—' }}</td>
+                    <td><span style="color:#e74c3c;font-weight:700;">{{ attempt.attempts }}x</span></td>
+                    <td>{{ attempt.blockedUntil ? attempt.blockedUntil|date('d/m/Y H:i') : '—' }}</td>
+                    <td><span class="badge-blocked">🚫 Bloquee</span></td>
+                    <td>
+                        <form method="post" action="{{ path('admin_unblock', {id: attempt.id}) }}">
+                            <button type="submit" class="btn-unblock">✅ Debloquer</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+
+    <div class="section-title">⚠️ Tentatives Suspectes</div>
+    <table>
+        <thead>
+            <tr>
+                <th>IP</th>
+                <th>Email cible</th>
+                <th>Tentatives</th>
+                <th>Derniere tentative</th>
+                <th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if suspicious is empty %}
+                <tr><td colspan="5" class="empty">✅ Aucune activite suspecte</td></tr>
+            {% else %}
+                {% for attempt in suspicious %}
+                <tr>
+                    <td style="color:white;font-weight:600;">{{ attempt.ip }}</td>
+                    <td>{{ attempt.email ?? '—' }}</td>
+                    <td><span style="color:#E8895A;font-weight:700;">{{ attempt.attempts }}x</span></td>
+                    <td>{{ attempt.lastAttempt|date('d/m/Y H:i') }}</td>
+                    <td>
+                        {% if attempt.isBlocked %}
+                            <span class="badge-blocked">🚫 Bloquee</span>
+                        {% else %}
+                            <span class="badge-suspicious">⚠️ Suspecte</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

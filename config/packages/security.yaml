@@ -40,4 +40,5 @@ security:
     - { path: ^/check-auth, roles: PUBLIC_ACCESS }
     - { path: ^/admin,   roles: ROLE_ADMIN }
     - { path: ^/coach,   roles: ROLE_COACH }
-    - { path: ^/patient, roles: ROLE_PATIENT }           
+    - { path: ^/patient, roles: ROLE_PATIENT } 
+    - { path: ^/check-blocked, roles: PUBLIC_ACCESS }          

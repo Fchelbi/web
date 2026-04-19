@@ -103,4 +103,33 @@ class MailService
             ");
         $this->mailer->send($email);
     }
+    public function sendSecurityAlert(string $ip, string $email, int $attempts): void
+    {
+        $emailMessage = (new \Symfony\Component\Mime\Email())
+            ->from('emnaboughoufa123@gmail.com')
+            ->to($email)
+            ->subject('🚨 EchoCare — Tentative de connexion suspecte !')
+            ->html('
+                <div style="font-family:Segoe UI,sans-serif;max-width:500px;margin:0 auto;background:#0D1B2A;border-radius:16px;overflow:hidden;">
+                    <div style="background:#e74c3c;padding:24px;text-align:center;">
+                        <h1 style="color:white;font-size:22px;margin:0;">🚨 Alerte Securite</h1>
+                    </div>
+                    <div style="padding:32px;background:#162232;">
+                        <h2 style="color:white;font-size:18px;margin-bottom:16px;">Tentative de brute force detectee !</h2>
+                        <div style="background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);border-radius:10px;padding:16px;margin-bottom:16px;">
+                            <p style="color:#e74c3c;margin:0 0 8px;"><strong>IP :</strong> ' . $ip . '</p>
+                            <p style="color:#e74c3c;margin:0 0 8px;"><strong>Email cible :</strong> ' . $email . '</p>
+                            <p style="color:#e74c3c;margin:0;"><strong>Tentatives :</strong> ' . $attempts . ' fois</p>
+                        </div>
+                        <p style="color:#8899AA;font-size:13px;">L\'IP a ete automatiquement bloquee pendant 15 minutes.</p>
+                        <a href="http://127.0.0.1:8000/admin/security" 
+                        style="display:inline-block;margin-top:16px;padding:12px 24px;background:#e74c3c;color:white;text-decoration:none;border-radius:8px;font-weight:600;">
+                            Voir les tentatives suspectes
+                        </a>
+                    </div>
+                </div>
+            ');
+
+        $this->mailer->send($emailMessage);
+    }
 }
