@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Coach · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 0 40px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-logo { font-size: 22px; font-weight: 700; color: white; }
+        .navbar-logo span { color: #E8895A; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .user-name { font-size: 14px; color: #8899AA; }
+        .btn-logout {
+            padding: 8px 18px; background: rgba(231,76,60,0.15); color: #e74c3c;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(231,76,60,0.3); }
+        .content { padding: 40px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h2 { font-size: 26px; font-weight: 700; color: white; }
+        .page-header p { font-size: 14px; color: #8899AA; margin-top: 6px; }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-card {
+            background: #162232; padding: 24px; border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05); text-align: center;
+            transition: transform 0.2s; position: relative; overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+        .stat-card.s1::after { background: #E8895A; }
+        .stat-card.s2::after { background: #27ae60; }
+        .stat-card.s3::after { background: #3498db; }
+        .stat-card .icon { font-size: 32px; margin-bottom: 10px; }
+        .stat-card .number { font-size: 32px; font-weight: 700; }
+        .stat-card.s1 .number { color: #E8895A; }
+        .stat-card.s2 .number { color: #27ae60; }
+        .stat-card.s3 .number { color: #3498db; }
+        .stat-card .label { font-size: 12px; color: #8899AA; margin-top: 4px; }
+
+        .patients-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .patient-card {
+            background: #162232; border-radius: 16px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .patient-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(to right, #E8895A, #4A6FA5);
+            transform: scaleX(0); transition: transform 0.3s;
+        }
+        .patient-card:hover { transform: translateY(-4px); border-color: rgba(232,137,90,0.2); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+        .patient-card:hover::before { transform: scaleX(1); }
+        .patient-avatar {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #E8895A, #4A6FA5);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 24px; font-weight: 700;
+            color: white; margin: 0 auto 16px;
+        }
+        .patient-card h3 { font-size: 16px; font-weight: 700; color: white; text-align: center; margin-bottom: 4px; }
+        .patient-card .email { font-size: 12px; color: #8899AA; text-align: center; margin-bottom: 6px; }
+        .patient-card .tel { font-size: 12px; color: #E8895A; text-align: center; margin-bottom: 16px; }
+        .patient-stats {
+            display: flex; justify-content: space-around; padding: 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 16px;
+        }
+        .p-stat { text-align: center; }
+        .p-stat .val { font-size: 18px; }
+        .p-stat .lbl { font-size: 10px; color: #8899AA; margin-top: 2px; }
+        .btn-voir {
+            display: block; text-align: center; padding: 10px;
+            background: rgba(232,137,90,0.15); color: #E8895A;
+            border: 1px solid rgba(232,137,90,0.3);
+            border-radius: 10px; font-size: 13px; font-weight: 600;
+            text-decoration: none; transition: all 0.2s;
+        }
+        .btn-voir:hover { background: #E8895A; color: white; }
+        .empty { text-align: center; padding: 80px; color: #4A5568; }
+        .empty .empty-icon { font-size: 60px; margin-bottom: 16px; opacity: 0.3; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">Echo<span>Care</span> · Coach</div>
+    <div class="navbar-right">
+        <span class="user-name">👋 {{ app.user.prenom }} {{ app.user.nom }}</span>
+        <a href="{{ path('app_logout') }}" class="btn-logout">🚪 Deconnexion</a>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="page-header">
+        <h2>🏋️ Mes Patients</h2>
+        <p>Suivez l'evolution du bien-etre de vos patients au quotidien</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card s1">
+            <div class="icon">👥</div>
+            <div class="number">{{ patients|length }}</div>
+            <div class="label">Total patients</div>
+        </div>
+        <div class="stat-card s2">
+            <div class="icon">📊</div>
+            <div class="number">{{ patients|length }}</div>
+            <div class="label">Actifs</div>
+        </div>
+        <div class="stat-card s3">
+            <div class="icon">📅</div>
+            <div class="number">{{ "now"|date("d/m") }}</div>
+            <div class="label">Aujourd'hui</div>
+        </div>
+    </div>
+
+    {% if patients is empty %}
+    <div class="empty">
+        <div class="empty-icon">👥</div>
+        <p style="font-size:18px;color:#4A5568;">Aucun patient enregistre</p>
+    </div>
+    {% else %}
+    <div class="patients-grid">
+        {% for patient in patients %}
+        <div class="patient-card">
+            <div class="patient-avatar">{{ patient.prenom|slice(0,1)|upper }}</div>
+            <h3>{{ patient.prenom }} {{ patient.nom }}</h3>
+            <p class="email">{{ patient.email }}</p>
+            <p class="tel">📞 {{ patient.numTel ?? '—' }}</p>
+            <div class="patient-stats">
+                <div class="p-stat">
+                    <div class="val">✅</div>
+                    <div class="lbl">Verifie</div>
+                </div>
+                <div class="p-stat">
+                    <div class="val">🌿</div>
+                    <div class="lbl">Patient</div>
+                </div>
+                <div class="p-stat">
+                    <div class="val">📊</div>
+                    <div class="lbl">Suivi</div>
+                </div>
+            </div>
+            <a href="{{ path('coach_patient_detail', {id: patient.id}) }}" class="btn-voir">
+                📊 Voir statistiques →
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

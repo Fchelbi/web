@@ -1,0 +1,7 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: 'noreply@echocare.com'
+        headers:
+            From: 'EchoCare <noreply@echocare.com>'

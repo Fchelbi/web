@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Compte vérifié · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #F0E6D8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .icon { font-size: 70px; margin-bottom: 20px; animation: pop 0.5s ease; }
+        @keyframes pop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        h2 { color: #27ae60; font-size: 26px; margin-bottom: 12px; }
+        p { color: #777; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+        .countdown { color: #4A6FA5; font-weight: 700; font-size: 16px; margin: 16px 0; }
+        .btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 14px 32px;
+            background: #E8895A;
+            color: white;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #d4784a; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">✅</div>
+    <h2>Compte vérifié !</h2>
+    <p>Votre compte a été activé avec succès.</p>
+    <p>Vous allez être redirigé automatiquement dans :</p>
+    <div class="countdown"><span id="count">5</span> secondes...</div>
+    <a href="{{ path('app_login') }}" class="btn">Se connecter maintenant</a>
+</div>
+
+<script>
+    let count = 5;
+    const el = document.getElementById('count');
+    const interval = setInterval(() => {
+        count--;
+        el.textContent = count;
+        if (count <= 0) {
+            clearInterval(interval);
+            window.location.href = "{{ path('app_login') }}";
+        }
+    }, 1000);
+</script>
+</body>
+</html>

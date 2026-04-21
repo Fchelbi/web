@@ -1,10 +1,10 @@
 security:
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+        App\Entity\User:
             algorithm: auto
 
     providers:
-        users_db:
+        app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
@@ -15,8 +15,33 @@ security:
             security: false
         main:
             lazy: true
-            provider: users_db
-            security: false
+            provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                success_handler: App\Security\LoginSuccessHandler
+            logout:
+                path: app_logout
+                target: app_login
+                invalidate_session: true
+                delete_cookies:
+                    PHPSESSID: ~
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
 
-    access_control: []
-
+    access_control:
+        - { path: ^/easyadmin, roles: PUBLIC_ACCESS }
+        - { path: ^/check-auth, roles: PUBLIC_ACCESS }
+        - { path: ^/check-blocked, roles: PUBLIC_ACCESS }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/signup, roles: PUBLIC_ACCESS }
+        - { path: ^/verify, roles: PUBLIC_ACCESS }
+        - { path: ^/2fa, roles: PUBLIC_ACCESS }
+        - { path: ^/spotify, roles: PUBLIC_ACCESS }
+        - { path: ^/login/face, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/coach, roles: ROLE_COACH }
+        - { path: ^/patient, roles: ROLE_PATIENT }

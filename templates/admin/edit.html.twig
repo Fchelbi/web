@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifier Utilisateur · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; display: flex; justify-content: center; align-items: center; padding: 40px; }
+        .card {
+            background: #162232; border-radius: 20px; padding: 40px;
+            max-width: 600px; width: 100%;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .card-header { margin-bottom: 28px; }
+        .card-header h2 { font-size: 22px; font-weight: 700; color: white; }
+        .card-header p { font-size: 13px; color: #8899AA; margin-top: 4px; }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .field-group { display: flex; flex-direction: column; margin-bottom: 18px; }
+        .field-label {
+            font-size: 11px; font-weight: 700; color: #8899AA;
+            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+        }
+        input, select {
+            padding: 13px 16px; border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px; background: rgba(255,255,255,0.05);
+            font-size: 14px; color: white; outline: none;
+            transition: border-color 0.2s; width: 100%;
+        }
+        input::placeholder { color: #4A5568; }
+        input:focus, select:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
+        select option { background: #162232; color: white; }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 44px; }
+        .toggle-pw {
+            position: absolute; right: 14px; top: 50%;
+            transform: translateY(-50%); cursor: pointer; font-size: 16px;
+        }
+        .hint { font-size: 11px; color: #4A5568; margin-top: 4px; }
+        .divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 20px 0; }
+        .btn-row { display: flex; gap: 12px; margin-top: 8px; }
+        .btn-save {
+            flex: 1; padding: 14px; background: #E8895A; color: white;
+            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-save:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(232,137,90,0.3); }
+        .btn-cancel {
+            flex: 1; padding: 14px; background: rgba(255,255,255,0.05); color: #8899AA;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+            font-size: 15px; font-weight: 600; text-decoration: none;
+            text-align: center; transition: all 0.2s;
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,0.1); color: white; }
+        .badge-user {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(232,137,90,0.15); color: #E8895A;
+            border: 1px solid rgba(232,137,90,0.3);
+            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="card-header">
+        <span class="badge-user">✏️ Modification</span>
+        <h2>Modifier {{ user.prenom }} {{ user.nom }}</h2>
+        <p>Modifiez les informations de l'utilisateur</p>
+    </div>
+
+    <form method="post" novalidate>
+        <div class="row-2">
+            <div class="field-group">
+                <label class="field-label">Nom</label>
+                <input type="text" name="nom" value="{{ user.nom }}" required>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Prenom</label>
+                <input type="text" name="prenom" value="{{ user.prenom }}" required>
+            </div>
+        </div>
+
+        <div class="field-group">
+            <label class="field-label">Email</label>
+            <input type="email" name="email" value="{{ user.email }}" required>
+        </div>
+
+        <div class="row-2">
+            <div class="field-group">
+                <label class="field-label">Telephone</label>
+                <input type="text" name="num_tel" value="{{ user.numTel ?? '' }}">
+            </div>
+            <div class="field-group">
+                <label class="field-label">Role</label>
+                <select name="role">
+                    <option value="Patient" {{ user.role == 'Patient' ? 'selected' : '' }}>🌿 Patient</option>
+                    <option value="Coach"   {{ user.role == 'Coach'   ? 'selected' : '' }}>🏋️ Coach</option>
+                    <option value="Admin"   {{ user.role == 'Admin'   ? 'selected' : '' }}>👑 Admin</option>
+                </select>
+            </div>
+        </div>
+
+        <hr class="divider">
+        <p style="color:#8899AA;font-size:13px;margin-bottom:16px;">🔐 Changer le mot de passe</p>
+
+        <div class="field-group">
+            <label class="field-label">Nouveau mot de passe</label>
+            <div class="password-wrapper">
+                <input type="password" name="password" id="pw" placeholder="••••••••">
+                <span class="toggle-pw" onclick="togglePw()">👁️</span>
+            </div>
+            <span class="hint">Laisser vide pour ne pas changer</span>
+        </div>
+
+        <div class="btn-row">
+            <button type="submit" class="btn-save">💾 Enregistrer</button>
+            <a href="{{ path('admin_dashboard') }}" class="btn-cancel">← Annuler</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function togglePw() {
+    const input = document.getElementById('pw');
+    const btn = document.querySelector('.toggle-pw');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    btn.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+</script>
+</body>
+</html>

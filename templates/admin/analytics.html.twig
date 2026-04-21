@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Analytics · EchoCare Admin</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 16px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar h1 { font-size: 20px; font-weight: 700; color: white; }
+        .navbar h1 span { color: #E8895A; }
+        .navbar-right { display: flex; gap: 10px; }
+        .navbar a {
+            color: #8899AA; text-decoration: none;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px; border-radius: 8px; font-size: 13px;
+            border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s;
+        }
+        .navbar a:hover { background: rgba(232,137,90,0.15); color: #E8895A; border-color: rgba(232,137,90,0.3); }
+        .content { padding: 30px 40px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h2 { font-size: 24px; font-weight: 700; color: white; }
+        .page-header p { font-size: 14px; color: #8899AA; margin-top: 4px; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi-card {
+            background: #162232; border-radius: 16px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.2s; position: relative; overflow: hidden;
+        }
+        .kpi-card:hover { transform: translateY(-4px); }
+        .kpi-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+        .kpi-card.blue::after { background: #4A6FA5; }
+        .kpi-card.orange::after { background: #E8895A; }
+        .kpi-card.green::after { background: #27ae60; }
+        .kpi-card.purple::after { background: #9b59b6; }
+        .kpi-icon { font-size: 32px; margin-bottom: 10px; }
+        .kpi-value { font-size: 36px; font-weight: 700; }
+        .kpi-card.blue .kpi-value { color: #4A6FA5; }
+        .kpi-card.orange .kpi-value { color: #E8895A; }
+        .kpi-card.green .kpi-value { color: #27ae60; }
+        .kpi-card.purple .kpi-value { color: #9b59b6; }
+        .kpi-label { font-size: 12px; color: #8899AA; margin-top: 4px; }
+        .kpi-trend { font-size: 12px; margin-top: 8px; color: #27ae60; }
+
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .chart-card {
+            background: #162232; border-radius: 16px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .chart-card h3 { font-size: 16px; font-weight: 700; color: white; margin-bottom: 20px; }
+
+        .bienetre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .bienetre-card {
+            background: #162232; border-radius: 16px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05); text-align: center;
+        }
+        .bienetre-card .icon { font-size: 36px; margin-bottom: 12px; }
+        .bienetre-card .value { font-size: 32px; font-weight: 700; }
+        .bienetre-card .label { font-size: 13px; color: #8899AA; margin-top: 4px; }
+
+        .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .recent-card {
+            background: #162232; border-radius: 16px; padding: 24px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .recent-card h3 { font-size: 16px; font-weight: 700; color: white; margin-bottom: 16px; }
+        .user-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .user-item:last-child { border-bottom: none; }
+        .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #E8895A, #4A6FA5);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 14px;
+        }
+        .user-info h4 { font-size: 14px; font-weight: 600; color: white; }
+        .user-info p { font-size: 12px; color: #8899AA; margin-top: 2px; }
+        .badge { margin-left: auto; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge-admin { background: rgba(155,89,182,0.2); color: #9b59b6; }
+        .badge-coach { background: rgba(52,152,219,0.2); color: #3498db; }
+        .badge-patient { background: rgba(39,174,96,0.2); color: #27ae60; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: fadeInUp 0.5s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>Echo<span>Care</span> · Analytics</h1>
+    <div class="navbar-right">
+        <a href="{{ path('admin_dashboard') }}">← Dashboard</a>
+        <a href="{{ path('app_logout') }}">🚪 Deconnexion</a>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="page-header">
+        <h2>📊 Dashboard Analytics</h2>
+        <p>Vue d'ensemble des statistiques EchoCare</p>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card blue animate delay-1">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-value">{{ total }}</div>
+            <div class="kpi-label">Utilisateurs total</div>
+            <div class="kpi-trend">↑ Actifs</div>
+        </div>
+        <div class="kpi-card orange animate delay-2">
+            <div class="kpi-icon">👑</div>
+            <div class="kpi-value">{{ totalAdmins }}</div>
+            <div class="kpi-label">Administrateurs</div>
+        </div>
+        <div class="kpi-card green animate delay-3">
+            <div class="kpi-icon">🏋️</div>
+            <div class="kpi-value">{{ totalCoachs }}</div>
+            <div class="kpi-label">Coachs</div>
+        </div>
+        <div class="kpi-card purple animate delay-3">
+            <div class="kpi-icon">🌿</div>
+            <div class="kpi-value">{{ totalPatients }}</div>
+            <div class="kpi-label">Patients</div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card animate">
+            <h3>📈 Repartition des utilisateurs</h3>
+            <canvas id="barChart" height="120"></canvas>
+        </div>
+        <div class="chart-card animate delay-1">
+            <h3>🥧 Par role</h3>
+            <canvas id="pieChart" height="200"></canvas>
+        </div>
+    </div>
+
+    <h3 style="font-size:18px;font-weight:700;color:white;margin-bottom:16px;">🌿 Bien-etre moyen des patients</h3>
+    <div class="bienetre-grid">
+        <div class="bienetre-card animate delay-1">
+            <div class="icon">😴</div>
+            <div class="value" style="color:#4A6FA5;">{{ avgBienEtre.avgSommeil ? avgBienEtre.avgSommeil|round : '—' }}%</div>
+            <div class="label">Qualite du sommeil</div>
+        </div>
+        <div class="bienetre-card animate delay-2">
+            <div class="icon">🧘</div>
+            <div class="value" style="color:#E8895A;">{{ avgBienEtre.avgStress ? avgBienEtre.avgStress|round : '—' }}%</div>
+            <div class="label">Niveau de stress</div>
+        </div>
+        <div class="bienetre-card animate delay-3">
+            <div class="icon">😊</div>
+            <div class="value" style="color:#27ae60;">{{ avgBienEtre.avgHumeur ? avgBienEtre.avgHumeur|round : '—' }}%</div>
+            <div class="label">Humeur generale</div>
+        </div>
+    </div>
+
+    <div class="grid-2-1">
+        <div class="chart-card animate">
+            <h3>📊 Score bien-etre</h3>
+            <canvas id="radarChart" height="120"></canvas>
+        </div>
+        <div class="recent-card animate delay-1">
+            <h3>🕐 Derniers inscrits</h3>
+            {% for user in lastUsers %}
+            <div class="user-item">
+                <div class="user-avatar">{{ user.prenom|slice(0,1)|upper }}</div>
+                <div class="user-info">
+                    <h4>{{ user.prenom }} {{ user.nom }}</h4>
+                    <p>{{ user.email }}</p>
+                </div>
+                <span class="badge badge-{{ user.role|lower }}">{{ user.role }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+Chart.defaults.color = '#8899AA';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: ['Admins', 'Coachs', 'Patients'],
+        datasets: [{
+            label: 'Utilisateurs',
+            data: [{{ totalAdmins }}, {{ totalCoachs }}, {{ totalPatients }}],
+            backgroundColor: ['rgba(232,137,90,0.7)', 'rgba(74,111,165,0.7)', 'rgba(39,174,96,0.7)'],
+            borderColor: ['#E8895A', '#4A6FA5', '#27ae60'],
+            borderWidth: 1, borderRadius: 8,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8899AA' } },
+            x: { grid: { display: false }, ticks: { color: '#8899AA' } }
+        },
+        animation: { duration: 1500 }
+    }
+});
+
+new Chart(document.getElementById('pieChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Admins', 'Coachs', 'Patients'],
+        datasets: [{
+            data: [{{ totalAdmins }}, {{ totalCoachs }}, {{ totalPatients }}],
+            backgroundColor: ['rgba(232,137,90,0.8)', 'rgba(74,111,165,0.8)', 'rgba(39,174,96,0.8)'],
+            borderColor: ['#E8895A', '#4A6FA5', '#27ae60'],
+            borderWidth: 2,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom', labels: { color: '#8899AA', padding: 16 } } },
+        cutout: '65%',
+        animation: { duration: 1500 }
+    }
+});
+
+new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+        labels: ['Sommeil', 'Humeur', 'Anti-Stress'],
+        datasets: [{
+            label: 'Moyenne patients',
+            data: [
+                {{ avgBienEtre.avgSommeil ? avgBienEtre.avgSommeil|round : 0 }},
+                {{ avgBienEtre.avgHumeur ? avgBienEtre.avgHumeur|round : 0 }},
+                {{ avgBienEtre.avgStress ? (100 - avgBienEtre.avgStress)|round : 0 }}
+            ],
+            backgroundColor: 'rgba(232,137,90,0.15)',
+            borderColor: '#E8895A',
+            pointBackgroundColor: '#E8895A',
+            pointBorderColor: '#0D1B2A',
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#8899AA' } } },
+        scales: {
+            r: {
+                beginAtZero: true, max: 100,
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: '#8899AA', backdropColor: 'transparent' },
+                pointLabels: { color: '#8899AA' }
+            }
+        },
+        animation: { duration: 1500 }
+    }
+});
+</script>
+</body>
+</html>

@@ -1,43 +1,284 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif; background: #0D1B2A;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .container {
+            display: flex; width: 860px; min-height: 560px;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+        }
+        .left-panel {
+            background: linear-gradient(160deg, #162232 0%, #0D1B2A 100%);
+            width: 45%; padding: 50px 40px;
+            display: flex; flex-direction: column;
+            justify-content: space-between; color: white;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo-area { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; }
+        .logo-icon {
+            width: 80px; height: 80px; background: rgba(232,137,90,0.15);
+            border: 2px solid rgba(232,137,90,0.3); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 36px;
+        }
+        .logo-area h1 { font-size: 28px; font-weight: 700; color: white; }
+        .logo-area h1 span { color: #E8895A; }
+        .logo-area p { font-size: 13px; color: #8899AA; letter-spacing: 1px; }
+        .features { display: flex; flex-direction: column; gap: 20px; }
+        .feature-item { border-left: 3px solid #E8895A; padding-left: 14px; }
+        .feature-item h3 { font-size: 14px; font-weight: 600; color: white; }
+        .feature-item p { font-size: 12px; color: #8899AA; margin-top: 2px; }
+        .version { text-align: center; font-size: 11px; color: #4A5568; }
+        .right-panel {
+            background: #162232; width: 55%; padding: 50px 45px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .dots { display: flex; gap: 6px; margin-bottom: 30px; }
+        .dot { width: 28px; height: 4px; border-radius: 2px; }
+        .dot:nth-child(1) { background: #E8895A; }
+        .dot:nth-child(2) { background: rgba(232,137,90,0.4); }
+        .dot:nth-child(3) { background: rgba(232,137,90,0.2); }
+        .right-panel h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 6px; }
+        .right-panel .subtitle { font-size: 13px; color: #8899AA; margin-bottom: 30px; }
+        .error-msg {
+            background: rgba(231,76,60,0.15); color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.3);
+            padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 16px;
+        }
+        .field-label {
+            font-size: 11px; font-weight: 700; color: #8899AA;
+            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; display: block;
+        }
+        input[type="email"], input[type="password"] {
+            width: 100%; padding: 14px 16px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px; background: rgba(255,255,255,0.05);
+            font-size: 14px; color: white; outline: none;
+            transition: border-color 0.2s; margin-bottom: 20px;
+        }
+        input[type="email"]::placeholder, input[type="password"]::placeholder { color: #4A5568; }
+        input:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
+        input.blocked-input { border-color: #e74c3c !important; }
+        .row-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .forgot { font-size: 12px; color: #E8895A; text-decoration: none; }
+        .btn-login {
+            width: 100%; padding: 15px; background: #E8895A; color: white;
+            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-login:hover { background: #d4784a; transform: translateY(-1px); }
+        .btn-login:disabled { background: #4A5568; cursor: not-allowed; transform: none; }
+        .separator {
+            text-align: center; color: #4A5568; font-size: 13px;
+            margin: 16px 0; position: relative;
+        }
+        .separator::before, .separator::after {
+            content: ''; position: absolute; top: 50%; width: 42%; height: 1px;
+            background: rgba(255,255,255,0.06);
+        }
+        .separator::before { left: 0; }
+        .separator::after { right: 0; }
+        .btn-signup {
+            width: 100%; padding: 14px; background: transparent;
+            color: #E8895A; border: 1.5px solid rgba(232,137,90,0.4);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; display: block; text-align: center; transition: all 0.2s;
+        }
+        .btn-signup:hover { background: rgba(232,137,90,0.1); border-color: #E8895A; }
+        .btn-face {
+            width: 100%; padding: 13px; background: rgba(255,255,255,0.05);
+            color: white; border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; display: block; text-align: center; transition: all 0.2s;
+        }
+        .btn-face:hover { background: rgba(255,255,255,0.08); }
+        .security-note { text-align: center; font-size: 11px; color: #4A5568; margin-top: 20px; }
+        .security-note span { color: #E8895A; }
 
-{% block title %}Login{% endblock %}
-
-{% block body %}
+        /* BLOCK BOX */
+        .block-box {
+            background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 14px; padding: 20px; text-align: center;
+            margin-bottom: 16px; display: none;
+        }
+        .block-box .block-icon { font-size: 36px; margin-bottom: 8px; }
+        .block-box h4 { color: #e74c3c; font-size: 16px; margin-bottom: 6px; }
+        .block-box p { color: #8899AA; font-size: 13px; line-height: 1.5; }
+        .block-box .timer { color: #E8895A; font-weight: 700; font-size: 20px; margin: 8px 0; }
+        .block-box .try-other {
+            display: inline-block; margin-top: 10px; padding: 8px 18px;
+            background: rgba(255,255,255,0.05); color: #8899AA;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+            text-decoration: none; font-size: 12px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
 <div class="container">
-    <div class="login-container" style="max-width: 400px; margin: 4rem auto;">
-        <div class="glassmorphism" style="padding: 2rem;">
-            <h1 class="page-title" style="text-align: center; margin-bottom: 2rem;">Login to Community</h1>
-            
-            {% if error %}
-                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                    {{ error.messageKey|trans(error.messageData, 'security') }}
-                </div>
-            {% endif %}
-
-            <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div>
-                    <label for="inputEmail" style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Email</label>
-                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus style="width: 100%; padding: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-family: inherit;">
-                </div>
-
-                <div>
-                    <label for="inputPassword" style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Password</label>
-                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required style="width: 100%; padding: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-family: inherit;">
-                </div>
-
-                <div style="display: flex; align-items: center;">
-                    <input type="checkbox" id="remember_me" name="_remember_me" checked style="width: 1rem; height: 1rem;">
-                    <label for="remember_me" style="margin-left: 0.5rem; color: var(--text-muted);">Remember me</label>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Sign in</button>
-            </form>
-
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
-                <p style="color: var(--text-muted); margin-bottom: 1rem;">Don't have an account?</p>
-                <a href="{{ path('app_register') }}" class="btn btn-primary" style="width: 100%; padding: 0.8rem; display: block;">Create Account</a>
+    <div class="left-panel">
+        <div class="logo-area">
+            <div class="logo-icon">🧠</div>
+            <div>
+                <h1>Echo<span>Care</span></h1>
+                <p>Psychologie · Bien-etre</p>
             </div>
         </div>
+        <div class="features">
+            <div class="feature-item">
+                <h3>Suivi personnalise</h3>
+                <p>Rapports automatises</p>
+            </div>
+            <div class="feature-item">
+                <h3>Communication facilitee</h3>
+                <p>Coach · Patient · Admin</p>
+            </div>
+            <div class="feature-item">
+                <h3>Securite renforcee</h3>
+                <p>Donnees protegees</p>
+            </div>
+        </div>
+        <div class="version">EchoCare v2.0</div>
+    </div>
+
+    <div class="right-panel">
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <h2>Bon retour</h2>
+        <p class="subtitle">Connectez-vous a votre espace</p>
+
+        {% if error %}
+        <div class="error-msg">
+            ⚠️ Email ou mot de passe incorrect !
+            {% if attempts is defined and attempts > 0 and attempts < 5 %}
+                <br><small style="color:#E8895A;">⚠️ {{ attempts }}/5 tentatives — Bloque apres 5 echecs !</small>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Block box dynamique -->
+        <div class="block-box" id="blockBox">
+            <div class="block-icon">🚫</div>
+            <h4>Compte bloque !</h4>
+            <p>Trop de tentatives pour<br><strong id="blockedEmail" style="color:#E8895A;"></strong></p>
+            <div class="timer" id="blockTimer"></div>
+            <p style="font-size:11px;color:#4A5568;">🤖 Systeme de securite IA EchoCare</p>
+            <span class="try-other" onclick="resetForm()">Essayer avec un autre compte →</span>
+        </div>
+
+        <form method="post" id="loginForm">
+            <label class="field-label">Adresse Email</label>
+            <input type="email" name="_username" id="emailInput"
+                   placeholder="vous@exemple.com"
+                   value="{{ last_username }}" autocomplete="email" required>
+
+            <div id="passwordSection">
+                <div class="row-between">
+                    <label class="field-label" style="margin-bottom:0;">Mot de passe</label>
+                    <a href="{{ path('app_forgot_password') }}" class="forgot">Oublie ?</a>
+                </div>
+                <input type="password" name="_password" placeholder="••••••••"
+                       autocomplete="current-password" required>
+                <input type="hidden" name="_csrf_token"
+                       data-controller="csrf-protection"
+                       value="{{ csrf_token('authenticate') }}">
+                <button type="submit" class="btn-login" id="loginBtn">Se connecter</button>
+            </div>
+        </form>
+
+        <div class="separator">ou</div>
+        <a href="{{ path('face_login') }}" class="btn-face">👁️ Connexion Face ID (Admin)</a>
+        <div class="separator">ou</div>
+        <a href="{{ path('app_signup') }}" class="btn-signup">Creer un compte</a>
+        <p class="security-note"><span>●</span> SSL · Donnees protegees · RGPD</p>
     </div>
 </div>
-{% endblock %}
+
+<script>
+const emailInput  = document.getElementById('emailInput');
+const blockBox    = document.getElementById('blockBox');
+const loginForm   = document.getElementById('loginForm');
+const loginBtn    = document.getElementById('loginBtn');
+const pwSection   = document.getElementById('passwordSection');
+const blockedEmail = document.getElementById('blockedEmail');
+const blockTimer  = document.getElementById('blockTimer');
+
+let countdownInterval = null;
+
+function checkBlocked(email) {
+    if (!email) return;
+    fetch('/check-blocked?email=' + encodeURIComponent(email))
+        .then(r => r.json())
+        .then(data => {
+            if (data.blocked) {
+                showBlockBox(email, data.remaining);
+            } else {
+                hideBlockBox();
+            }
+        }).catch(() => {});
+}
+
+function showBlockBox(email, remaining) {
+    blockBox.style.display = 'block';
+    pwSection.style.display = 'none';
+    emailInput.classList.add('blocked-input');
+    emailInput.readOnly = true;
+    blockedEmail.textContent = email;
+
+    // Countdown
+    let secs = remaining; // Deja en secondes !
+    clearInterval(countdownInterval);
+    updateTimer(secs);
+    countdownInterval = setInterval(() => {
+        secs--;
+        if (secs <= 0) {
+            clearInterval(countdownInterval);
+            hideBlockBox();
+            emailInput.readOnly = false;
+        } else {
+            updateTimer(secs);
+        }
+    }, 1000);
+}
+
+function updateTimer(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    blockTimer.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function hideBlockBox() {
+    blockBox.style.display = 'none';
+    pwSection.style.display = 'block';
+    emailInput.classList.remove('blocked-input');
+    emailInput.readOnly = false;
+    clearInterval(countdownInterval);
+}
+
+function resetForm() {
+    emailInput.value = '';
+    hideBlockBox();
+    emailInput.focus();
+}
+
+// Check au blur
+emailInput.addEventListener('blur', function() {
+    checkBlocked(this.value.trim());
+});
+
+// Check si email pre-rempli au chargement
+if (emailInput && emailInput.value) {
+    checkBlocked(emailInput.value.trim());
+}
+</script>
+</body>
+</html>

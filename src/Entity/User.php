@@ -4,175 +4,125 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé !')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_user = null;
+    #[ORM\Column(name: 'id_user')]
+    private ?int $id = null;
 
-    #[ORM\Column(type: 'string', length: 100)]
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'Le nom est requis')]
+    #[Assert\Length(min: 2, max: 100, minMessage: 'Min 2 caractères', maxMessage: 'Max 100 caractères')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\-]+$/', message: 'Le nom ne doit contenir que des lettres')]
     private ?string $nom = null;
 
-    #[ORM\Column(type: 'string', length: 100)]
+    #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'Le prénom est requis')]
+    #[Assert\Length(min: 2, max: 100, minMessage: 'Min 2 caractères', maxMessage: 'Max 100 caractères')]
+    #[Assert\Regex(pattern: '/^[a-zA-ZÀ-ÿ\s\-]+$/', message: 'Le prénom ne doit contenir que des lettres')]
     private ?string $prenom = null;
 
-    #[ORM\Column(type: 'string', length: 150, unique: true)]
+    #[ORM\Column(length: 150, unique: true)]
+    #[Assert\NotBlank(message: 'L\'email est requis')]
+    #[Assert\Email(message: 'Email invalide')]
     private ?string $email = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $mdp = null;
+    #[ORM\Column(name: 'mdp', length: 255)]
+    private ?string $password = null;
 
-    #[ORM\Column(type: 'string', length: 50)]
+    #[ORM\Column(
+        type: 'string',
+        columnDefinition: "ENUM('Patient','Admin','Coach')",
+        nullable: true
+    )]
+    #[Assert\Choice(choices: ['Patient', 'Admin', 'Coach'], message: 'Rôle invalide')]
     private ?string $role = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
-    private ?string $num_tel = null;
+    #[ORM\Column(name: 'num_tel', length: 20, nullable: true)]
+    #[Assert\Regex(pattern: '/^\d{8}$/', message: 'Le téléphone doit contenir 8 chiffres')]
+    private ?string $numTel = null;
 
-    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    #[ORM\Column(length: 500, nullable: true)]
     private ?string $photo = null;
 
-    public function getId_user(): ?int
-    {
-        return $this->id_user;
-    }
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $resetToken = null;
 
-    public function setId_user(?int $id_user): self
-    {
-        $this->id_user = $id_user;
-        return $this;
-    }
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $resetTokenExpiresAt = null;
 
-    public function getNom(): ?string
-    {
-        return $this->nom;
-    }
+    #[ORM\Column(options: ['default' => false])]
+    private bool $isVerified = false;
 
-    public function setNom(?string $nom): self
-    {
-        $this->nom = $nom;
-        return $this;
-    }
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $verificationToken = null;
 
-    public function getPrenom(): ?string
-    {
-        return $this->prenom;
-    }
+    #[ORM\Column(length: 6, nullable: true)]
+    private ?string $twoFactorCode = null;
 
-    public function setPrenom(?string $prenom): self
-    {
-        $this->prenom = $prenom;
-        return $this;
-    }
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $twoFactorExpiresAt = null;
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $deviceToken = null;
 
-    public function setEmail(?string $email): self
-    {
-        $this->email = $email;
-        return $this;
-    }
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $faceDescriptor = null;
 
-    public function getMdp(): ?string
-    {
-        return $this->mdp;
-    }
+    public function getId(): ?int { return $this->id; }
+    public function getNom(): ?string { return $this->nom; }
+    public function setNom(string $nom): static { $this->nom = $nom; return $this; }
+    public function getPrenom(): ?string { return $this->prenom; }
+    public function setPrenom(string $prenom): static { $this->prenom = $prenom; return $this; }
+    public function getEmail(): ?string { return $this->email; }
+    public function setEmail(string $email): static { $this->email = $email; return $this; }
+    public function getPassword(): ?string { return $this->password; }
+    public function setPassword(string $password): static { $this->password = $password; return $this; }
+    public function getRole(): ?string { return $this->role; }
+    public function setRole(?string $role): static { $this->role = $role; return $this; }
+    public function getNumTel(): ?string { return $this->numTel; }
+    public function setNumTel(?string $numTel): static { $this->numTel = $numTel; return $this; }
+    public function getPhoto(): ?string { return $this->photo; }
+    public function setPhoto(?string $photo): static { $this->photo = $photo; return $this; }
+    public function getResetToken(): ?string { return $this->resetToken; }
+    public function setResetToken(?string $t): static { $this->resetToken = $t; return $this; }
+    public function getResetTokenExpiresAt(): ?\DateTimeImmutable { return $this->resetTokenExpiresAt; }
+    public function setResetTokenExpiresAt(?\DateTimeImmutable $t): static { $this->resetTokenExpiresAt = $t; return $this; }
+    public function isVerified(): bool { return $this->isVerified; }
+    public function setIsVerified(bool $v): static { $this->isVerified = $v; return $this; }
+    public function getVerificationToken(): ?string { return $this->verificationToken; }
+    public function setVerificationToken(?string $t): static { $this->verificationToken = $t; return $this; }
+    public function getTwoFactorCode(): ?string { return $this->twoFactorCode; }
+    public function setTwoFactorCode(?string $code): static { $this->twoFactorCode = $code; return $this; }
+    public function getTwoFactorExpiresAt(): ?\DateTimeImmutable { return $this->twoFactorExpiresAt; }
+    public function setTwoFactorExpiresAt(?\DateTimeImmutable $t): static { $this->twoFactorExpiresAt = $t; return $this; }
+    public function getDeviceToken(): ?string { return $this->deviceToken; }
+    public function setDeviceToken(?string $t): static { $this->deviceToken = $t; return $this; }
+    public function getFaceDescriptor(): ?string { return $this->faceDescriptor; }
+    public function setFaceDescriptor(?string $f): static { $this->faceDescriptor = $f; return $this; }
 
-    public function setMdp(?string $mdp): self
-    {
-        $this->mdp = $mdp;
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(?string $role): self
-    {
-        $this->role = $role;
-        return $this;
-    }
-
-    public function getNum_tel(): ?string
-    {
-        return $this->num_tel;
-    }
-
-    public function setNum_tel(?string $num_tel): self
-    {
-        $this->num_tel = $num_tel;
-        return $this;
-    }
-
-    public function getPhoto(): ?string
-    {
-        return $this->photo;
-    }
-
-    public function setPhoto(?string $photo): self
-    {
-        $this->photo = $photo;
-        return $this;
-    }
-
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
-    }
-
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
-        $roles = [$this->role ?? 'ROLE_USER'];
-        return array_unique($roles);
+        return ['ROLE_' . strtoupper($this->role ?? 'PATIENT')];
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): string
-    {
-        return $this->mdp ?? '';
+    public function getUserIdentifier(): string 
+    { 
+        return (string) $this->email; 
     }
+    public function eraseCredentials(): void {}
 
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials(): void
+    public function __toString(): string
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-    }
-
-    /**
-     * @deprecated since Symfony 5.3, use getUserIdentifier instead
-     */
-    public function getUsername(): string
-    {
-        return $this->getUserIdentifier();
-    }
-
-    /**
-     * @deprecated since Symfony 5.3
-     */
-    public function getSalt(): ?string
-    {
-        return null;
+        return $this->prenom . ' ' . $this->nom;
     }
 }
