@@ -1,0 +1,148 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="post-detail-container" style="max-width:900px;margin:0 auto;">
+    <div class="post-card glassmorphism" style="border:1px solid var(--border-color);">
+        <div class="post-header">
+            <div class="user-info">
+                {% if post.user.photo %}
+                    <img src="{{ post.user.photo }}" alt="Avatar" class="avatar">
+                {% else %}
+                    <div class="avatar-placeholder">{{ post.user.prenom|slice(0,1) }}{{ post.user.nom|slice(0,1) }}</div>
+                {% endif %}
+                <div class="user-details">
+                    <span class="user-name">{{ post.user.prenom }} {{ post.user.nom }}</span>
+                    <span class="post-date">{{ post.createdAt ? post.createdAt|date('M j, Y \\a\\t g:i A') : '' }}</span>
+                </div>
+            </div>
+            {% if post.category %}
+                <span class="category-badge">{{ post.category.name }}</span>
+            {% endif %}
+        </div>
+        
+        <h1 class="post-title" style="font-size:2rem;">{{ post.title }}</h1>
+
+        {% if post.photo %}
+            <img src="{{ post.photo }}" alt="Post photo" class="post-image" loading="lazy">
+        {% endif %}
+
+        <p class="post-content" style="font-size:1.05rem;line-height:1.8;color:var(--text-main);">{{ post.content }}</p>
+        
+        <div class="post-footer" style="flex-wrap:wrap;">
+            <div class="action-buttons">
+                <button class="btn btn-action like-btn" onclick="likePost({{ post.id }})">
+                    <i data-lucide="thumbs-up" style="width:16px;height:16px;"></i>
+                    <span class="like-count" id="likes-{{post.id}}">{{ post.likes|default(0) }}</span>
+                </button>
+                <button class="btn btn-action dislike-btn" onclick="dislikePost({{ post.id }})">
+                    <i data-lucide="thumbs-down" style="width:16px;height:16px;"></i>
+                    <span class="dislike-count" id="dislikes-{{post.id}}">{{ post.dislikes|default(0) }}</span>
+                </button>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+                <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-icon btn-action" data-tooltip="Edit">
+                    <i data-lucide="pencil" style="width:16px;height:16px;"></i>
+                </a>
+                <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                    <button type="submit" class="btn btn-icon btn-danger" data-tooltip="Delete">
+                        <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                    </button>
+                </form>
+                <a href="{{ path('app_post_index') }}" class="btn btn-icon btn-secondary" data-tooltip="Back">
+                    <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMMENTS SECTION -->
+    <div class="comments-section glassmorphism">
+        <div class="comments-header">
+            <h2>
+                <i data-lucide="message-circle"></i>
+                Comments ({{ post.comments|length }})
+            </h2>
+        </div>
+        
+        {% if post.comments|length > 0 %}
+            <div class="comments-list">
+                {% for comment in post.comments %}
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <div class="user-info">
+                                {% if comment.user.photo %}
+                                    <img src="{{ comment.user.photo }}" alt="Avatar" class="avatar" style="width:36px;height:36px;">
+                                {% else %}
+                                    <div class="avatar-placeholder" style="width:36px;height:36px;font-size:0.7rem;">{{ comment.user.prenom|slice(0,1) }}{{ comment.user.nom|slice(0,1) }}</div>
+                                {% endif %}
+                                <div class="user-details">
+                                    <span class="user-name" style="font-size:0.9rem;">{{ comment.user.prenom }} {{ comment.user.nom }}</span>
+                                    <span class="post-date" style="font-size:0.75rem;">{{ comment.createdAt ? comment.createdAt|date('M j, Y \\a\\t g:i A') : '' }}</span>
+                                </div>
+                            </div>
+                            <form method="post" action="{{ path('app_comment_delete', {'id': comment.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                <button type="submit" class="btn btn-icon btn-icon-sm btn-danger" data-tooltip="Delete" onclick="return confirm('Delete this comment?')">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="comment-body">
+                            {{ comment.content }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align:center;padding:2.5rem 1.5rem;color:var(--text-subtle);">
+                <i data-lucide="message-square-dashed" style="width:40px;height:40px;margin-bottom:0.8rem;display:block;margin-left:auto;margin-right:auto;"></i>
+                <p style="font-size:1rem;margin:0;">No comments yet. Be the first to share your thoughts!</p>
+            </div>
+        {% endif %}
+
+        <!-- ADD COMMENT FORM -->
+        <div class="comment-form-wrapper">
+            <h4>
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                Add a Comment
+            </h4>
+            {{ form_start(comment_form, {'action': path('app_post_comment', {'id': post.id})}) }}
+                {{ form_widget(comment_form) }}
+                <button class="btn btn-primary" style="margin-top:0.5rem;gap:0.4rem;">
+                    <i data-lucide="send" style="width:16px;height:16px;"></i>
+                    Post
+                </button>
+            {{ form_end(comment_form) }}
+        </div>
+    </div>
+</div>
+
+<script>
+    function likePost(id) {
+        const btn = event.currentTarget;
+        btn.style.transform = 'scale(1.15)';
+        setTimeout(() => btn.style.transform = '', 200);
+
+        fetch('/post/' + id + '/like', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('likes-' + id).innerText = data.likes;
+            });
+    }
+
+    function dislikePost(id) {
+        const btn = event.currentTarget;
+        btn.style.transform = 'scale(1.15)';
+        setTimeout(() => btn.style.transform = '', 200);
+
+        fetch('/post/' + id + '/dislike', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dislikes-' + id).innerText = data.dislikes;
+            });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Community Feed{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    <div class="header-section">
+        <h1 class="page-title">Community Feed</h1>
+    </div>
+
+    {% if search_query %}
+        <div class="search-results-banner">
+            <span>Results for: <strong>{{ search_query }}</strong></span>
+            <a href="{{ path('app_post_index') }}">
+                <i data-lucide="x" style="width:14px;height:14px;display:inline"></i> Clear
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Create Post Box (User only) -->
+    <div class="create-post-box glassmorphism">
+        <div class="user-info">
+            <div class="avatar-placeholder" style="background:linear-gradient(135deg, var(--blue-claire), #5cade0);">U</div>
+            <div class="user-details">
+                <span class="user-name">User</span>
+            </div>
+        </div>
+        <a href="{{ path('app_post_new') }}" class="create-post-btn">
+            What's on your mind?
+        </a>
+    </div>
+
+    <div class="posts-container" id="posts-container">
+        {% for post in posts %}
+            {{ include('post/_post_card.html.twig') }}
+        {% else %}
+            <div class="empty-state glassmorphism">
+                <i data-lucide="message-circle" style="width:48px;height:48px;color:var(--text-subtle);margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;"></i>
+                <p style="font-size:1.1rem;">No posts found. Start the conversation!</p>
+            </div>
+        {% endfor %}
+    </div>
+    
+    {% if posts|length == 5 %}
+        <div class="load-more-container">
+            <button id="load-more-btn" class="btn btn-primary btn-large" style="gap:0.6rem;">
+                <i data-lucide="chevrons-down" style="width:18px;height:18px;"></i>
+                Load More
+            </button>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    let offset = 5;
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if(loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            this.classList.add('btn-loading');
+            this.disabled = true;
+            
+            fetch('/post/load-more/' + offset)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.count > 0) {
+                        document.getElementById('posts-container').insertAdjacentHTML('beforeend', data.html);
+                        offset += data.count;
+                        this.classList.remove('btn-loading');
+                        this.disabled = false;
+                        
+                        // Re-init icons for new content
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+                        if(data.count < 5) {
+                            this.parentElement.remove();
+                        }
+                    } else {
+                        this.parentElement.remove();
+                    }
+                });
+        });
+    }
+
+    function likePost(id) {
+        const btn = event.currentTarget;
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = '', 200);
+        
+        fetch('/post/' + id + '/like', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('likes-' + id).innerText = data.likes;
+            });
+    }
+
+    function dislikePost(id) {
+        const btn = event.currentTarget;
+        btn.style.transform = 'scale(1.2)';
+        setTimeout(() => btn.style.transform = '', 200);
+
+        fetch('/post/' + id + '/dislike', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('dislikes-' + id).innerText = data.dislikes;
+            });
+    }
+
+    // Intersection Observer for lazy loading animation
+    document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.lazy-animate').forEach(el => observer.observe(el));
+    });
+</script>
+{% endblock %}

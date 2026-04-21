@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="login-container" style="max-width: 400px; margin: 4rem auto;">
+        <div class="glassmorphism" style="padding: 2rem;">
+            <h1 class="page-title" style="text-align: center; margin-bottom: 2rem;">Login to Community</h1>
+            
+            {% if error %}
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #fca5a5; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div>
+                    <label for="inputEmail" style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Email</label>
+                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus style="width: 100%; padding: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-family: inherit;">
+                </div>
+
+                <div>
+                    <label for="inputPassword" style="display: block; margin-bottom: 0.5rem; color: var(--text-muted);">Password</label>
+                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required style="width: 100%; padding: 0.8rem; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: white; font-family: inherit;">
+                </div>
+
+                <div style="display: flex; align-items: center;">
+                    <input type="checkbox" id="remember_me" name="_remember_me" checked style="width: 1rem; height: 1rem;">
+                    <label for="remember_me" style="margin-left: 0.5rem; color: var(--text-muted);">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Sign in</button>
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Don't have an account?</p>
+                <a href="{{ path('app_register') }}" class="btn btn-primary" style="width: 100%; padding: 0.8rem; display: block;">Create Account</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

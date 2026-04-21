@@ -1,0 +1,473 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% if 'admin' in app.request.attributes.get('_route') %}Admin Dashboard{% else %}Community{% endif %}{% endblock %}
+
+{% block body %}
+<div class="layout-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar glassmorphism">
+        <div class="sidebar-header">
+            <h2 class="sidebar-logo">Community</h2>
+            <p class="sidebar-subtitle">Professional Network</p>
+        </div>
+
+
+
+        <nav class="sidebar-nav">
+            <!-- User Space -->
+            <div class="nav-section">
+                <h3 class="nav-section-title">
+                    <i data-lucide="layout-grid" style="width:14px;height:14px"></i>
+                    User Space
+                </h3>
+                <a href="{{ path('app_post_index') }}" class="nav-item {% if 'post_index' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="newspaper"></i></span>
+                    <span class="nav-label">Feed</span>
+                </a>
+                <a href="{{ path('app_post_new') }}" class="nav-item {% if 'post_new' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="plus-circle"></i></span>
+                    <span class="nav-label">Create Post</span>
+                </a>
+                <a href="{{ path('app_category_index') }}" class="nav-item {% if 'category' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="tag"></i></span>
+                    <span class="nav-label">Categories</span>
+                </a>
+            </div>
+
+            <!-- Admin Space -->
+            <div class="nav-section">
+                <h3 class="nav-section-title nav-section-divider">
+                    <i data-lucide="shield" style="width:14px;height:14px"></i>
+                    Admin Space
+                </h3>
+                <a href="{{ path('app_admin_dashboard') }}" class="nav-item {% if 'admin_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+                <a href="{{ path('app_admin_users') }}" class="nav-item {% if 'admin_users' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="users"></i></span>
+                    <span class="nav-label">Users</span>
+                </a>
+                <a href="{{ path('app_admin_moderation') }}" class="nav-item {% if 'admin_moderation' in app.request.attributes.get('_route') %}active{% endif %}">
+                    <span class="nav-icon"><i data-lucide="shield-check"></i></span>
+                    <span class="nav-label">Moderation</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="avatar-placeholder" style="width:38px;height:38px;font-size:0.8rem;">A</div>
+                <div class="sidebar-user-info">
+                    <p class="sidebar-user-name">Admin User</p>
+                    <p class="sidebar-user-role">Administrator</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="search-container glassmorphism" style="border-radius:30px;padding: 0.2rem;">
+                <form method="get" action="{{ path('app_post_index') }}">
+                    <div class="search-wrapper" style="margin:0;">
+                        <i data-lucide="search" class="search-icon" style="color:var(--text-subtle);"></i>
+                        <input type="search" name="q" placeholder="Search across the community..." class="search-input" value="{{ app.request.query.get('q')|default('') }}" style="border:none;background:transparent;width:100%;padding-left:2.8rem;border-radius:30px;">
+                    </div>
+                </form>
+            </div>
+        </header>
+
+        {% for label, messages in app.flashes %}
+            <div class="flash-messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<!-- ================================================================
+     AI IMAGE STUDIO — Floating Widget
+     ================================================================ -->
+<div class="aicb-widget">
+
+    <!-- Trigger bubble -->
+    <button id="aicb-trigger" class="aicb-trigger" onclick="toggleAIChatbot()" aria-label="Open AI Image Studio">
+        <span class="aicb-trigger-icon">✦</span>
+    </button>
+
+    <!-- Panel -->
+    <div id="aicb-panel" class="aicb-panel" style="display:none;" role="dialog" aria-label="AI Image Studio">
+
+        <!-- Header -->
+        <div class="aicb-header">
+            <div class="aicb-header-left">
+                <div class="aicb-header-orb">✦</div>
+                <div>
+                    <div class="aicb-title">AI Image Studio</div>
+                    <div class="aicb-subtitle">
+                        <span class="aicb-status-dot"></span>
+                        Powered by Imagen 3
+                    </div>
+                </div>
+            </div>
+            <button class="aicb-close" onclick="toggleAIChatbot()" aria-label="Close">
+                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                    <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- ── FORM STATE ── -->
+        <div id="aicb-form" class="aicb-body" style="display:flex; flex-direction:column;">
+
+            <!-- Prompt input -->
+            <div class="aicb-field">
+                <label class="aicb-label" for="aicb-prompt">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    Describe your image
+                </label>
+                <textarea id="aicb-prompt" class="aicb-textarea" rows="3"
+                    placeholder="e.g. A moonlit cyberpunk alley with neon reflections on wet cobblestones…"></textarea>
+            </div>
+
+            <!-- Style selector -->
+            <div class="aicb-field">
+                <label class="aicb-label">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                    </svg>
+                    Visual style
+                </label>
+                <div class="aicb-styles">
+                    <button class="aicb-style-pill active" data-style="photorealistic" onclick="selectAICBStyle(this)">📸 Realistic</button>
+                    <button class="aicb-style-pill" data-style="anime illustration" onclick="selectAICBStyle(this)">🎌 Anime</button>
+                    <button class="aicb-style-pill" data-style="digital concept art" onclick="selectAICBStyle(this)">🎨 Digital Art</button>
+                    <button class="aicb-style-pill" data-style="soft watercolor painting" onclick="selectAICBStyle(this)">🖌 Watercolor</button>
+                    <button class="aicb-style-pill" data-style="textured oil painting" onclick="selectAICBStyle(this)">🏛 Oil Paint</button>
+                    <button class="aicb-style-pill" data-style="fine pencil sketch" onclick="selectAICBStyle(this)">✏ Sketch</button>
+                </div>
+            </div>
+
+            <!-- Generate button -->
+            <button class="aicb-btn-generate" onclick="generateAICBImage()">
+                <span>Generate Image</span>
+                <svg class="aicb-btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M5 3l14 9-14 9V3z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- ── LOADING STATE ── -->
+        <div id="aicb-loading" class="aicb-body aicb-body-center" style="display:none; flex-direction:column;">
+            <div class="aicb-spinner">
+                <div class="aicb-ring aicb-ring-1"></div>
+                <div class="aicb-ring aicb-ring-2"></div>
+                <div class="aicb-ring aicb-ring-3"></div>
+                <div class="aicb-core"></div>
+            </div>
+            <p class="aicb-loading-title">Crafting your masterpiece…</p>
+            <div class="aicb-progress">
+                <div class="aicb-progress-bar"></div>
+            </div>
+            <p class="aicb-loading-hint">This usually takes 10–20 seconds</p>
+        </div>
+
+        <!-- ── RESULT STATE ── -->
+        <div id="aicb-result" class="aicb-result-wrap" style="display:none; flex-direction:column;">
+            <div class="aicb-img-frame">
+                <img id="aicb-result-img" src="" alt="AI Generated Image" class="aicb-result-img">
+                <div class="aicb-img-overlay">
+                    <span class="aicb-img-badge">✦ AI Generated</span>
+                </div>
+            </div>
+            <div class="aicb-result-actions">
+                <button class="aicb-btn-back" onclick="resetAICBForm()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M19 12H5M12 5l-7 7 7 7"/>
+                    </svg>
+                    Regenerate
+                </button>
+                <button class="aicb-btn-post" id="aicb-post-btn" onclick="postAICBImage()">
+                    Publish Post &nbsp;✨
+                </button>
+            </div>
+        </div>
+
+    </div><!-- /panel -->
+</div><!-- /aicb-widget -->
+
+<style>
+    .layout-wrapper {
+        display: flex;
+        min-height: 100vh;
+        gap: 0;
+    }
+
+    .sidebar {
+        width: 270px;
+        height: 100vh;
+        background: var(--card-bg);
+        border-right: 1px solid var(--border-color);
+        border-radius: 0;
+        overflow-y: auto;
+        position: sticky;
+        top: 0;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+        z-index: 10;
+    }
+
+    .sidebar-header {
+        padding: 1.8rem 1.5rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-logo {
+        color: var(--primary-color);
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+
+    .sidebar-subtitle {
+        color: var(--text-subtle);
+        margin: 0.3rem 0 0 0;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .sidebar-search {
+        padding: 1rem 1rem;
+    }
+
+    .search-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.8rem;
+        width: 16px;
+        height: 16px;
+        color: var(--text-subtle);
+        pointer-events: none;
+    }
+
+    .search-wrapper .search-input {
+        padding-left: 2.4rem;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 0.5rem 0;
+        overflow-y: auto;
+    }
+
+    .nav-section {
+        margin-bottom: 0.5rem;
+    }
+
+    .nav-section-title {
+        color: var(--text-subtle);
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 1.2rem 0 0.6rem 0;
+        padding: 0 1.2rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-section-divider {
+        margin-top: 1.5rem;
+        padding-top: 1.2rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.7rem 1rem;
+        margin: 0.15rem 0.6rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .nav-item:hover {
+        background: rgba(232, 117, 154, 0.1);
+        color: var(--text-main);
+        transform: translateX(3px);
+    }
+
+    .nav-item.active {
+        background: linear-gradient(135deg, rgba(232, 117, 154, 0.2), rgba(232, 117, 154, 0.08));
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+
+    .nav-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.6rem;
+    }
+
+    .nav-icon i,
+    .nav-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .nav-label {
+        flex: 1;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.2rem;
+    }
+
+    .sidebar-user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .sidebar-user-name {
+        margin: 0;
+        color: var(--text-main);
+        font-weight: 700;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .sidebar-user-role {
+        margin: 0.2rem 0 0 0;
+        color: var(--text-subtle);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 2rem 2.5rem;
+        overflow-y: auto;
+        animation: pageTransition 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        opacity: 0;
+    }
+
+    /* Scrollbar styling */
+    .top-bar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        backdrop-filter: blur(8px);
+        background: linear-gradient(to bottom, var(--bg-color), transparent);
+        padding-top: 1rem;
+    }
+
+    .flash-messages {
+        margin: 1rem 0 0;
+    }
+
+    .alert {
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        border-radius: 0.85rem;
+        font-weight: 600;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
+    }
+
+    .alert-success {
+        background: rgba(94, 179, 131, 0.12);
+        color: var(--success-text, #166534);
+        border: 1px solid rgba(94, 179, 131, 0.2);
+    }
+
+    .alert-error {
+        background: rgba(239, 68, 68, 0.12);
+        color: var(--danger-text, #991b1b);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .alert-info {
+        background: rgba(59, 130, 246, 0.12);
+        color: var(--text-main);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .search-container {
+        width: 100%;
+        max-width: 600px;
+        transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .search-container:focus-within {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 2px var(--primary-color), var(--shadow-glow);
+    }
+
+    .search-input:focus {
+        box-shadow: none !important;
+    }
+
+    .sidebar::-webkit-scrollbar,
+    .main-content::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-track,
+    .main-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb,
+    .main-content::-webkit-scrollbar-thumb {
+        background: rgba(232, 117, 154, 0.2);
+        border-radius: 2px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover,
+    .main-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(232, 117, 154, 0.4);
+    }
+</style>
+
+<script src="/js/ai-chatbot.js" defer></script>
+{% endblock %}

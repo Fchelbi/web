@@ -1,0 +1,53 @@
+<div class="post-card glassmorphism" data-post-id="{{ post.id }}">
+    <div class="post-header">
+        <div class="user-info">
+            {% if post.user.photo %}
+                <img src="{{ post.user.photo }}" alt="Avatar" class="avatar">
+            {% else %}
+                <div class="avatar-placeholder">{{ post.user.prenom|slice(0,1) }}{{ post.user.nom|slice(0,1) }}</div>
+            {% endif %}
+            <div class="user-details">
+                <span class="user-name">{{ post.user.prenom }} {{ post.user.nom }}</span>
+                <span class="post-date">{{ post.createdAt ? post.createdAt|date('M j, Y \\a\\t g:i A') : '' }}</span>
+            </div>
+        </div>
+        {% if post.category %}
+            <span class="category-badge">{{ post.category.name }}</span>
+        {% endif %}
+    </div>
+    
+    <h2 class="post-title">{{ post.title }}</h2>
+
+    {% if post.photo %}
+        <img src="{{ post.photo }}" alt="Post photo" class="post-image" loading="lazy">
+    {% endif %}
+
+    <p class="post-content">{{ post.content|length > 200 ? post.content|slice(0, 200) ~ '...' : post.content }}</p>
+    
+    <div class="post-footer">
+        <div class="action-buttons">
+            <button class="btn btn-action like-btn" onclick="likePost({{ post.id }})" data-tooltip="Like">
+                <i data-lucide="thumbs-up" style="width:16px;height:16px;"></i>
+                <span class="like-count" id="likes-{{post.id}}">{{ post.likes|default(0) }}</span>
+            </button>
+            <button class="btn btn-action dislike-btn" onclick="dislikePost({{ post.id }})" data-tooltip="Dislike">
+                <i data-lucide="thumbs-down" style="width:16px;height:16px;"></i>
+                <span class="dislike-count" id="dislikes-{{post.id}}">{{ post.dislikes|default(0) }}</span>
+            </button>
+        </div>
+        <div style="display:flex;gap:0.4rem;align-items:center;">
+            <a href="{{ path('app_post_edit', {'id': post.id}) }}" class="btn btn-icon btn-action" data-tooltip="Edit">
+                <i data-lucide="pencil" style="width:16px;height:16px;"></i>
+            </a>
+            <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" style="display:inline;margin:0;" onsubmit="console.log('Card delete form submitted for post ' + {{ post.id }}); return confirm('Delete this post?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                <button type="submit" class="btn btn-icon btn-danger" data-tooltip="Delete">
+                    <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                </button>
+            </form>
+            <a href="{{ path('app_post_show', {'id': post.id}) }}" class="btn btn-primary" style="gap:0.4rem;padding:0.55rem 1.2rem;margin-left:0.5rem;">
+                <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+            </a>
+        </div>
+    </div>
+</div>

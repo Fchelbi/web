@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="register-container" style="max-width: 500px; margin: 4rem auto;">
+        <div class="glassmorphism" style="padding: 2rem;">
+            <h1 class="page-title" style="text-align: center; margin-bottom: 2rem;">Create Account</h1>
+            
+            <form method="post" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {{ form_start(registrationForm) }}
+                
+                <div>
+                    {{ form_label(registrationForm.prenom, 'First Name') }}
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.prenom) }}
+                </div>
+
+                <div>
+                    {{ form_label(registrationForm.nom, 'Last Name') }}
+                    {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.nom) }}
+                </div>
+
+                <div>
+                    {{ form_label(registrationForm.email, 'Email') }}
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div>
+                    {{ form_label(registrationForm.plainPassword, 'Password') }}
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">Register</button>
+                
+                {{ form_end(registrationForm) }}
+            </form>
+
+            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">Already have an account?</p>
+                <a href="{{ path('app_login') }}" class="btn btn-primary" style="width: 100%; padding: 0.8rem; display: block;">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
