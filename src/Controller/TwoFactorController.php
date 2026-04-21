@@ -79,7 +79,7 @@ class TwoFactorController extends AbstractController
 
                     $cookie = Cookie::create('device_token_' . $user->getId())
                         ->withValue($deviceToken)
-                        ->withExpires(new \DateTimeImmutable('+30 days'))
+                        ->withExpires(new \DateTimeImmutable('+10 days'))
                         ->withPath('/')
                         ->withHttpOnly(true);
 

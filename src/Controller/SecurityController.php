@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Repository\LoginAttemptRepository;
 use App\Service\BruteForceService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,14 +32,6 @@ class SecurityController extends AbstractController
         $blocked   = $lastUsername ? $this->bruteForce->isBlocked($lastUsername) : false;
         $remaining = $blocked ? $this->bruteForce->getRemainingTime($lastUsername) : 0;
         $attempts  = $lastUsername ? $this->bruteForce->getAttempts($lastUsername) : 0;
-
-        if ($this->getUser()) {
-            $this->bruteForce->recordSuccessfulLogin($this->getUser()->getUserIdentifier());
-            $roles = $this->getUser()->getRoles();
-            if (in_array('ROLE_ADMIN', $roles)) return $this->redirectToRoute('admin_dashboard');
-            elseif (in_array('ROLE_COACH', $roles)) return $this->redirectToRoute('coach_dashboard');
-            else return $this->redirectToRoute('patient_dashboard');
-        }
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
@@ -76,7 +67,7 @@ class SecurityController extends AbstractController
 
         return new JsonResponse([
             'blocked'   => $blocked,
-            'remaining' => $remaining, // Secondes exactes !
+            'remaining' => $remaining,
         ]);
     }
 }

@@ -115,7 +115,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return ['ROLE_' . strtoupper($this->role ?? 'PATIENT')];
     }
 
-    public function getUserIdentifier(): string { return (string) $this->email; }
+    public function getUserIdentifier(): string 
+    { 
+        return (string) $this->email; 
+    }
     public function eraseCredentials(): void {}
 
     public function __toString(): string
