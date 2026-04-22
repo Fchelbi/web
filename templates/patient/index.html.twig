@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Espace · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 0 60px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-logo { font-size: 22px; font-weight: 700; color: white; }
+        .navbar-logo span { color: #E8895A; }
+        .navbar-links { display: flex; gap: 32px; align-items: center; }
+        .navbar-links a {
+            color: #8899AA; text-decoration: none; font-size: 14px;
+            font-weight: 500; transition: color 0.2s; position: relative;
+        }
+        .navbar-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 0; height: 2px; background: #E8895A; transition: width 0.3s;
+        }
+        .navbar-links a:hover { color: white; }
+        .navbar-links a:hover::after, .navbar-links a.active::after { width: 100%; }
+        .navbar-links a.active { color: white; font-weight: 600; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .user-pill {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(255,255,255,0.05); padding: 8px 16px;
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.08);
+        }
+        .user-pill .avatar {
+            width: 32px; height: 32px; background: #E8895A;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; color: white; font-size: 14px; font-weight: 700;
+        }
+        .user-pill span { font-size: 13px; color: #CBD5E0; font-weight: 600; }
+        .btn-logout {
+            padding: 8px 18px; background: rgba(231,76,60,0.15); color: #e74c3c;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(231,76,60,0.3); }
+        .hero {
+            background: linear-gradient(135deg, #162232 0%, #0D1B2A 100%);
+            padding: 60px 60px; position: relative; overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.05); min-height: 280px;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -80px; right: -80px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(232,137,90,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; max-width: 600px; }
+        .hero-badge {
+            display: inline-block; background: rgba(232,137,90,0.15);
+            color: #E8895A; border: 1px solid rgba(232,137,90,0.3);
+            padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            margin-bottom: 16px; animation: fadeInDown 0.6s ease;
+        }
+        .hero h1 {
+            font-size: 38px; font-weight: 700; line-height: 1.2; margin-bottom: 14px;
+            animation: fadeInUp 0.6s ease 0.1s both; color: white;
+        }
+        .hero h1 span { color: #E8895A; }
+        .hero p { font-size: 16px; color: #8899AA; line-height: 1.6; animation: fadeInUp 0.6s ease 0.2s both; }
+        .brain-cartoon {
+            position: absolute; right: 80px; top: 50%;
+            font-size: 130px; z-index: 1;
+            animation: brainFloat 3s ease-in-out infinite, brainWave 2s ease-in-out infinite alternate;
+            filter: drop-shadow(0 0 40px rgba(232,137,90,0.25));
+            cursor: pointer; user-select: none;
+        }
+        @keyframes brainFloat {
+            0%, 100% { transform: translateY(-55%); }
+            50% { transform: translateY(-45%); }
+        }
+        @keyframes brainWave {
+            0% { filter: drop-shadow(0 0 20px rgba(232,137,90,0.2)) rotate(-5deg); }
+            100% { filter: drop-shadow(0 0 50px rgba(232,137,90,0.4)) rotate(5deg); }
+        }
+        .brain-particles { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); width: 260px; height: 260px; pointer-events: none; z-index: 0; }
+        .particle { position: absolute; border-radius: 50%; background: #E8895A; opacity: 0; animation: particleFloat 3s ease-in-out infinite; }
+        .particle:nth-child(1) { width: 6px; height: 6px; top: 20%; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 4px; height: 4px; top: 70%; left: 80%; animation-delay: 0.5s; }
+        .particle:nth-child(3) { width: 8px; height: 8px; top: 10%; left: 70%; animation-delay: 1s; }
+        .particle:nth-child(4) { width: 5px; height: 5px; top: 80%; left: 20%; animation-delay: 1.5s; }
+        .particle:nth-child(5) { width: 4px; height: 4px; top: 40%; left: 90%; animation-delay: 2s; }
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(0) scale(0); }
+            50% { opacity: 0.6; transform: translateY(-20px) scale(1); }
+            100% { opacity: 0; transform: translateY(-40px) scale(0); }
+        }
+        .stats-bar {
+            background: #162232; margin: -24px 60px 0; border-radius: 16px;
+            padding: 24px 32px; display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 16px; border: 1px solid rgba(255,255,255,0.05);
+            position: relative; z-index: 10; animation: fadeInUp 0.6s ease 0.3s both;
+        }
+        .stat-item { text-align: center; padding: 8px; border-right: 1px solid rgba(255,255,255,0.05); }
+        .stat-item:last-child { border-right: none; }
+        .stat-item .icon { font-size: 28px; margin-bottom: 6px; }
+        .stat-item .number { font-size: 28px; font-weight: 700; color: #E8895A; }
+        .stat-item .label { font-size: 12px; color: #8899AA; margin-top: 2px; }
+        .content { padding: 40px 60px; }
+        .section-title {
+            font-size: 20px; font-weight: 700; color: white; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05); margin-left: 10px; }
+        .spotify-panel {
+            background: #162232; border-radius: 16px; padding: 28px;
+            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 40px;
+        }
+        .spotify-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .spotify-logo {
+            width: 50px; height: 50px; background: #1DB954;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 24px;
+        }
+        .spotify-header h3 { color: white; font-size: 18px; font-weight: 700; }
+        .spotify-header p { color: #8899AA; font-size: 13px; margin-top: 2px; }
+        .playlists-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .loading-spotify { text-align: center; padding: 30px; color: #8899AA; grid-column: 1/-1; }
+        .grid-2-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 40px; }
+        .grid-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 40px; }
+        .service-card {
+            background: #162232; border-radius: 16px; padding: 28px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            text-decoration: none; display: block; position: relative; overflow: hidden;
+        }
+        .service-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(to right, #E8895A, #4A6FA5);
+            transform: scaleX(0); transition: transform 0.3s;
+        }
+        .service-card:hover { transform: translateY(-6px); border-color: rgba(232,137,90,0.2); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+        .service-card:hover::before { transform: scaleX(1); }
+        .service-card .icon { font-size: 36px; margin-bottom: 14px; }
+        .service-card h3 { font-size: 15px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .service-card p { font-size: 13px; color: #8899AA; line-height: 1.5; }
+        .service-card .arrow { display: inline-block; margin-top: 14px; color: #E8895A; font-size: 13px; font-weight: 600; transition: transform 0.2s; }
+        .service-card:hover .arrow { transform: translateX(4px); }
+        .wellbeing-panel { background: #162232; border-radius: 16px; padding: 28px; border: 1px solid rgba(255,255,255,0.05); }
+        .wellbeing-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .wellbeing-header h4 { font-size: 15px; font-weight: 700; color: white; }
+        .wellbeing-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .wellbeing-item:last-child { border-bottom: none; }
+        .w-icon { font-size: 28px; }
+        .w-info { flex: 1; }
+        .w-info h4 { font-size: 13px; font-weight: 600; color: white; }
+        .w-info p { font-size: 11px; color: #8899AA; margin-top: 2px; }
+        .w-bar-wrap { width: 100px; }
+        .w-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
+        .w-fill { height: 100%; border-radius: 3px; }
+        .w-pct { font-size: 11px; color: #8899AA; text-align: right; margin-top: 4px; }
+        .btn-evaluer {
+            display: block; text-align: center; margin-top: 16px; padding: 12px;
+            background: #E8895A; color: white; border-radius: 10px;
+            text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-evaluer:hover { background: #d4784a; transform: translateY(-1px); }
+        .next-session {
+            background: linear-gradient(135deg, #162232, #1A2B3C);
+            border-radius: 16px; padding: 28px; color: white; text-align: center;
+            border: 1px solid rgba(232,137,90,0.1);
+        }
+        .next-session .big-icon { font-size: 50px; margin-bottom: 14px; }
+        .next-session h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .next-session p { font-size: 13px; color: #8899AA; line-height: 1.5; }
+        .next-session .btn-session {
+            display: inline-block; margin-top: 16px; padding: 10px 24px;
+            background: rgba(232,137,90,0.15); border: 1px solid rgba(232,137,90,0.3);
+            border-radius: 8px; color: #E8895A; text-decoration: none; font-size: 13px; font-weight: 600;
+        }
+        .profile-panel { background: #162232; border-radius: 16px; padding: 28px; border: 1px solid rgba(255,255,255,0.05); }
+        .profile-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+        .profile-avatar {
+            width: 70px; height: 70px; background: linear-gradient(135deg, #E8895A, #4A6FA5);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 28px; margin: 0 auto 12px;
+        }
+        .profile-header h3 { font-size: 16px; font-weight: 700; color: white; }
+        .profile-header p { font-size: 12px; color: #8899AA; margin-top: 4px; }
+        .profile-badge {
+            display: inline-block; background: rgba(39,174,96,0.15); color: #27ae60;
+            border: 1px solid rgba(39,174,96,0.3);
+            padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; margin-top: 8px;
+        }
+        .profile-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; }
+        .profile-row:last-child { border-bottom: none; }
+        .profile-row .lbl { color: #8899AA; flex: 1; }
+        .profile-row .val { color: white; font-weight: 600; }
+        .btn-edit-profile {
+            display: block; text-align: center; margin-top: 16px; padding: 10px;
+            background: rgba(74,111,165,0.15); color: #6B9FD4;
+            border: 1px solid rgba(74,111,165,0.3);
+            border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;
+        }
+        .btn-edit-profile:hover { background: rgba(74,111,165,0.3); color: white; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: fadeInUp 0.6s ease both; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">Echo<span>Care</span></div>
+    <div class="navbar-links">
+        <a href="{{ path('patient_dashboard') }}" class="active">Accueil</a>
+        <a href="#">Mes seances</a>
+        <a href="#">Messages</a>
+        <a href="{{ path('patient_bien_etre') }}">Bien-etre</a>
+        <a href="{{ path('patient_profile') }}">Mon profil</a>
+    </div>
+    <div class="navbar-right">
+        <div class="user-pill">
+            <div class="avatar">{{ app.user.prenom|slice(0,1)|upper }}</div>
+            <span>{{ app.user.prenom }}</span>
+        </div>
+        <a href="{{ path('app_logout') }}" class="btn-logout">🚪 Deconnexion</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">🌿 Espace Patient</div>
+        <h1>Bonjour, <span>{{ app.user.prenom }}</span> !<br>Comment allez-vous ?</h1>
+        <p>Bienvenue sur votre espace personnel. Suivez votre parcours bien-etre et restez connecte avec votre coach.</p>
+    </div>
+    <div class="brain-particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="brain-cartoon">🧠</div>
+</section>
+
+<div class="stats-bar">
+    <div class="stat-item">
+        <div class="icon">📅</div>
+        <div class="number">0</div>
+        <div class="label">Seances effectuees</div>
+    </div>
+    <div class="stat-item">
+        <div class="icon">💬</div>
+        <div class="number">0</div>
+        <div class="label">Messages</div>
+    </div>
+    <div class="stat-item">
+        <div class="icon">⭐</div>
+        <div class="number">{% if last is defined and last %}{{ ((last.sommeil + last.humeur + (100 - last.stress)) / 3)|round }}%{% else %}—{% endif %}</div>
+        <div class="label">Score bien-etre</div>
+    </div>
+</div>
+
+<div class="content">
+
+    {% if last is defined and last %}
+    <div class="section-title animate">🎵 Musique pour votre humeur</div>
+    <div class="spotify-panel animate delay-1">
+        <div class="spotify-header">
+            <div class="spotify-logo">🎵</div>
+            <div>
+                <h3>Playlists recommandees</h3>
+                <p>Selon votre humeur du jour :
+                    <strong style="color:#1DB954;">
+                        {% if last.mood == 'excellent' %}😄 Excellent
+                        {% elseif last.mood == 'bien' %}🙂 Bien
+                        {% elseif last.mood == 'neutre' %}😐 Neutre
+                        {% elseif last.mood == 'fatigue' %}😴 Fatigue
+                        {% else %}😟 Triste{% endif %}
+                    </strong>
+                </p>
+            </div>
+        </div>
+        <div class="playlists-grid" id="playlistsGrid">
+            <div class="loading-spotify">⏳ Chargement des playlists...</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="section-title animate">🎯 Mes services</div>
+    <div class="grid-2-cards">
+        <a href="#" class="service-card animate delay-1">
+            <div class="icon">🧘</div>
+            <h3>Seances de therapie</h3>
+            <p>Planifiez et suivez vos seances avec votre coach personnel.</p>
+            <span class="arrow">Voir mes seances →</span>
+        </a>
+        <a href="{{ path('patient_bien_etre') }}" class="service-card animate delay-2">
+            <div class="icon">🌿</div>
+            <h3>Mon bien-etre</h3>
+            <p>Evaluez votre humeur quotidienne et suivez votre progression.</p>
+            <span class="arrow">Evaluer mon etat →</span>
+        </a>
+    </div>
+
+    <div class="section-title animate">💚 Mon bien-etre & profil</div>
+    <div class="grid-2">
+        <div>
+            <div class="wellbeing-panel animate delay-1" style="margin-bottom:20px;">
+                <div class="wellbeing-header">
+                    <h4>🌿 Derniere evaluation</h4>
+                    {% if last is defined and last %}
+                        <span style="font-size:11px;color:#8899AA;">{{ last.createdAt|date('d/m/Y') }}</span>
+                    {% endif %}
+                </div>
+                <div class="wellbeing-item">
+                    <span class="w-icon">😴</span>
+                    <div class="w-info"><h4>Sommeil</h4><p>Qualite du sommeil</p></div>
+                    <div class="w-bar-wrap">
+                        <div class="w-bar"><div class="w-fill" style="width:{% if last is defined and last %}{{ last.sommeil }}{% else %}0{% endif %}%;background:#4A6FA5;"></div></div>
+                        <div class="w-pct">{% if last is defined and last %}{{ last.sommeil }}%{% else %}—{% endif %}</div>
+                    </div>
+                </div>
+                <div class="wellbeing-item">
+                    <span class="w-icon">🧘</span>
+                    <div class="w-info"><h4>Stress</h4><p>Niveau de stress</p></div>
+                    <div class="w-bar-wrap">
+                        <div class="w-bar"><div class="w-fill" style="width:{% if last is defined and last %}{{ last.stress }}{% else %}0{% endif %}%;background:#E8895A;"></div></div>
+                        <div class="w-pct">{% if last is defined and last %}{{ last.stress }}%{% else %}—{% endif %}</div>
+                    </div>
+                </div>
+                <div class="wellbeing-item">
+                    <span class="w-icon">😊</span>
+                    <div class="w-info"><h4>Humeur</h4><p>Humeur generale</p></div>
+                    <div class="w-bar-wrap">
+                        <div class="w-bar"><div class="w-fill" style="width:{% if last is defined and last %}{{ last.humeur }}{% else %}0{% endif %}%;background:#27ae60;"></div></div>
+                        <div class="w-pct">{% if last is defined and last %}{{ last.humeur }}%{% else %}—{% endif %}</div>
+                    </div>
+                </div>
+                <a href="{{ path('patient_bien_etre') }}" class="btn-evaluer">✏️ Evaluer mon etat aujourd'hui</a>
+            </div>
+
+            <div class="next-session animate delay-2">
+                <div class="big-icon">🗓️</div>
+                <h3>Prochaine seance</h3>
+                <p>Aucune seance planifiee pour le moment.<br>Contactez votre coach pour en programmer une.</p>
+                <a href="#" class="btn-session">📅 Planifier une seance</a>
+            </div>
+        </div>
+
+        <div class="profile-panel animate delay-1">
+            <div class="profile-header">
+                <div class="profile-avatar">🌿</div>
+                <h3>{{ app.user.prenom }} {{ app.user.nom }}</h3>
+                <p>{{ app.user.email }}</p>
+                <span class="profile-badge">✅ Compte verifie</span>
+            </div>
+            <div class="profile-row"><span class="lbl">👤 Prenom</span><span class="val">{{ app.user.prenom }}</span></div>
+            <div class="profile-row"><span class="lbl">👤 Nom</span><span class="val">{{ app.user.nom }}</span></div>
+            <div class="profile-row"><span class="lbl">📧 Email</span><span class="val">{{ app.user.email }}</span></div>
+            <div class="profile-row"><span class="lbl">📞 Tel</span><span class="val">{{ app.user.numTel ?? '—' }}</span></div>
+            <div class="profile-row"><span class="lbl">🌿 Role</span><span class="val">Patient</span></div>
+            <a href="{{ path('patient_profile') }}" class="btn-edit-profile">✏️ Modifier mon profil</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fix bouton retour apres deconnexion
+window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+        window.location.reload();
+    }
+});
+
+// Verifie si session active
+fetch('/check-auth')
+    .then(r => r.json())
+    .then(data => {
+        if (!data.authenticated) {
+            window.location.href = '/login';
+        }
+    }).catch(() => {});
+
+{% if last is defined and last %}
+fetch('/spotify/playlist/{{ last.mood }}')
+    .then(r => r.json())
+    .then(playlists => {
+        const grid = document.getElementById('playlistsGrid');
+        if (!playlists || !playlists.length) {
+            grid.innerHTML = '<div class="loading-spotify">❌ Aucune playlist trouvee</div>';
+            return;
+        }
+        grid.innerHTML = playlists.map(p => `
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;transition:all 0.2s;">
+                <iframe
+                    src="${p.embed}?utm_source=generator&theme=0"
+                    width="100%" height="152"
+                    frameBorder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    style="border-radius:12px 12px 0 0;">
+                </iframe>
+                <div style="padding:10px 12px;">
+                    <p style="color:white;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</p>
+                    <a href="${p.url}" target="_blank" style="color:#1DB954;font-size:11px;text-decoration:none;">Ouvrir dans Spotify →</a>
+                </div>
+            </div>
+        `).join('');
+    })
+    .catch(err => {
+        document.getElementById('playlistsGrid').innerHTML =
+            '<div class="loading-spotify" style="color:#e74c3c;">❌ Erreur : ' + err.message + '</div>';
+    });
+{% endif %}
+</script>
+
+{% include 'components/_forum_sidebar.html.twig' %}
+
+</body>
+</html>

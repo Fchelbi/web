@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion Face ID · EchoCare</title>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif; background: #0D1B2A;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .container {
+            display: flex; width: 860px; min-height: 560px;
+            border-radius: 24px; overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+        }
+        .left-panel {
+            background: linear-gradient(160deg, #162232 0%, #0D1B2A 100%);
+            width: 45%; padding: 50px 40px;
+            display: flex; flex-direction: column;
+            justify-content: space-between; color: white;
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+        .logo-area { text-align: center; }
+        .logo-icon {
+            width: 80px; height: 80px;
+            background: rgba(232,137,90,0.15);
+            border: 2px solid rgba(232,137,90,0.3);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 36px; margin: 0 auto 16px;
+        }
+        .logo-area h1 { font-size: 28px; font-weight: 700; color: white; }
+        .logo-area h1 span { color: #E8895A; }
+        .logo-area p { font-size: 13px; color: #8899AA; margin-top: 6px; }
+        .features { display: flex; flex-direction: column; gap: 16px; }
+        .feature-item { border-left: 3px solid #E8895A; padding-left: 14px; }
+        .feature-item h3 { font-size: 14px; font-weight: 600; color: white; }
+        .feature-item p { font-size: 12px; color: #8899AA; margin-top: 2px; }
+        .version { text-align: center; font-size: 11px; color: #4A5568; }
+
+        .right-panel {
+            background: #162232; width: 55%; padding: 40px 45px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .dots { display: flex; gap: 6px; margin-bottom: 24px; }
+        .dot { width: 28px; height: 4px; border-radius: 2px; }
+        .dot:nth-child(1) { background: #E8895A; }
+        .dot:nth-child(2) { background: rgba(232,137,90,0.4); }
+        .dot:nth-child(3) { background: rgba(232,137,90,0.2); }
+        h2 { font-size: 24px; font-weight: 700; color: white; margin-bottom: 6px; }
+        .subtitle { font-size: 13px; color: #8899AA; margin-bottom: 24px; }
+
+        .video-wrapper {
+            position: relative; border-radius: 16px; overflow: hidden;
+            border: 2px solid rgba(232,137,90,0.3); margin-bottom: 16px;
+        }
+        video { display: block; width: 100%; height: 240px; background: #0D1B2A; object-fit: cover; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .scanning-ring {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px; height: 150px;
+            border: 3px solid #E8895A; border-radius: 50%;
+            animation: pulse 2s infinite; pointer-events: none;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.4; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .status {
+            padding: 12px 16px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; margin-bottom: 16px; text-align: center;
+        }
+        .status.loading { background: rgba(232,137,90,0.1); color: #E8895A; border: 1px solid rgba(232,137,90,0.2); }
+        .status.ready { background: rgba(39,174,96,0.1); color: #27ae60; border: 1px solid rgba(39,174,96,0.2); }
+        .status.error { background: rgba(231,76,60,0.1); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
+        .status.success { background: rgba(39,174,96,0.1); color: #27ae60; border: 1px solid rgba(39,174,96,0.2); }
+
+        .btn-scan {
+            width: 100%; padding: 14px; background: #E8895A; color: white;
+            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 10px;
+        }
+        .btn-scan:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(232,137,90,0.3); }
+        .btn-scan:disabled { background: rgba(255,255,255,0.05); color: #4A5568; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .separator {
+            text-align: center; color: #4A5568; font-size: 13px;
+            margin: 12px 0; position: relative;
+        }
+        .separator::before, .separator::after {
+            content: ''; position: absolute; top: 50%;
+            width: 42%; height: 1px; background: rgba(255,255,255,0.05);
+        }
+        .separator::before { left: 0; }
+        .separator::after { right: 0; }
+
+        .btn-password {
+            width: 100%; padding: 13px; background: transparent;
+            color: #E8895A; border: 1.5px solid rgba(232,137,90,0.4);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; display: block; text-align: center; transition: all 0.2s;
+        }
+        .btn-password:hover { background: rgba(232,137,90,0.1); border-color: #E8895A; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="left-panel">
+        <div class="logo-area">
+            <div class="logo-icon">🧠</div>
+            <h1>Echo<span>Care</span></h1>
+            <p>Psychologie · Bien-etre</p>
+        </div>
+        <div class="features">
+            <div class="feature-item">
+                <h3>🔐 Connexion securisee</h3>
+                <p>Reconnaissance faciale IA</p>
+            </div>
+            <div class="feature-item">
+                <h3>⚡ Acces instantane</h3>
+                <p>Plus besoin de mot de passe</p>
+            </div>
+            <div class="feature-item">
+                <h3>🛡️ Admin uniquement</h3>
+                <p>Reserve aux administrateurs</p>
+            </div>
+        </div>
+        <div class="version">EchoCare v2.0</div>
+    </div>
+
+    <div class="right-panel">
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <h2>Connexion Face ID 🔐</h2>
+        <p class="subtitle">Regardez la camera pour vous connecter</p>
+
+        <div class="video-wrapper">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="scanning-ring" id="ring"></div>
+        </div>
+
+        <div class="status loading" id="status">⏳ Chargement des modeles IA...</div>
+
+        <button class="btn-scan" id="scanBtn" disabled onclick="scan()">
+            👁️ Scanner mon visage
+        </button>
+
+        <div class="separator">ou</div>
+        <a href="{{ path('app_login') }}" class="btn-password">🔑 Connexion par mot de passe</a>
+    </div>
+</div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const status = document.getElementById('status');
+const scanBtn = document.getElementById('scanBtn');
+const ring = document.getElementById('ring');
+
+async function loadModels() {
+    try {
+        const MODEL_URL = '/models';
+        await Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        ]);
+        status.className = 'status ready';
+        status.textContent = '✅ Pret ! Activez la camera.';
+        startCamera();
+    } catch(e) {
+        status.className = 'status error';
+        status.textContent = '❌ Erreur chargement modeles : ' + e.message;
+    }
+}
+
+async function startCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.addEventListener('play', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            detectLoop();
+        });
+    } catch(e) {
+        status.className = 'status error';
+        status.textContent = '❌ Camera non accessible : ' + e.message;
+    }
+}
+
+async function detectLoop() {
+    const detection = await faceapi
+        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks().withFaceDescriptor();
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (detection) {
+        faceapi.draw.drawDetections(canvas, [detection]);
+        status.className = 'status ready';
+        status.textContent = '😊 Visage detecte ! Cliquez pour vous connecter.';
+        scanBtn.disabled = false;
+        ring.style.borderColor = '#27ae60';
+    } else {
+        status.className = 'status loading';
+        status.textContent = '👤 Positionnez votre visage...';
+        scanBtn.disabled = true;
+        ring.style.borderColor = '#E8895A';
+    }
+    setTimeout(detectLoop, 300);
+}
+
+async function scan() {
+    scanBtn.disabled = true;
+    status.className = 'status loading';
+    status.textContent = '⏳ Verification en cours...';
+    const detection = await faceapi
+        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks().withFaceDescriptor();
+    if (!detection) {
+        status.className = 'status error';
+        status.textContent = '❌ Visage non detecte. Reessayez.';
+        scanBtn.disabled = false;
+        return;
+    }
+    const descriptor = Array.from(detection.descriptor);
+    const res = await fetch('{{ path("face_login_verify") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ descriptor })
+    });
+    const data = await res.json();
+    if (data.success) {
+        status.className = 'status success';
+        status.textContent = '🎉 Visage reconnu ! Redirection...';
+        ring.style.borderColor = '#27ae60';
+        setTimeout(() => window.location.href = data.redirect, 1500);
+    } else {
+        status.className = 'status error';
+        status.textContent = '❌ Visage non reconnu. Reessayez.';
+        ring.style.borderColor = '#e74c3c';
+        scanBtn.disabled = false;
+    }
+}
+loadModels();
+</script>
+</body>
+</html>

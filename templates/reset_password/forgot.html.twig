@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mot de passe oublie · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif; background: #0D1B2A;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .card {
+            background: #162232; border-radius: 24px; padding: 50px 40px;
+            max-width: 460px; width: 100%; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo { font-size: 20px; font-weight: 700; color: white; margin-bottom: 28px; }
+        .logo span { color: #E8895A; }
+        .icon-wrap {
+            width: 90px; height: 90px;
+            background: rgba(232,137,90,0.1);
+            border: 2px solid rgba(232,137,90,0.3);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 40px; margin: 0 auto 24px;
+        }
+        h1 { font-size: 24px; font-weight: 700; color: white; margin-bottom: 10px; }
+        p { font-size: 14px; color: #8899AA; line-height: 1.6; margin-bottom: 28px; }
+
+        .success-msg {
+            background: rgba(39,174,96,0.1); color: #27ae60;
+            border: 1px solid rgba(39,174,96,0.2);
+            padding: 14px 16px; border-radius: 10px;
+            font-size: 14px; margin-bottom: 20px;
+        }
+        .error-msg {
+            background: rgba(231,76,60,0.1); color: #e74c3c;
+            border: 1px solid rgba(231,76,60,0.2);
+            padding: 14px 16px; border-radius: 10px;
+            font-size: 14px; margin-bottom: 20px;
+        }
+
+        .field-label {
+            font-size: 11px; font-weight: 700; color: #8899AA;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 8px; display: block; text-align: left;
+        }
+        input[type="email"] {
+            width: 100%; padding: 14px 16px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 10px; background: rgba(255,255,255,0.05);
+            font-size: 14px; color: white; outline: none;
+            transition: border-color 0.2s; margin-bottom: 20px;
+        }
+        input[type="email"]::placeholder { color: #4A5568; }
+        input[type="email"]:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
+
+        .btn-send {
+            width: 100%; padding: 15px; background: #E8895A; color: white;
+            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; margin-bottom: 12px;
+        }
+        .btn-send:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(232,137,90,0.3); }
+
+        .btn-back {
+            width: 100%; padding: 13px; background: transparent;
+            color: #8899AA; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            text-decoration: none; display: block; transition: all 0.2s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.05); color: white; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">Echo<span>Care</span></div>
+    <div class="icon-wrap">🔑</div>
+    <h1>Mot de passe oublie ?</h1>
+    <p>Entrez votre adresse email et nous vous enverrons un lien pour reinitialiser votre mot de passe.</p>
+
+    {% if success is defined and success %}
+        <div class="success-msg">✅ {{ success }}</div>
+    {% endif %}
+    {% if error is defined and error %}
+        <div class="error-msg">❌ {{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+        <label class="field-label">Adresse Email</label>
+        <input type="email" name="email" placeholder="vous@exemple.com" required>
+        <button type="submit" class="btn-send">📧 Envoyer le lien</button>
+    </form>
+    <a href="{{ path('app_login') }}" class="btn-back">← Retour a la connexion</a>
+</div>
+</body>
+</html>
