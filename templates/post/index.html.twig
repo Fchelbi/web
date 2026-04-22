@@ -25,7 +25,7 @@
                 {% if app.user and app.user.photo %}
                     <img src="{{ app.user.photo }}" alt="Avatar" class="avatar">
                 {% else %}
-                    <div class="avatar-placeholder" style="background:linear-gradient(135deg, var(--blue-claire), #5cade0);">{{ app.user ? app.user.prenom|slice(0,1)|upper : 'U' }}</div>
+                    <div class="avatar-placeholder" style="background:linear-gradient(135deg, var(--blue-claire), #E8895A);">{{ app.user ? app.user.prenom|slice(0,1)|upper : 'U' }}</div>
                 {% endif %}
                 <div class="user-details">
                     <span class="user-name">{{ app.user ? app.user.prenom ~ ' ' ~ app.user.nom : 'Guest' }}</span>
@@ -66,7 +66,7 @@
                 {% if app.user.photo %}
                     <img src="{{ app.user.photo }}" alt="Avatar" class="avatar" style="width:52px;height:52px;">
                 {% else %}
-                    <div class="avatar-placeholder" style="width:52px;height:52px;font-size:1.1rem;background:linear-gradient(135deg,var(--primary-color),#c96b8a);">{{ app.user.prenom|slice(0,1)|upper }}</div>
+                    <div class="avatar-placeholder" style="width:52px;height:52px;font-size:1.1rem;background:linear-gradient(135deg,var(--primary-color),#E8895A);">{{ app.user.prenom|slice(0,1)|upper }}</div>
                 {% endif %}
                 <div>
                     <p style="margin:0;font-weight:700;color:var(--text-main);font-size:0.95rem;">{{ app.user.prenom }} {{ app.user.nom }}</p>
