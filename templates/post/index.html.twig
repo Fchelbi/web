@@ -346,8 +346,8 @@
 </script>
 
 <!-- ── RANDOM ADVICE MODAL ── -->
-<div id="advice-modal" class="advice-modal-overlay" style="display:none;">
-    <div class="advice-modal-content glassmorphism">
+<div id="advice-modal" class="advice-modal-overlay">
+    <div class="advice-modal-content">
         <button class="advice-close-btn" id="advice-close" aria-label="Close">
             <i data-lucide="x" style="width:20px;height:20px;"></i>
         </button>
@@ -355,7 +355,7 @@
             <i data-lucide="sparkles" style="width:32px;height:32px;color:#f59e0b;"></i>
         </div>
         <h3 class="advice-title">Wisdom for you</h3>
-        <p id="advice-text" class="advice-text">Fetching advice...</p>
+        <p id="advice-text" class="advice-text">Drafting wisdom...</p>
         <button id="advice-listen-btn" class="btn btn-outline" style="margin: 20px auto 0; display:flex; gap:8px;">
             <i data-lucide="volume-2" style="width:16px;height:16px;"></i> Listen Again
         </button>
@@ -383,16 +383,17 @@
     .advice-modal-content {
         position: relative;
         width: 90%;
-        max-width: 420px;
-        padding: 45px 35px;
+        max-width: 440px;
+        padding: 40px;
         text-align: center;
         border-radius: 24px;
-        background: #111827; /* Darker, solid background */
-        transform: translateY(20px) scale(0.95);
-        transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.7);
-        z-index: 10000001;
+        background-color: #111827 !important; /* Force solid background */
+        transform: translateY(20px) scale(0.9);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        z-index: 10000000;
+        opacity: 1 !important;
     }
     .advice-modal-overlay.show .advice-modal-content {
         transform: translateY(0) scale(1);
