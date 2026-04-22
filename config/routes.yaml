@@ -3,6 +3,21 @@ consultation_list:
     controller: App\Controller\ConsultationController::index
     methods: [GET]
 
+google_connect:
+    path: /google/connect
+    controller: App\Controller\ConsultationController::googleConnect
+    methods: [GET]
+
+google_callback:
+    path: /google/callback
+    controller: App\Controller\ConsultationController::googleCallback
+    methods: [GET]
+
+ai_suggest:
+    path: /ai/suggest
+    controller: App\Controller\ConsultationController::aiSuggest
+    methods: [POST]
+
 consultation_add:
     path: /consultation/add
     controller: App\Controller\ConsultationController::add

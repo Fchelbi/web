@@ -44,6 +44,10 @@
                             {{ form_label(form.motif, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                             {{ form_widget(form.motif, {'attr': {'class': 'form-control' ~ (form.motif.vars.errors|length > 0 ? ' is-invalid' : ''), 'rows': 4}}) }}
                             <div class="form-text">{{ form_help(form.motif) }}</div>
+                            <button type="button" id="aiSuggestButton" class="btn btn-outline-primary btn-sm mt-2">
+                                💡 Suggérer un psy
+                            </button>
+                            <div id="aiSuggestion" class="alert alert-info mt-3 d-none"></div>
                             {% if form.motif.vars.errors|length > 0 %}
                                 <div class="invalid-feedback d-block">
                                     {{ form_errors(form.motif) }}
@@ -72,4 +76,58 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const button = document.getElementById('aiSuggestButton');
+            const resultBox = document.getElementById('aiSuggestion');
+            const motifField = document.getElementById('{{ form.motif.vars.id }}');
+
+            button.addEventListener('click', async function () {
+                const motif = motifField.value.trim();
+
+                resultBox.className = 'alert alert-info mt-3';
+                resultBox.textContent = '';
+
+                if (!motif) {
+                    resultBox.className = 'alert alert-warning mt-3';
+                    resultBox.textContent = 'Veuillez saisir un motif avant de demander une suggestion.';
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent = 'Analyse en cours...';
+                resultBox.textContent = 'Analyse du motif en cours...';
+
+                try {
+                    const response = await fetch('{{ path('ai_suggest') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ motif: motif })
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'Suggestion indisponible.');
+                    }
+
+                    resultBox.className = 'alert alert-success mt-3';
+                    resultBox.innerHTML = '<div class="fw-semibold mb-1">Suggestion IA</div>' + data.suggestion;
+                } catch (error) {
+                    resultBox.className = 'alert alert-danger mt-3';
+                    resultBox.textContent = error.message;
+                } finally {
+                    button.disabled = false;
+                    button.textContent = '💡 Suggérer un psy';
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -8,17 +8,71 @@ use App\Form\ConsultationFilterType;
 use App\Form\ConsultationGestionType;
 use App\Form\ConsultationType;
 use App\Repository\ConsultationEnLigneRepository;
+use App\Service\AiService;
+use App\Service\GoogleMeetService;
 use App\Service\SmsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class ConsultationController extends AbstractController
 {
+    #[Route('/google/connect', name: 'google_connect', methods: ['GET'])]
+    public function googleConnect(GoogleMeetService $googleMeetService): Response
+    {
+        return $this->redirect($googleMeetService->getAuthorizationUrl());
+    }
+
+    #[Route('/google/callback', name: 'google_callback', methods: ['GET'])]
+    public function googleCallback(Request $request, GoogleMeetService $googleMeetService): Response
+    {
+        $code = $request->query->get('code');
+
+        if (!$code) {
+            $this->addFlash('error', 'Autorisation Google annulee.');
+
+            return $this->redirectToRoute('psy_consultations');
+        }
+
+        try {
+            $googleMeetService->saveTokenFromCode($code);
+            $this->addFlash('success', 'Google Calendar est connecte.');
+        } catch (\Throwable $exception) {
+            $this->addFlash('error', 'Connexion Google impossible : ' . $exception->getMessage());
+        }
+
+        return $this->redirectToRoute('psy_consultations');
+    }
+
+    #[Route('/ai/suggest', name: 'ai_suggest', methods: ['POST'])]
+    public function aiSuggest(Request $request, AiService $aiService): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (!is_array($data)) {
+            $data = $request->request->all();
+        }
+
+        $motif = (string) ($data['motif'] ?? '');
+
+        try {
+            return $this->json([
+                'success' => true,
+                'suggestion' => $aiService->suggestPsychologue($motif),
+            ]);
+        } catch (\Throwable $exception) {
+            return $this->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    }
+
     #[Route('/consultations', name: 'consultation_list', methods: ['GET'])]
     public function index(
         Request $request,
@@ -137,9 +191,19 @@ class ConsultationController extends AbstractController
     public function accept(
         ConsultationEnLigne $consultation,
         EntityManagerInterface $entityManager,
+        GoogleMeetService $googleMeetService,
         SmsService $smsService
     ): Response {
         $consultation->setStatut(ConsultationEnLigne::STATUT_CONFIRMEE);
+
+        try {
+            $meetLink = $googleMeetService->createMeetLink($consultation);
+            $consultation->setMeetLink($meetLink);
+        } catch (\Throwable $exception) {
+            $consultation->setMeetLink(null);
+            $this->addFlash('warning', 'Lien non généré : ' . $exception->getMessage());
+        }
+
         $entityManager->flush();
 
         $message = sprintf(
