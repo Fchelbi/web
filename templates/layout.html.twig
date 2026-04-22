@@ -35,9 +35,13 @@
                     <i data-lucide="layout-grid" style="width:14px;height:14px"></i>
                     User Space
                 </h3>
+                <a href="{{ path('patient_dashboard') }}" class="nav-item">
+                    <span class="nav-icon"><i data-lucide="home"></i></span>
+                    <span class="nav-label">Main Dashboard</span>
+                </a>
                 <a href="{{ path('app_post_index') }}" class="nav-item {% if 'post_index' in app.request.attributes.get('_route') %}active{% endif %}">
                     <span class="nav-icon"><i data-lucide="newspaper"></i></span>
-                    <span class="nav-label">Feed</span>
+                    <span class="nav-label">Forum Feed</span>
                 </a>
                 <a href="{{ path('app_post_new') }}" class="nav-item {% if 'post_new' in app.request.attributes.get('_route') %}active{% endif %}">
                     <span class="nav-icon"><i data-lucide="plus-circle"></i></span>
@@ -113,16 +117,34 @@
     <main class="main-content">
         <div class="content-container">
             {% block topbar %}
-            <header class="top-bar">
-                <div class="search-container glassmorphism" style="border-radius:30px;padding: 0.2rem;">
-                    <form method="get" action="{{ path('app_post_index') }}">
-                        <div class="search-wrapper" style="margin:0;">
-                            <i data-lucide="search" class="search-icon" style="color:var(--text-subtle);"></i>
-                            <input type="search" name="q" placeholder="Search across the community..." class="search-input" value="{{ app.request.query.get('q')|default('') }}" style="border:none;background:transparent;width:100%;padding-left:2.8rem;border-radius:30px;">
-                        </div>
-                    </form>
+            <nav class="navbar glassmorphism" style="border-radius: 0 0 16px 16px; border-top:none;">
+                <div class="navbar-logo">Echo<span>Care</span></div>
+                
+                <div class="top-bar-search">
+                    <div class="search-container glassmorphism" style="border-radius:30px;padding: 0.2rem; background: rgba(255,255,255,0.03);">
+                        <form method="get" action="{{ path('app_post_index') }}">
+                            <div class="search-wrapper" style="margin:0;">
+                                <i data-lucide="search" class="search-icon" style="color:var(--text-subtle);"></i>
+                                <input type="search" name="q" placeholder="Search community..." class="search-input" value="{{ app.request.query.get('q')|default('') }}" style="border:none;background:transparent;width:100%;padding-left:2.8rem;border-radius:30px; font-size:0.85rem;">
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </header>
+
+                <div class="navbar-links">
+                    <a href="{{ path('patient_dashboard') }}" class="{% if 'patient_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">Accueil</a>
+                    <a href="{{ path('patient_bien_etre') }}" class="{% if 'bien_etre' in app.request.attributes.get('_route') %}active{% endif %}">Bien-etre</a>
+                    <a href="{{ path('app_post_index') }}" class="{% if 'post' in app.request.attributes.get('_route') or 'category' in app.request.attributes.get('_route') %}active{% endif %}">Forum</a>
+                    <a href="{{ path('patient_profile') }}" class="{% if 'profile' in app.request.attributes.get('_route') %}active{% endif %}">Mon profil</a>
+                </div>
+
+                <div class="navbar-right">
+                    <div class="user-pill-nav">
+                        <div class="avatar">{{ app.user.prenom|slice(0,1)|upper }}</div>
+                        <span>{{ app.user.prenom }}</span>
+                    </div>
+                </div>
+            </nav>
             {% endblock %}
 
             {% for label, messages in app.flashes %}
@@ -639,6 +661,60 @@
         background: rgba(239, 68, 68, 0.1);
         color: #ef4444 !important;
         transform: scale(1.1);
+    }
+
+    /* Global Navbar Integration */
+    .navbar {
+        background: #162232;
+        padding: 0 40px;
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+    .navbar-logo { font-size: 20px; font-weight: 700; color: white; }
+    .navbar-logo span { color: #E8895A; }
+    .navbar-links { display: flex; gap: 24px; align-items: center; }
+    .navbar-links a {
+        color: #8899AA; text-decoration: none; font-size: 13px;
+        font-weight: 500; transition: color 0.2s; position: relative;
+    }
+    .navbar-links a::after {
+        content: ''; position: absolute; bottom: -4px; left: 0;
+        width: 0; height: 2px; background: #E8895A; transition: width 0.3s;
+    }
+    .navbar-links a:hover { color: white; }
+    .navbar-links a:hover::after, .navbar-links a.active::after { width: 100%; }
+    .navbar-links a.active { color: white; font-weight: 600; }
+    .navbar-right { display: flex; align-items: center; gap: 16px; }
+    .user-pill-nav {
+        display: flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,0.05); padding: 6px 14px;
+        border-radius: 30px; border: 1px solid rgba(255,255,255,0.08);
+    }
+    .user-pill-nav .avatar {
+        width: 28px; height: 28px; background: #E8895A;
+        border-radius: 50%; display: flex; align-items: center;
+        justify-content: center; color: white; font-size: 12px; font-weight: 700;
+    }
+    .user-pill-nav span { font-size: 12px; color: #CBD5E0; font-weight: 600; }
+    .btn-logout-nav {
+        padding: 6px 14px; background: rgba(231,76,60,0.15); color: #e74c3c;
+        border-radius: 8px; text-decoration: none; font-size: 12px;
+        font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
+    }
+    .btn-logout-nav:hover { background: rgba(231,76,60,0.3); }
+
+    .top-bar-search {
+        flex: 1;
+        max-width: 400px;
+        margin: 0 2rem;
     }
 </style>
 
