@@ -4,14 +4,15 @@
 
 /* Widget container — anchored to bottom-right */
 .aicb-widget {
-    position: fixed !important;
-    bottom: 32px !important;
-    right: 32px !important;
-    z-index: 99999 !important;
+    position: static !important;
 }
 
 /* ── Trigger bubble ────────────────────────────────────────── */
 .aicb-trigger {
+    position: fixed !important;
+    bottom: 32px !important;
+    right: 32px !important;
+    z-index: 99999 !important;
     width: 58px;
     height: 58px;
     border-radius: 50%;
@@ -64,9 +65,9 @@
 
 /* ── Panel ─────────────────────────────────────────────────── */
 .aicb-panel {
-    position: absolute;
-    bottom: 74px;
-    right: 0;
+    position: fixed !important;
+    bottom: 106px !important;
+    right: 32px !important;
     width: 370px;
     border-radius: 22px;
     flex-direction: column;
