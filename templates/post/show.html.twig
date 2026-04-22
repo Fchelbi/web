@@ -230,15 +230,29 @@
                                     {% endif %}
                                 </div>
                                 <p class="show-reply-text" id="cc-{{ reply.id }}">{{ reply.content }}</p>
-                                <div class="tx-pills-sm" id="tx-pills-c{{ reply.id }}" style="margin-top:0.35rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-subtle);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                                    <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'en',this)" type="button">EN</button>
-                                    <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'fr',this)" type="button">FR</button>
-                                    <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'ar',this)" type="button">AR</button>
-                                    <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'es',this)" type="button">ES</button>
-                                    <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'de',this)" type="button">DE</button>
-                                    <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'zh-CN',this)" type="button">ZH</button>
-                                    <span class="tx-badge" id="txcb-{{ reply.id }}"></span>
+                                <div class="show-comment-bar" style="margin-top: 0.5rem;">
+                                    <div class="show-comment-reacts">
+                                        <button class="show-react-sm like-btn {{ app.user and reply.likedByUsers.contains(app.user) ? 'active' : '' }}"
+                                                onclick="likeComment({{ reply.id }})" type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                                            <span id="comment-likes-{{ reply.id }}">{{ reply.likedByUsers.count }}</span>
+                                        </button>
+                                        <button class="show-react-sm dislike-btn {{ app.user and reply.dislikedByUsers.contains(app.user) ? 'active' : '' }}"
+                                                onclick="dislikeComment({{ reply.id }})" type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                                            <span id="comment-dislikes-{{ reply.id }}">{{ reply.dislikedByUsers.count }}</span>
+                                        </button>
+                                    </div>
+                                    <div class="tx-pills-sm" id="tx-pills-c{{ reply.id }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-subtle);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'en',this)" type="button">EN</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'fr',this)" type="button">FR</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'ar',this)" type="button">AR</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'es',this)" type="button">ES</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'de',this)" type="button">DE</button>
+                                        <button class="tx-pill-xs" onclick="txComment({{ reply.id }},'zh-CN',this)" type="button">ZH</button>
+                                        <span class="tx-badge" id="txcb-{{ reply.id }}"></span>
+                                    </div>
                                 </div>
                             </div>
                             {% endfor %}
