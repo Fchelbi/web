@@ -10,7 +10,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/css/style.css?v=2">
-        <link rel="stylesheet" href="/css/ai-chatbot.css?v=2">
+        <link rel="stylesheet" href="/css/ai-chatbot.css?v=10">
         <script src="https://unpkg.com/lucide@latest"></script>
         
         <!-- PACE.js for Lazy-Loading Progress Bar -->
@@ -59,7 +59,7 @@
     </head>
     <body>
         <!-- ================================================================
-             AI IMAGE STUDIO — Floating Widget
+             AI POST ASSISTANT — Floating Widget (Dark Theme)
              ================================================================ -->
         <div class="aicb-widget">
             <!-- Trigger bubble -->
@@ -84,10 +84,22 @@
                 <!-- ── FORM STATE ── -->
                 <div id="aicb-form" class="aicb-body">
                     <p class="aicb-welcome">What would you like to share today?</p>
-                    <div class="aicb-input-wrapper">
-                        <textarea id="aicb-prompt" class="aicb-textarea" placeholder="e.g. Tips for morning anxiety..."></textarea>
-                        <div class="aicb-glow"></div>
+
+                    <!-- API Key -->
+                    <div class="aicb-api-section">
+                        <label class="aicb-api-label">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                            API Key
+                        </label>
+                        <input type="password" id="aicb-api-key" class="aicb-api-input" placeholder="Paste your Gemini API key…" autocomplete="off">
+                        <p class="aicb-api-hint">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></p>
                     </div>
+
+                    <!-- Prompt -->
+                    <div class="aicb-input-wrapper">
+                        <textarea id="aicb-prompt" class="aicb-textarea" placeholder="e.g. Tips for morning anxiety…" rows="3"></textarea>
+                    </div>
+
                     <button class="aicb-btn-generate" onclick="generateAICBPost()">
                         Generate Support Post
                         <span class="aicb-sparkle">✦</span>
@@ -109,9 +121,9 @@
                     <p class="aicb-loading-hint">This usually takes just a few seconds</p>
                 </div>
 
-                <!-- ── RESULT STATE (Used for Errors now) ── -->
+                <!-- ── ERROR STATE ── -->
                 <div id="aicb-result" class="aicb-result-wrap" style="display:none; flex-direction:column; padding: 20px; text-align: center;">
-                    <p id="aicb-error-text" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 20px;"></p>
+                    <p id="aicb-error-text" style="color: #e8895a; font-size: 0.88rem; margin-bottom: 20px;"></p>
                     <div class="aicb-result-actions">
                         <button class="aicb-btn-back" onclick="resetAICBForm()" style="width: 100%; justify-content: center;">
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -203,6 +215,6 @@
             });
         </script>
 
-        <script src="/js/ai-chatbot.js?v=9" defer></script>
+        <script src="/js/ai-chatbot.js?v=10" defer></script>
     </body>
 </html>

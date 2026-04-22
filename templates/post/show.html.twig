@@ -51,10 +51,13 @@
             {# Content #}
             <p class="show-post-body" id="show-post-content">{{ post.content }}</p>
 
-            {# Translate bar #}
+            {# Translate + Voice bar #}
             <div class="tx-bar">
+                <button class="tts-btn" type="button" onclick="ttsSpeak(document.getElementById('show-post-title').innerText + '. ' + document.getElementById('show-post-content').innerText, this)" title="Listen to this post">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                    Listen
+                </button>
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-subtle);flex-shrink:0;"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                <span class="tx-bar-label">Translate:</span>
                 <div class="tx-pills" id="tx-pills-post">
                     <button class="tx-pill" onclick="txPost('en',this)" type="button">EN</button>
                     <button class="tx-pill" onclick="txPost('fr',this)" type="button">FR</button>
@@ -165,7 +168,7 @@
                         {# Text #}
                         <p class="show-comment-text" id="cc-{{ comment.id }}">{{ comment.content }}</p>
 
-                        {# Reactions + translate #}
+                        {# Reactions + voice + translate #}
                         <div class="show-comment-bar">
                             <div class="show-comment-reacts">
                                 <button class="show-react-sm like-btn {{ app.user and comment.likedByUsers.contains(app.user) ? 'active' : '' }}"
@@ -177,6 +180,9 @@
                                         onclick="dislikeComment({{ comment.id }})" type="button">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
                                     <span id="comment-dislikes-{{ comment.id }}">{{ comment.dislikedByUsers.count }}</span>
+                                </button>
+                                <button class="tts-btn" type="button" onclick="ttsSpeak(document.getElementById('cc-{{ comment.id }}').innerText, this)" title="Listen">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                                 </button>
                             </div>
                             <div class="tx-pills-sm" id="tx-pills-c{{ comment.id }}">
@@ -241,6 +247,9 @@
                                                 onclick="dislikeComment({{ reply.id }})" type="button">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
                                             <span id="comment-dislikes-{{ reply.id }}">{{ reply.dislikedByUsers.count }}</span>
+                                        </button>
+                                        <button class="tts-btn" type="button" onclick="ttsSpeak(document.getElementById('cc-{{ reply.id }}').innerText, this)" title="Listen">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
                                         </button>
                                     </div>
                                     <div class="tx-pills-sm" id="tx-pills-c{{ reply.id }}">

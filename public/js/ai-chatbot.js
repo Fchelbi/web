@@ -1,19 +1,16 @@
 (function () {
     'use strict';
 
-    var API_KEY  = 'AIzaSyC59bLCbBS-HZ_ZshkO1b8ZE84ml5EM5lI';
     var BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
-
-    /*
-     * Models tried in order until one succeeds.
-     * Gemini models are free-tier on AI Studio; Imagen needs Cloud billing.
-     */
-    var GEMINI_MODELS = [
-        'gemini-2.0-flash-preview-image-generation',
-        'gemini-2.0-flash-exp'
-    ];
-
     var panelOpen = false;
+
+    /* ── Get / Set API Key from localStorage ─────────────────── */
+    function getApiKey() {
+        return localStorage.getItem('echocare_gemini_key') || '';
+    }
+    function setApiKey(key) {
+        localStorage.setItem('echocare_gemini_key', key.trim());
+    }
 
     /* ── Toggle panel ───────────────────────────────────────── */
     window.toggleAIChatbot = function () {
@@ -22,6 +19,10 @@
 
         if (!panelOpen) {
             panel.style.display = 'flex';
+            // Pre-fill API key input
+            var keyInput = document.getElementById('aicb-api-key');
+            if (keyInput) keyInput.value = getApiKey();
+
             requestAnimationFrame(function () {
                 requestAnimationFrame(function () {
                     panel.classList.add('aicb-visible');
@@ -43,6 +44,14 @@
     window.generateAICBPost = async function () {
         var promptEl = document.getElementById('aicb-prompt');
         var prompt   = promptEl.value.trim();
+        var keyInput = document.getElementById('aicb-api-key');
+        var apiKey   = keyInput ? keyInput.value.trim() : '';
+
+        if (!apiKey) {
+            aicbToast('Please enter your Gemini API key first', 'error');
+            if (keyInput) keyInput.focus();
+            return;
+        }
 
         if (!prompt) {
             aicbToast('Please enter a topic first', 'error');
@@ -50,31 +59,32 @@
             return;
         }
 
+        // Save the key for future use
+        setApiKey(apiKey);
         aicbState('loading');
 
         try {
-            var result = await callGeminiText(prompt);
-            
+            var result = await callGeminiText(prompt, apiKey);
+
             // Save to session storage
             sessionStorage.setItem('ai_post_title', result.title);
             sessionStorage.setItem('ai_post_content', result.content);
-            
+
             // Redirect to post creation page
             window.location.href = '/post/new';
         } catch (e) {
             console.error('[AI Assistant] Generation failed:', e.message);
             var errorEl = document.getElementById('aicb-error-text');
-            if(errorEl) errorEl.textContent = 'Generation failed: ' + e.message;
+            if (errorEl) errorEl.textContent = 'Generation failed: ' + e.message;
             aicbState('result');
         }
     };
 
-    /* ── Gemini text generation (free tier) ─────────────────── */
-    async function callGeminiText(prompt) {
-        // Using gemini-flash-latest to automatically route to the most stable, available free-tier model
-        var url = BASE_URL + 'gemini-flash-latest:generateContent?key=' + API_KEY;
+    /* ── Gemini text generation ─────────────────────────────── */
+    async function callGeminiText(prompt, apiKey) {
+        var url = BASE_URL + 'gemini-2.0-flash:generateContent?key=' + apiKey;
 
-        var systemPrompt = "You are a supportive, professional AI assistant for a psychology and mental health community forum. Write an engaging, empathetic, and helpful forum post based on the user's prompt. Keep it structured and easy to read.";
+        var systemPrompt = "You are a supportive, professional AI assistant for a psychology and mental health community forum called EchoCare. Write an engaging, empathetic, and helpful forum post based on the user's prompt. Keep it structured and easy to read.";
 
         var res = await fetch(url, {
             method : 'POST',
@@ -111,7 +121,7 @@
         }
 
         var textResponse = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
-        
+
         if (!textResponse) {
             throw new Error('Response contained no text data');
         }
@@ -159,19 +169,19 @@
         if (window.location.pathname.includes('/post/new') || window.location.pathname.includes('/post/new/')) {
             var savedTitle = sessionStorage.getItem('ai_post_title');
             var savedContent = sessionStorage.getItem('ai_post_content');
-            
+
             if (savedTitle && savedContent) {
                 var titleInput = document.getElementById('post_title');
                 var contentInput = document.getElementById('post_content');
-                
+
                 if (titleInput && contentInput) {
                     titleInput.value = savedTitle;
                     contentInput.value = savedContent;
-                    
+
                     // Clear so it doesn't auto-fill again on refresh
                     sessionStorage.removeItem('ai_post_title');
                     sessionStorage.removeItem('ai_post_content');
-                    
+
                     // Show a notification
                     setTimeout(function() {
                         aicbToast('AI Post drafted successfully! Review and publish.', 'success');
@@ -180,5 +190,63 @@
             }
         }
     });
+
+    /* ============================================================
+       TEXT-TO-SPEECH (TTS) — Global utility
+       ============================================================ */
+    var currentUtterance = null;
+    var currentTTSBtn    = null;
+
+    window.ttsSpeak = function (text, btn) {
+        // If already speaking — stop
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            if (currentTTSBtn) currentTTSBtn.classList.remove('tts-playing');
+
+            // If same button clicked, just stop
+            if (currentTTSBtn === btn) {
+                currentTTSBtn = null;
+                return;
+            }
+        }
+
+        if (!text || !text.trim()) return;
+
+        var utterance = new SpeechSynthesisUtterance(text.trim());
+        utterance.lang  = 'en-US';
+        utterance.rate  = 0.95;
+        utterance.pitch = 1.0;
+
+        // Try to pick a nice voice
+        var voices = window.speechSynthesis.getVoices();
+        var preferred = voices.find(function(v) {
+            return v.lang.startsWith('en') && v.name.toLowerCase().includes('google');
+        }) || voices.find(function(v) {
+            return v.lang.startsWith('en');
+        });
+        if (preferred) utterance.voice = preferred;
+
+        btn.classList.add('tts-playing');
+        currentTTSBtn = btn;
+
+        utterance.onend = function () {
+            btn.classList.remove('tts-playing');
+            currentTTSBtn = null;
+        };
+        utterance.onerror = function () {
+            btn.classList.remove('tts-playing');
+            currentTTSBtn = null;
+        };
+
+        window.speechSynthesis.speak(utterance);
+    };
+
+    // Pre-load voices (some browsers need this)
+    if (window.speechSynthesis) {
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.onvoiceschanged = function() {
+            window.speechSynthesis.getVoices();
+        };
+    }
 
 })();
