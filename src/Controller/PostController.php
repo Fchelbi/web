@@ -376,13 +376,14 @@ class PostController extends AbstractController
             return new JsonResponse(['error' => 'API key missing'], 500);
         }
 
-        $ch = curl_init('https://api.deepseek.com/v1/chat/completions');
+        $ch = curl_init('https://api.deepseek.com/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         
         $headers = [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiKey
+            'Authorization: Bearer ' . trim($apiKey)
         ];
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -392,16 +393,16 @@ class PostController extends AbstractController
             'messages' => [
                 [
                     'role' => 'user',
-                    'content' => 'Give me one short sentence of random wisdom, advice, or motivational thought. Do not use quotes or introductory text.'
+                    'content' => 'Give me one short sentence of random wisdom or advice. No quotes.'
                 ]
             ],
-            'max_tokens' => 50,
-            'temperature' => 0.7
+            'max_tokens' => 50
         ];
         
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         
         $response = curl_exec($ch);
+        $err = curl_error($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         
@@ -414,6 +415,24 @@ class PostController extends AbstractController
             }
         }
         
-        return new JsonResponse(['error' => 'Failed to generate advice'], 500);
+        // --- FALLBACK TO ADVICESLIP API ---
+        try {
+            $fallbackResp = file_get_contents('https://api.adviceslip.com/advice');
+            if ($fallbackResp) {
+                $fallbackData = json_decode($fallbackResp, true);
+                if (isset($fallbackData['slip']['advice'])) {
+                    return new JsonResponse([
+                        'advice' => $fallbackData['slip']['advice'],
+                        'note' => 'DeepSeek balance low, using fallback wisdom.'
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {}
+
+        return new JsonResponse([
+            'error' => 'Advice Generation Failed',
+            'details' => 'DeepSeek: ' . ($err ?: 'HTTP ' . $httpCode),
+            'fallback' => 'Failed'
+        ], 500);
     }
 }

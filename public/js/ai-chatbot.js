@@ -218,4 +218,74 @@
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
     }
 
+    /* ============================================================
+       RANDOM ADVICE GENERATOR — Global integration
+       ============================================================ */
+    /* ============================================================
+       RANDOM ADVICE GENERATOR — Global integration
+       ============================================================ */
+    function initAdviceGenerator() {
+        var btnAdvice = document.getElementById('btn-random-advice');
+        var modal     = document.getElementById('advice-modal');
+        var btnClose   = document.getElementById('advice-close');
+        var textEl    = document.getElementById('advice-text');
+        var btnListen  = document.getElementById('advice-listen-btn');
+        var currentAdvice = "";
+
+        if (btnAdvice && modal) {
+            console.log('[Advice] Initializing generator...');
+            btnAdvice.onclick = async function(e) {
+                e.preventDefault();
+                console.log('[Advice] Button clicked');
+                modal.style.display = 'flex';
+                void modal.offsetWidth;
+                modal.classList.add('show');
+                
+                if (textEl) textEl.innerHTML = 'Drafting wisdom...';
+                currentAdvice = "";
+
+                try {
+                    var response = await fetch('/post/api/advice', { cache: "no-cache" });
+                    var data     = await response.json();
+                    
+                    if (data && data.advice) {
+                        currentAdvice = data.advice;
+                        if (textEl) textEl.innerText = '"' + currentAdvice + '"';
+                        if (typeof window.ttsSpeak === 'function') {
+                            window.ttsSpeak(currentAdvice, btnListen || document.createElement('div'));
+                        }
+                    } else {
+                        if (textEl) textEl.innerText = "Wisdom is shy today. Please try again.";
+                    }
+                } catch(err) {
+                    console.error('[Advice] Fetch failed:', err);
+                    if (textEl) textEl.innerText = "Connection lost.";
+                }
+            };
+
+            var closeModal = function() {
+                modal.classList.remove('show');
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                setTimeout(function() { modal.style.display = 'none'; }, 300);
+            };
+
+            if (btnClose) btnClose.onclick = closeModal;
+            modal.onclick = function(e) { if (e.target === modal) closeModal(); };
+            
+            if (btnListen) {
+                btnListen.onclick = function() {
+                    if (currentAdvice && typeof window.ttsSpeak === 'function') {
+                        window.ttsSpeak(currentAdvice, btnListen);
+                    }
+                };
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAdviceGenerator);
+    } else {
+        initAdviceGenerator();
+    }
+
 })();

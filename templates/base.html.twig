@@ -126,6 +126,96 @@
             });
         </script>
 
-        <script src="/js/ai-chatbot.js?v=15" defer></script>
+        <!-- ── RANDOM ADVICE MODAL (Global) ── -->
+        <div id="advice-modal" class="advice-modal-overlay">
+            <div class="advice-modal-content">
+                <button class="advice-close-btn" id="advice-close" aria-label="Close">×</button>
+                <div class="advice-icon-wrap">✦</div>
+                <h3 class="advice-title">Wisdom for you</h3>
+                <p id="advice-text" class="advice-text">Drafting wisdom...</p>
+                <button id="advice-listen-btn" class="advice-btn-listen">
+                    Listen Again
+                </button>
+            </div>
+        </div>
+
+        <script src="/js/ai-chatbot.js?v=16" defer></script>
+
+        <style>
+            .advice-modal-overlay {
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(0, 0, 0, 0.85);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                z-index: 99999999;
+                display: none;
+                align-items: center;
+                justify-content: center;
+            }
+            .advice-modal-overlay.show {
+                display: flex !important;
+            }
+            .advice-modal-content {
+                position: relative;
+                background: #1a202c;
+                width: 90%;
+                max-width: 450px;
+                padding: 50px 30px;
+                border-radius: 24px;
+                border: 2px solid #f59e0b;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+                color: white;
+                text-align: center;
+                margin: auto;
+            }
+            .advice-close-btn {
+                position: absolute;
+                top: 15px; right: 15px;
+                background: rgba(255,255,255,0.05);
+                border: none;
+                color: #94a3b8;
+                border-radius: 50%;
+                width: 32px; height: 32px;
+                cursor: pointer;
+                font-size: 20px;
+            }
+            .advice-icon-wrap {
+                background: rgba(245, 158, 11, 0.1);
+                width: 64px; height: 64px;
+                border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                margin: 0 auto 20px;
+                color: #f59e0b;
+                font-size: 32px;
+            }
+            .advice-title {
+                color: #cbd5e0;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 15px;
+            }
+            .advice-text {
+                font-size: 1.35rem;
+                font-weight: 500;
+                color: #fff;
+                line-height: 1.5;
+                margin-bottom: 25px;
+            }
+            .advice-btn-listen {
+                background: transparent;
+                border: 1px solid rgba(255,255,255,0.2);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 30px;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            }
+            .advice-btn-listen:hover {
+                background: rgba(255,255,255,0.1);
+            }
+        </style>
     </body>
 </html>
