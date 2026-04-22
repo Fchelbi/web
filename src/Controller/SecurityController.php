@@ -16,6 +16,12 @@ class SecurityController extends AbstractController
         private BruteForceService $bruteForce,
     ) {}
 
+    #[Route(path: '/', name: 'app_home')]
+    public function home(): Response
+    {
+        return $this->redirectToRoute('app_login');
+    }
+
     #[Route(path: '/login', name: 'app_login')]
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {

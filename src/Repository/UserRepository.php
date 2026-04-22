@@ -35,4 +35,21 @@ class UserRepository extends ServiceEntityRepository
 
         return [$users, (int) $total];
     }
+
+    public function countBanned(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.isBanned = true')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countActiveForumUsers(): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(DISTINCT user_id) as total FROM post";
+        $result = $conn->executeQuery($sql);
+        return (int) $result->fetchOne();
+    }
 }

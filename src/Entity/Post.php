@@ -13,6 +13,8 @@ class Post
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->likedByUsers = new ArrayCollection();
+        $this->dislikedByUsers = new ArrayCollection();
     }
 
     #[ORM\Id]
@@ -48,6 +50,27 @@ class Post
 
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post', orphanRemoval: true, cascade: ['persist'])]
     private Collection $comments;
+
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'post_likes')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id_user')]
+    private Collection $likedByUsers;
+
+    #[ORM\ManyToMany(targetEntity: User::class)]
+    #[ORM\JoinTable(name: 'post_dislikes')]
+    #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id_user')]
+    private Collection $dislikedByUsers;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isFlagged = false;
+
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
+    private ?string $flagReason = null;
+
+    #[ORM\Column(type: 'string', length: 20, options: ['default' => 'approved'])]
+    private string $moderationStatus = 'approved';
 
     public function getId(): ?int
     {
@@ -150,6 +173,83 @@ class Post
     public function setUser(?User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+    public function isFlagged(): bool
+    {
+        return $this->isFlagged;
+    }
+
+    public function setIsFlagged(bool $isFlagged): self
+    {
+        $this->isFlagged = $isFlagged;
+        return $this;
+    }
+
+    public function getFlagReason(): ?string
+    {
+        return $this->flagReason;
+    }
+
+    public function setFlagReason(?string $flagReason): self
+    {
+        $this->flagReason = $flagReason;
+        return $this;
+    }
+
+    public function getModerationStatus(): string
+    {
+        return $this->moderationStatus;
+    }
+
+    public function setModerationStatus(string $moderationStatus): self
+    {
+        $this->moderationStatus = $moderationStatus;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getLikedByUsers(): Collection
+    {
+        return $this->likedByUsers;
+    }
+
+    public function addLikedByUser(User $user): self
+    {
+        if (!$this->likedByUsers->contains($user)) {
+            $this->likedByUsers[] = $user;
+        }
+        return $this;
+    }
+
+    public function removeLikedByUser(User $user): self
+    {
+        $this->likedByUsers->removeElement($user);
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getDislikedByUsers(): Collection
+    {
+        return $this->dislikedByUsers;
+    }
+
+    public function addDislikedByUser(User $user): self
+    {
+        if (!$this->dislikedByUsers->contains($user)) {
+            $this->dislikedByUsers[] = $user;
+        }
+        return $this;
+    }
+
+    public function removeDislikedByUser(User $user): self
+    {
+        $this->dislikedByUsers->removeElement($user);
         return $this;
     }
 }

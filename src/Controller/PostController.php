@@ -42,13 +42,6 @@ class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/test-delete/{id}', name: 'app_post_test_delete', methods: ['GET'])]
-    public function testDelete(Post $post): Response
-    {
-        file_put_contents(__DIR__.'/../../../debug.log', date('Y-m-d H:i:s') . " - Test delete called for post ID: " . $post->getId() . "\n", FILE_APPEND);
-        return new Response('Test delete called for post ' . $post->getId());
-    }
-
     #[Route('/load-more/{offset}', name: 'app_post_load_more', methods: ['GET'])]
     public function loadMore(int $offset, PostRepository $postRepository): JsonResponse
     {
@@ -70,17 +63,109 @@ class PostController extends AbstractController
     #[Route('/{id}/like', name: 'app_post_like', methods: ['POST'])]
     public function like(Post $post, EntityManagerInterface $entityManager): JsonResponse
     {
-        $post->setLikes(($post->getLikes() ?? 0) + 1);
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Authentification requise'], 403);
+        }
+
+        // If user disliked before, remove that dislike
+        if ($post->getDislikedByUsers()->contains($user)) {
+            $post->removeDislikedByUser($user);
+        }
+
+        // Toggle like
+        if ($post->getLikedByUsers()->contains($user)) {
+            $post->removeLikedByUser($user);
+        } else {
+            $post->addLikedByUser($user);
+        }
+
         $entityManager->flush();
-        return new JsonResponse(['likes' => $post->getLikes()]);
+
+        return new JsonResponse([
+            'likes' => $post->getLikedByUsers()->count(),
+            'dislikes' => $post->getDislikedByUsers()->count()
+        ]);
     }
 
     #[Route('/{id}/dislike', name: 'app_post_dislike', methods: ['POST'])]
     public function dislike(Post $post, EntityManagerInterface $entityManager): JsonResponse
     {
-        $post->setDislikes(($post->getDislikes() ?? 0) + 1);
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Authentification requise'], 403);
+        }
+
+        // If user liked before, remove that like
+        if ($post->getLikedByUsers()->contains($user)) {
+            $post->removeLikedByUser($user);
+        }
+
+        // Toggle dislike
+        if ($post->getDislikedByUsers()->contains($user)) {
+            $post->removeDislikedByUser($user);
+        } else {
+            $post->addDislikedByUser($user);
+        }
+
         $entityManager->flush();
-        return new JsonResponse(['dislikes' => $post->getDislikes()]);
+
+        return new JsonResponse([
+            'likes' => $post->getLikedByUsers()->count(),
+            'dislikes' => $post->getDislikedByUsers()->count()
+        ]);
+    }
+
+    #[Route('/comment/{id}/like', name: 'app_comment_like', methods: ['POST'])]
+    public function likeComment(\App\Entity\Comment $comment, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Authentification requise'], 403);
+        }
+
+        if ($comment->getDislikedByUsers()->contains($user)) {
+            $comment->removeDislikedByUser($user);
+        }
+
+        if ($comment->getLikedByUsers()->contains($user)) {
+            $comment->removeLikedByUser($user);
+        } else {
+            $comment->addLikedByUser($user);
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'likes' => $comment->getLikedByUsers()->count(),
+            'dislikes' => $comment->getDislikedByUsers()->count()
+        ]);
+    }
+
+    #[Route('/comment/{id}/dislike', name: 'app_comment_dislike', methods: ['POST'])]
+    public function dislikeComment(\App\Entity\Comment $comment, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Authentification requise'], 403);
+        }
+
+        if ($comment->getLikedByUsers()->contains($user)) {
+            $comment->removeLikedByUser($user);
+        }
+
+        if ($comment->getDislikedByUsers()->contains($user)) {
+            $comment->removeDislikedByUser($user);
+        } else {
+            $comment->addDislikedByUser($user);
+        }
+
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'likes' => $comment->getLikedByUsers()->count(),
+            'dislikes' => $comment->getDislikedByUsers()->count()
+        ]);
     }
 
     #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
@@ -121,13 +206,7 @@ class PostController extends AbstractController
                 }
             }
 
-            // Assign to default admin user
-            $userRepo = $entityManager->getRepository(\App\Entity\User::class);
-            $user = $userRepo->find(1);
-            if (!$user) {
-                $user = $userRepo->findOneBy([]);
-            }
-            $post->setUser($user);
+            $post->setUser($this->getUser());
             $entityManager->persist($post);
             $entityManager->flush();
 
@@ -145,9 +224,13 @@ class PostController extends AbstractController
     {
         $form = $this->createForm(\App\Form\CommentType::class, new \App\Entity\Comment());
 
-        return $this->renderForm('post/show.html.twig', [
+        $topLevelComments = $post->getComments()->filter(fn($c) => $c->getParent() === null)->toArray();
+        usort($topLevelComments, fn($a, $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
+
+        return $this->render('post/show.html.twig', [
             'post' => $post,
-            'comment_form' => $form,
+            'comment_form' => $form->createView(),
+            'topLevelComments' => $topLevelComments,
         ]);
     }
 
@@ -156,19 +239,30 @@ class PostController extends AbstractController
     {
         $comment = new \App\Entity\Comment();
         $comment->setPost($post);
+        
+        // Handle nested reply
+        $parentId = $request->request->get('parentId');
+        if ($parentId) {
+            $parent = $entityManager->getRepository(\App\Entity\Comment::class)->find($parentId);
+            if ($parent) {
+                $comment->setParent($parent);
+            }
+        }
+
         $form = $this->createForm(\App\Form\CommentType::class, $comment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $comment->setCreatedAt(new \DateTime());
-            $userRepo = $entityManager->getRepository(\App\Entity\User::class);
-            $user = $userRepo->find(1);
+            $user = $this->getUser();
             if (!$user) {
-                $user = $userRepo->findOneBy([]);
+                $this->addFlash('error', 'You must be logged in to comment.');
+                return $this->redirectToRoute('app_post_show', ['id' => $post->getId()]);
             }
+            $comment->setCreatedAt(new \DateTime());
             $comment->setUser($user);
             $entityManager->persist($comment);
             $entityManager->flush();
+            $this->addFlash('success', 'Comment saved!');
         }
 
         return $this->redirectToRoute('app_post_show', ['id' => $post->getId()], Response::HTTP_SEE_OTHER);
@@ -177,6 +271,10 @@ class PostController extends AbstractController
     #[Route('/{id}/edit', name: 'app_post_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Post $post, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
+        if ($post->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('You can only edit your own posts.');
+        }
+
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
@@ -215,9 +313,13 @@ class PostController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/delete', name: 'app_post_delete', methods: ['GET', 'POST'])]
+    #[Route('/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
     public function delete(Request $request, Post $post, EntityManagerInterface $entityManager): Response
     {
+        if ($post->getUser() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('You can only delete your own posts.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->get('_token'))) {
             if ($post->getPhoto()) {
                 $photoPath = $this->getParameter('kernel.project_dir').'/public'.$post->getPhoto();
@@ -247,5 +349,23 @@ class PostController extends AbstractController
         }
 
         return $this->redirectToRoute('app_post_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/comment/{id}/delete', name: 'app_comment_delete', methods: ['POST'])]
+    public function deleteComment(Request $request, \App\Entity\Comment $comment, EntityManagerInterface $entityManager): Response
+    {
+        $post = $comment->getPost();
+        if ($this->isCsrfTokenValid('delete' . $comment->getId(), $request->get('_token'))) {
+            // Check permissions (owner or admin)
+            if ($this->getUser() === $comment->getUser() || $this->isGranted('ROLE_ADMIN')) {
+                $entityManager->remove($comment);
+                $entityManager->flush();
+                $this->addFlash('success', 'Comment deleted successfully.');
+            } else {
+                $this->addFlash('error', 'Access denied.');
+            }
+        }
+
+        return $this->redirectToRoute('app_post_show', ['id' => $post->getId()]);
     }
 }

@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\BienEtre;
+use App\Entity\Comment;
 use App\Entity\LoginAttempt;
+use App\Entity\Post;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -89,16 +91,29 @@ class AdminUserController extends AbstractController
     #[Route('/user/{id}/delete', name: 'admin_user_delete', methods: ['POST'])]
     public function delete(User $user, EntityManagerInterface $em): Response
     {
-        // Supprime d'abord les bien_etre lies
-        $bienEtres = $em->getRepository(BienEtre::class)->findBy(['user' => $user]);
-        foreach ($bienEtres as $b) {
+        // Remove BienEtre records
+        foreach ($em->getRepository(BienEtre::class)->findBy(['user' => $user]) as $b) {
             $em->remove($b);
         }
 
-        // Supprime les login attempts lies
-        $attempts = $em->getRepository(LoginAttempt::class)->findBy(['email' => $user->getEmail()]);
-        foreach ($attempts as $a) {
+        // Remove login attempts
+        foreach ($em->getRepository(LoginAttempt::class)->findBy(['email' => $user->getEmail()]) as $a) {
             $em->remove($a);
+        }
+
+        // Remove posts (and their comments via orphanRemoval)
+        $posts = $em->getRepository(Post::class)->findBy(['user' => $user]);
+        foreach ($posts as $post) {
+            foreach ($post->getComments() as $comment) {
+                $em->remove($comment);
+            }
+            $em->remove($post);
+        }
+
+        // Remove comments authored by the user on other posts
+        $comments = $em->getRepository(Comment::class)->findBy(['user' => $user]);
+        foreach ($comments as $comment) {
+            $em->remove($comment);
         }
 
         $em->remove($user);

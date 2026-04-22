@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var API_KEY  = 'AIzaSyCu-TQuwlS23-r1C54L6bySbwkY_BGbsqA';
+    var API_KEY  = 'AIzaSyC59bLCbBS-HZ_ZshkO1b8ZE84ml5EM5lI';
     var BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
     /*
@@ -13,8 +13,7 @@
         'gemini-2.0-flash-exp'
     ];
 
-    var selectedStyle = 'photorealistic';
-    var panelOpen     = false;
+    var panelOpen = false;
 
     /* ── Toggle panel ───────────────────────────────────────── */
     window.toggleAIChatbot = function () {
@@ -40,88 +39,70 @@
         }
     };
 
-    /* ── Style selection ────────────────────────────────────── */
-    window.selectAICBStyle = function (el) {
-        document.querySelectorAll('.aicb-style-pill').forEach(function (p) {
-            p.classList.remove('active');
-        });
-        el.classList.add('active');
-        selectedStyle = el.dataset.style;
-    };
-
-    /* ── Generate image ─────────────────────────────────────── */
-    window.generateAICBImage = async function () {
+    /* ── Generate Post ─────────────────────────────────────── */
+    window.generateAICBPost = async function () {
         var promptEl = document.getElementById('aicb-prompt');
         var prompt   = promptEl.value.trim();
 
         if (!prompt) {
-            aicbToast('Please enter a description first', 'error');
+            aicbToast('Please enter a topic first', 'error');
             promptEl.focus();
             return;
         }
 
         aicbState('loading');
 
-        var fullPrompt = prompt + ', ' + selectedStyle +
-                         ' style, highly detailed, cinematic lighting, 4k quality';
-
-        var src = null;
-
-        /* Try every Gemini model variant first */
-        for (var i = 0; i < GEMINI_MODELS.length; i++) {
-            try {
-                src = await callGemini(GEMINI_MODELS[i], fullPrompt);
-                console.log('[AI Studio] Success with model:', GEMINI_MODELS[i]);
-                break;
-            } catch (e) {
-                console.warn('[AI Studio] ' + GEMINI_MODELS[i] + ' failed:', e.message);
-            }
+        try {
+            var result = await callGeminiText(prompt);
+            
+            // Save to session storage
+            sessionStorage.setItem('ai_post_title', result.title);
+            sessionStorage.setItem('ai_post_content', result.content);
+            
+            // Redirect to post creation page
+            window.location.href = '/post/new';
+        } catch (e) {
+            console.error('[AI Assistant] Generation failed:', e.message);
+            var errorEl = document.getElementById('aicb-error-text');
+            if(errorEl) errorEl.textContent = 'Generation failed: ' + e.message;
+            aicbState('result');
         }
-
-        /* Fall back to Imagen 3 if all Gemini attempts failed */
-        if (!src) {
-            try {
-                src = await callImagen(fullPrompt);
-                console.log('[AI Studio] Success with Imagen 3');
-            } catch (e) {
-                console.error('[AI Studio] Imagen 3 also failed:', e.message);
-                aicbState('form');
-                aicbToast('Generation failed: ' + e.message, 'error');
-                return;
-            }
-        }
-
-        /* Render */
-        var img   = document.getElementById('aicb-result-img');
-        img.onload  = function () { aicbState('result'); };
-        img.onerror = function () {
-            aicbState('form');
-            aicbToast('Image failed to render. Try again.', 'error');
-        };
-        img.src = src;
     };
 
-    /* ── Gemini generateContent (free tier) ─────────────────── */
-    async function callGemini(modelName, prompt) {
-        var url = BASE_URL + modelName + ':generateContent?key=' + API_KEY;
+    /* ── Gemini text generation (free tier) ─────────────────── */
+    async function callGeminiText(prompt) {
+        // Using gemini-flash-latest to automatically route to the most stable, available free-tier model
+        var url = BASE_URL + 'gemini-flash-latest:generateContent?key=' + API_KEY;
+
+        var systemPrompt = "You are a supportive, professional AI assistant for a psychology and mental health community forum. Write an engaging, empathetic, and helpful forum post based on the user's prompt. Keep it structured and easy to read.";
 
         var res = await fetch(url, {
             method : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body   : JSON.stringify({
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
                 contents: [{
                     role : 'user',
-                    parts: [{ text: 'Create a high-quality image of: ' + prompt }]
+                    parts: [{ text: 'Write a forum post about: ' + prompt }]
                 }],
                 generationConfig: {
-                    responseModalities: ['TEXT', 'IMAGE'],
-                    temperature       : 1
+                    temperature: 0.7,
+                    responseMimeType: 'application/json',
+                    responseSchema: {
+                        type: 'object',
+                        properties: {
+                            title: { type: 'string', description: 'A catchy, supportive title for the forum post' },
+                            content: { type: 'string', description: 'The body of the post. Use paragraphs and friendly formatting.' }
+                        },
+                        required: ['title', 'content']
+                    }
                 }
             })
         });
 
         var data = await res.json();
-        console.log('[AI Studio] ' + modelName + ' raw response:', data);
 
         if (!res.ok) {
             throw new Error(
@@ -129,81 +110,18 @@
             );
         }
 
-        /* Walk parts looking for inlineData */
-        var parts = (data.candidates &&
-                     data.candidates[0] &&
-                     data.candidates[0].content &&
-                     data.candidates[0].content.parts) || [];
-
-        for (var i = 0; i < parts.length; i++) {
-            if (parts[i].inlineData && parts[i].inlineData.data) {
-                return 'data:' + (parts[i].inlineData.mimeType || 'image/jpeg') +
-                       ';base64,' + parts[i].inlineData.data;
-            }
+        var textResponse = data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+        
+        if (!textResponse) {
+            throw new Error('Response contained no text data');
         }
 
-        throw new Error(modelName + ': response contained no image data');
-    }
-
-    /* ── Imagen 3 (requires Cloud billing) ──────────────────── */
-    async function callImagen(prompt) {
-        var url = BASE_URL + 'imagen-3.0-generate-002:predict?key=' + API_KEY;
-
-        var res = await fetch(url, {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body   : JSON.stringify({
-                instances : [{ prompt: prompt }],
-                parameters: {
-                    sampleCount      : 1,
-                    aspectRatio      : '1:1',
-                    safetyFilterLevel: 'BLOCK_SOME',
-                    personGeneration : 'ALLOW_ADULT'
-                }
-            })
-        });
-
-        var data = await res.json();
-        console.log('[AI Studio] Imagen 3 raw response:', data);
-
-        if (!res.ok) {
-            throw new Error(
-                (data.error && data.error.message) ? data.error.message : 'HTTP ' + res.status
-            );
-        }
-
-        var pred = data.predictions && data.predictions[0];
-        if (!pred || !pred.bytesBase64Encoded) {
-            throw new Error('Imagen 3: response contained no image data');
-        }
-
-        return 'data:' + (pred.mimeType || 'image/png') + ';base64,' + pred.bytesBase64Encoded;
+        return JSON.parse(textResponse);
     }
 
     /* ── Reset to form ──────────────────────────────────────── */
     window.resetAICBForm = function () {
-        var img    = document.getElementById('aicb-result-img');
-        img.src    = '';
-        img.onload = img.onerror = null;
         aicbState('form');
-    };
-
-    /* ── Publish / Post ─────────────────────────────────────── */
-    window.postAICBImage = function () {
-        var btn      = document.getElementById('aicb-post-btn');
-        var origHTML = btn.innerHTML;
-        btn.disabled  = true;
-        btn.innerHTML = '<span class="aicb-dots"><span></span><span></span><span></span></span>';
-
-        setTimeout(function () {
-            document.getElementById('aicb-prompt').value = '';
-            document.getElementById('aicb-result-img').src = '';
-            aicbState('form');
-            toggleAIChatbot();
-            aicbToast('Post published successfully! ✨', 'success');
-            btn.disabled  = false;
-            btn.innerHTML = origHTML;
-        }, 1800);
     };
 
     /* ── State switcher ─────────────────────────────────────── */
@@ -235,5 +153,32 @@
             setTimeout(function () { toast.remove(); }, 420);
         }, 5000);
     }
+
+    /* ── Auto-fill logic for /post/new ──────────────────────── */
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.pathname.includes('/post/new') || window.location.pathname.includes('/post/new/')) {
+            var savedTitle = sessionStorage.getItem('ai_post_title');
+            var savedContent = sessionStorage.getItem('ai_post_content');
+            
+            if (savedTitle && savedContent) {
+                var titleInput = document.getElementById('post_title');
+                var contentInput = document.getElementById('post_content');
+                
+                if (titleInput && contentInput) {
+                    titleInput.value = savedTitle;
+                    contentInput.value = savedContent;
+                    
+                    // Clear so it doesn't auto-fill again on refresh
+                    sessionStorage.removeItem('ai_post_title');
+                    sessionStorage.removeItem('ai_post_content');
+                    
+                    // Show a notification
+                    setTimeout(function() {
+                        aicbToast('AI Post drafted successfully! Review and publish.', 'success');
+                    }, 500);
+                }
+            }
+        }
+    });
 
 })();

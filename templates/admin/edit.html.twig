@@ -1,99 +1,97 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Modifier Utilisateur · EchoCare</title>
+{% extends 'layout.html.twig' %}
+
+{% block title %}Modifier Utilisateur · EchoCare{% endblock %}
+
+{% block content %}
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; display: flex; justify-content: center; align-items: center; padding: 40px; }
-        .card {
-            background: #162232; border-radius: 20px; padding: 40px;
-            max-width: 600px; width: 100%;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        .edit-card {
+            background: var(--card-bg); border-radius: var(--radius-lg); padding: 1.8rem;
+            max-width: 580px; width: 100%;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(8px);
         }
-        .card-header { margin-bottom: 28px; }
-        .card-header h2 { font-size: 22px; font-weight: 700; color: white; }
-        .card-header p { font-size: 13px; color: #8899AA; margin-top: 4px; }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .field-group { display: flex; flex-direction: column; margin-bottom: 18px; }
-        .field-label {
-            font-size: 11px; font-weight: 700; color: #8899AA;
-            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
+        .edit-card-header { margin-bottom: 1.4rem; }
+        .edit-card-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem; }
+        .edit-card-header p { font-size: 0.8rem; color: var(--text-subtle); margin: 0; }
+        .edit-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+        .edit-field { display: flex; flex-direction: column; margin-bottom: 1rem; }
+        .edit-label {
+            font-size: 0.72rem; font-weight: 700; color: var(--text-subtle);
+            letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 0.4rem;
         }
-        input, select {
-            padding: 13px 16px; border: 1.5px solid rgba(255,255,255,0.08);
-            border-radius: 10px; background: rgba(255,255,255,0.05);
-            font-size: 14px; color: white; outline: none;
-            transition: border-color 0.2s; width: 100%;
+        .edit-input {
+            padding: 0.6rem 0.85rem; border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); background: rgba(255,255,255,0.04);
+            font-size: 0.875rem; color: var(--text-main); outline: none;
+            transition: border-color 0.2s; width: 100%; font-family: inherit;
         }
-        input::placeholder { color: #4A5568; }
-        input:focus, select:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
-        select option { background: #162232; color: white; }
-        .password-wrapper { position: relative; }
-        .password-wrapper input { padding-right: 44px; }
-        .toggle-pw {
-            position: absolute; right: 14px; top: 50%;
-            transform: translateY(-50%); cursor: pointer; font-size: 16px;
+        .edit-input::placeholder { color: var(--text-subtle); }
+        .edit-input:focus { border-color: var(--primary-color); background: rgba(96,150,186,0.05); }
+        .edit-input option { background: #162232; color: white; }
+        .edit-pw-wrap { position: relative; }
+        .edit-pw-wrap .edit-input { padding-right: 2.5rem; }
+        .edit-toggle-pw {
+            position: absolute; right: 0.75rem; top: 50%;
+            transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: var(--text-subtle);
         }
-        .hint { font-size: 11px; color: #4A5568; margin-top: 4px; }
-        .divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 20px 0; }
-        .btn-row { display: flex; gap: 12px; margin-top: 8px; }
-        .btn-save {
-            flex: 1; padding: 14px; background: #E8895A; color: white;
-            border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s;
+        .edit-hint { font-size: 0.72rem; color: var(--text-subtle); margin-top: 0.25rem; }
+        .edit-divider { border: none; border-top: 1px solid var(--border-color); margin: 1rem 0; }
+        .edit-btn-row { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+        .edit-btn-save {
+            flex: 1; padding: 0.65rem; background: var(--primary-color); color: white;
+            border: none; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; font-family: inherit;
         }
-        .btn-save:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(232,137,90,0.3); }
-        .btn-cancel {
-            flex: 1; padding: 14px; background: rgba(255,255,255,0.05); color: #8899AA;
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
-            font-size: 15px; font-weight: 600; text-decoration: none;
+        .edit-btn-save:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .edit-btn-cancel {
+            flex: 1; padding: 0.65rem; background: rgba(255,255,255,0.04); color: var(--text-muted);
+            border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+            font-size: 0.875rem; font-weight: 600; text-decoration: none;
             text-align: center; transition: all 0.2s;
         }
-        .btn-cancel:hover { background: rgba(255,255,255,0.1); color: white; }
-        .badge-user {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(232,137,90,0.15); color: #E8895A;
-            border: 1px solid rgba(232,137,90,0.3);
-            padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
-            margin-bottom: 20px;
+        .edit-btn-cancel:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+        .edit-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: rgba(96,150,186,0.12); color: var(--primary-color);
+            border: 1px solid rgba(96,150,186,0.25);
+            padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+            margin-bottom: 1rem;
         }
     </style>
-</head>
-<body>
-<div class="card">
-    <div class="card-header">
-        <span class="badge-user">✏️ Modification</span>
+
+<div style="display: flex; justify-content: center; width: 100%;">
+<div class="edit-card">
+    <div class="edit-card-header">
+        <span class="edit-badge">✏️ Modification</span>
         <h2>Modifier {{ user.prenom }} {{ user.nom }}</h2>
         <p>Modifiez les informations de l'utilisateur</p>
     </div>
 
     <form method="post" novalidate>
-        <div class="row-2">
-            <div class="field-group">
-                <label class="field-label">Nom</label>
-                <input type="text" name="nom" value="{{ user.nom }}" required>
+        <div class="edit-row-2">
+            <div class="edit-field">
+                <label class="edit-label">Nom</label>
+                <input class="edit-input" type="text" name="nom" value="{{ user.nom }}" required>
             </div>
-            <div class="field-group">
-                <label class="field-label">Prenom</label>
-                <input type="text" name="prenom" value="{{ user.prenom }}" required>
+            <div class="edit-field">
+                <label class="edit-label">Prenom</label>
+                <input class="edit-input" type="text" name="prenom" value="{{ user.prenom }}" required>
             </div>
         </div>
 
-        <div class="field-group">
-            <label class="field-label">Email</label>
-            <input type="email" name="email" value="{{ user.email }}" required>
+        <div class="edit-field">
+            <label class="edit-label">Email</label>
+            <input class="edit-input" type="email" name="email" value="{{ user.email }}" required>
         </div>
 
-        <div class="row-2">
-            <div class="field-group">
-                <label class="field-label">Telephone</label>
-                <input type="text" name="num_tel" value="{{ user.numTel ?? '' }}">
+        <div class="edit-row-2">
+            <div class="edit-field">
+                <label class="edit-label">Telephone</label>
+                <input class="edit-input" type="text" name="num_tel" value="{{ user.numTel ?? '' }}">
             </div>
-            <div class="field-group">
-                <label class="field-label">Role</label>
-                <select name="role">
+            <div class="edit-field">
+                <label class="edit-label">Role</label>
+                <select class="edit-input" name="role">
                     <option value="Patient" {{ user.role == 'Patient' ? 'selected' : '' }}>🌿 Patient</option>
                     <option value="Coach"   {{ user.role == 'Coach'   ? 'selected' : '' }}>🏋️ Coach</option>
                     <option value="Admin"   {{ user.role == 'Admin'   ? 'selected' : '' }}>👑 Admin</option>
@@ -101,23 +99,24 @@
             </div>
         </div>
 
-        <hr class="divider">
-        <p style="color:#8899AA;font-size:13px;margin-bottom:16px;">🔐 Changer le mot de passe</p>
+        <hr class="edit-divider">
+        <p style="color:var(--text-subtle);font-size:0.8rem;margin-bottom:0.75rem;">🔐 Changer le mot de passe</p>
 
-        <div class="field-group">
-            <label class="field-label">Nouveau mot de passe</label>
-            <div class="password-wrapper">
-                <input type="password" name="password" id="pw" placeholder="••••••••">
-                <span class="toggle-pw" onclick="togglePw()">👁️</span>
+        <div class="edit-field">
+            <label class="edit-label">Nouveau mot de passe</label>
+            <div class="edit-pw-wrap">
+                <input class="edit-input" type="password" name="password" id="pw" placeholder="••••••••">
+                <span class="edit-toggle-pw" onclick="togglePw()">👁️</span>
             </div>
-            <span class="hint">Laisser vide pour ne pas changer</span>
+            <span class="edit-hint">Laisser vide pour ne pas changer</span>
         </div>
 
-        <div class="btn-row">
-            <button type="submit" class="btn-save">💾 Enregistrer</button>
-            <a href="{{ path('admin_dashboard') }}" class="btn-cancel">← Annuler</a>
+        <div class="edit-btn-row">
+            <button type="submit" class="edit-btn-save">💾 Enregistrer</button>
+            <a href="{{ path('admin_dashboard') }}" class="edit-btn-cancel">← Annuler</a>
         </div>
     </form>
+</div>
 </div>
 
 <script>
@@ -128,5 +127,4 @@ function togglePw() {
     btn.textContent = input.type === 'password' ? '👁️' : '🙈';
 }
 </script>
-</body>
-</html>
+{% endblock %}

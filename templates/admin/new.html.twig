@@ -1,146 +1,138 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Ajouter Utilisateur · EchoCare</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #F0E6D8; min-height: 100vh; }
-        .navbar {
-            background: #4A6FA5; padding: 16px 40px;
-            display: flex; justify-content: space-between; align-items: center; color: white;
-        }
-        .navbar h1 { font-size: 20px; font-weight: 700; }
-        .navbar h1 span { color: #E8895A; }
-        .navbar a {
-            color: white; text-decoration: none;
-            background: rgba(255,255,255,0.15);
-            padding: 8px 16px; border-radius: 8px; font-size: 13px;
-        }
-        .navbar a:hover { background: rgba(255,255,255,0.25); }
-        .content { padding: 40px; display: flex; justify-content: center; }
-        .card {
-            background: white; border-radius: 16px;
-            padding: 40px; width: 100%; max-width: 600px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .card h2 { font-size: 22px; color: #2C3E50; margin-bottom: 6px; }
-        .card p { font-size: 13px; color: #999; margin-bottom: 28px; }
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .field-group { display: flex; flex-direction: column; margin-bottom: 18px; }
-        .field-label {
-            font-size: 11px; font-weight: 700; color: #4A6FA5;
-            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
-        }
-        input, select {
-            padding: 12px 16px; border: 1.5px solid #E8E0D5;
-            border-radius: 10px; background: #F5EFE6;
-            font-size: 14px; color: #333; outline: none;
-            transition: border-color 0.2s; width: 100%;
-        }
-        input:focus, select:focus { border-color: #4A6FA5; background: white; }
-        input.error { border-color: #e74c3c; }
-        .error-msg { font-size: 11px; color: #e74c3c; margin-top: 4px; display: none; }
-        .password-wrapper { position: relative; }
-        .password-wrapper input { padding-right: 44px; }
-        .toggle-pw {
-            position: absolute; right: 14px; top: 50%;
-            transform: translateY(-50%); cursor: pointer; font-size: 16px;
-        }
-        .strength-bar { height: 4px; border-radius: 2px; background: #E8E0D5; margin-top: 6px; overflow: hidden; }
-        .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
-        .strength-text { font-size: 11px; color: #999; margin-top: 4px; }
-        .btn-submit {
-            width: 100%; padding: 14px; background: #E8895A;
-            color: white; border: none; border-radius: 10px;
-            font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
-        }
-        .btn-submit:hover { background: #d4784a; }
-        .btn-cancel {
-            width: 100%; padding: 13px; background: transparent;
-            color: #4A6FA5; border: 1.5px solid #4A6FA5;
-            border-radius: 10px; font-size: 14px; font-weight: 600;
-            text-decoration: none; display: block; text-align: center;
-            margin-top: 10px; transition: all 0.2s;
-        }
-        .btn-cancel:hover { background: #4A6FA5; color: white; }
-    </style>
-</head>
-<body>
+{% extends 'layout.html.twig' %}
 
-<nav class="navbar">
-    <h1>Echo<span>Care</span> · Admin</h1>
-    <a href="{{ path('admin_dashboard') }}">← Retour</a>
-</nav>
+{% block title %}Ajouter Utilisateur · EchoCare{% endblock %}
 
-<div class="content">
-    <div class="card">
-        <h2>➕ Ajouter un utilisateur</h2>
+{% block content %}
+<style>
+    .new-card {
+        background: var(--card-bg); border-radius: var(--radius-lg); padding: 1.8rem;
+        max-width: 580px; width: 100%;
+        border: 1px solid var(--border-color); backdrop-filter: blur(8px);
+    }
+    .new-card-header { margin-bottom: 1.4rem; }
+    .new-card-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem; }
+    .new-card-header p { font-size: 0.8rem; color: var(--text-subtle); margin: 0; }
+    .new-badge {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        background: rgba(96,150,186,0.12); color: var(--primary-color);
+        border: 1px solid rgba(96,150,186,0.25);
+        padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .new-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .new-field { display: flex; flex-direction: column; margin-bottom: 1rem; }
+    .new-label {
+        font-size: 0.72rem; font-weight: 700; color: var(--text-subtle);
+        letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    .new-input {
+        padding: 0.6rem 0.85rem; border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm); background: rgba(255,255,255,0.04);
+        font-size: 0.875rem; color: var(--text-main); outline: none;
+        transition: border-color 0.2s; width: 100%; font-family: inherit;
+    }
+    .new-input::placeholder { color: var(--text-subtle); }
+    .new-input:focus { border-color: var(--primary-color); background: rgba(96,150,186,0.05); }
+    .new-input.error { border-color: var(--danger); }
+    .new-input option { background: #162232; color: white; }
+    .new-error { font-size: 0.72rem; color: var(--danger-text); margin-top: 0.25rem; display: none; }
+    .new-pw-wrap { position: relative; }
+    .new-pw-wrap .new-input { padding-right: 2.5rem; }
+    .new-toggle-pw {
+        position: absolute; right: 0.75rem; top: 50%;
+        transform: translateY(-50%); cursor: pointer; font-size: 0.9rem; color: var(--text-subtle);
+    }
+    .strength-bar { height: 3px; border-radius: 2px; background: rgba(255,255,255,0.06); margin-top: 0.4rem; overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+    .strength-text { font-size: 0.72rem; color: var(--text-subtle); margin-top: 0.2rem; }
+    .new-btn-submit {
+        width: 100%; padding: 0.7rem; background: var(--primary-color); color: white;
+        border: none; border-radius: var(--radius-sm); font-size: 0.875rem; font-weight: 600;
+        cursor: pointer; margin-top: 0.5rem; font-family: inherit; transition: all 0.2s;
+    }
+    .new-btn-submit:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .new-btn-cancel {
+        width: 100%; padding: 0.65rem; background: rgba(255,255,255,0.04); color: var(--text-muted);
+        border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+        font-size: 0.875rem; font-weight: 600; text-decoration: none;
+        display: block; text-align: center; margin-top: 0.5rem; transition: all 0.2s;
+    }
+    .new-btn-cancel:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+    .new-divider { border: none; border-top: 1px solid var(--border-color); margin: 0.25rem 0 1rem; }
+</style>
+
+<div style="display: flex; justify-content: center; width: 100%;">
+<div class="new-card">
+    <div class="new-card-header">
+        <span class="new-badge">➕ Nouveau</span>
+        <h2>Ajouter un utilisateur</h2>
         <p>Remplissez les informations ci-dessous</p>
-
-        <form method="post" id="newForm" novalidate>
-            <div class="row-2">
-                <div class="field-group">
-                    <label class="field-label">Nom</label>
-                    <input type="text" name="nom" id="nom" placeholder="Nom" required>
-                    <span class="error-msg" id="nom-error">Min 2 caractères</span>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">Prénom</label>
-                    <input type="text" name="prenom" id="prenom" placeholder="Prénom" required>
-                    <span class="error-msg" id="prenom-error">Min 2 caractères</span>
-                </div>
-            </div>
-
-            <div class="row-2">
-                <div class="field-group">
-                    <label class="field-label">Email</label>
-                    <input type="email" name="email" id="email" placeholder="vous@exemple.com" required>
-                    <span class="error-msg" id="email-error">Email invalide</span>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">Téléphone</label>
-                    <input type="text" name="num_tel" id="num_tel" placeholder="Ex: 22 000 000">
-                    <span class="error-msg" id="tel-error">8 chiffres requis</span>
-                </div>
-            </div>
-
-            <div class="row-2">
-                <div class="field-group">
-                    <label class="field-label">Mot de passe</label>
-                    <div class="password-wrapper">
-                        <input type="password" name="password" id="password" placeholder="••••••••" required>
-                        <span class="toggle-pw" onclick="togglePw('password', this)">👁️</span>
-                    </div>
-                    <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-                    <span class="strength-text" id="strength-text"></span>
-                    <span class="error-msg" id="pw-error">Min 8 car. majuscule, chiffre, symbole</span>
-                </div>
-                <div class="field-group">
-                    <label class="field-label">Confirmer mot de passe</label>
-                    <div class="password-wrapper">
-                        <input type="password" name="confirm_password" id="confirm_password" placeholder="••••••••" required>
-                        <span class="toggle-pw" onclick="togglePw('confirm_password', this)">👁️</span>
-                    </div>
-                    <span class="error-msg" id="confirm-error">Mots de passe différents</span>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label class="field-label">Rôle</label>
-                <select name="role" id="role" required>
-                    <option value="">-- Choisir un rôle --</option>
-                    <option value="Patient">🌿 Patient</option>
-                    <option value="Coach">🏋️ Coach</option>
-                    <option value="Admin">👑 Admin</option>
-                </select>
-                <span class="error-msg" id="role-error">Veuillez choisir un rôle</span>
-            </div>
-
-            <button type="submit" class="btn-submit">✅ Ajouter</button>
-        </form>
-        <a href="{{ path('admin_dashboard') }}" class="btn-cancel">Annuler</a>
     </div>
+
+    <form method="post" id="newForm" novalidate>
+        <div class="new-row-2">
+            <div class="new-field">
+                <label class="new-label">Nom</label>
+                <input class="new-input" type="text" name="nom" id="nom" placeholder="Nom" required>
+                <span class="new-error" id="nom-error">Min 2 caractères</span>
+            </div>
+            <div class="new-field">
+                <label class="new-label">Prénom</label>
+                <input class="new-input" type="text" name="prenom" id="prenom" placeholder="Prénom" required>
+                <span class="new-error" id="prenom-error">Min 2 caractères</span>
+            </div>
+        </div>
+
+        <div class="new-row-2">
+            <div class="new-field">
+                <label class="new-label">Email</label>
+                <input class="new-input" type="email" name="email" id="email" placeholder="vous@exemple.com" required>
+                <span class="new-error" id="email-error">Email invalide</span>
+            </div>
+            <div class="new-field">
+                <label class="new-label">Téléphone</label>
+                <input class="new-input" type="text" name="num_tel" id="num_tel" placeholder="Ex: 22000000">
+                <span class="new-error" id="tel-error">8 chiffres requis</span>
+            </div>
+        </div>
+
+        <div class="new-row-2">
+            <div class="new-field">
+                <label class="new-label">Mot de passe</label>
+                <div class="new-pw-wrap">
+                    <input class="new-input" type="password" name="password" id="password" placeholder="••••••••" required>
+                    <span class="new-toggle-pw" onclick="togglePw('password', this)">👁️</span>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                <span class="strength-text" id="strength-text"></span>
+                <span class="new-error" id="pw-error">Min 8 car. majuscule + chiffre + symbole</span>
+            </div>
+            <div class="new-field">
+                <label class="new-label">Confirmer mot de passe</label>
+                <div class="new-pw-wrap">
+                    <input class="new-input" type="password" name="confirm_password" id="confirm_password" placeholder="••••••••" required>
+                    <span class="new-toggle-pw" onclick="togglePw('confirm_password', this)">👁️</span>
+                </div>
+                <span class="new-error" id="confirm-error">Mots de passe différents</span>
+            </div>
+        </div>
+
+        <div class="new-field">
+            <label class="new-label">Rôle</label>
+            <select class="new-input" name="role" id="role" required>
+                <option value="">-- Choisir un rôle --</option>
+                <option value="Patient">🌿 Patient</option>
+                <option value="Coach">🏋️ Coach</option>
+                <option value="Admin">👑 Admin</option>
+            </select>
+            <span class="new-error" id="role-error">Veuillez choisir un rôle</span>
+        </div>
+
+        <hr class="new-divider">
+        <button type="submit" class="new-btn-submit">✅ Ajouter l'utilisateur</button>
+    </form>
+    <a href="{{ path('admin_dashboard') }}" class="new-btn-cancel">← Annuler</a>
+</div>
 </div>
 
 <script>
@@ -161,9 +153,9 @@
         const levels = [
             { w: '0%', c: 'transparent', t: '' },
             { w: '25%', c: '#e74c3c', t: '🔴 Très faible' },
-            { w: '50%', c: '#e67e22', t: '🟠 Faible' },
+            { w: '50%', c: '#E8895A', t: '🟠 Faible' },
             { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
-            { w: '100%', c: '#2ecc71', t: '🟢 Fort' },
+            { w: '100%', c: '#27ae60', t: '🟢 Fort' },
         ];
         fill.style.width = levels[score].w;
         fill.style.background = levels[score].c;
@@ -190,5 +182,4 @@
         if (!valid) e.preventDefault();
     });
 </script>
-</body>
-</html>
+{% endblock %}

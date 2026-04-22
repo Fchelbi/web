@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Admin · EchoCare</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+{% extends 'layout.html.twig' %}
 
-        .navbar {
-            background: #162232; padding: 16px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .navbar h1 { font-size: 20px; font-weight: 700; color: white; }
+{% block title %}Dashboard Admin · EchoCare{% endblock %}
+
+{% block topbar %}
+    <div class="top-bar" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px; margin-bottom: 24px;">
+        <h2>👥 Gestion des Utilisateurs</h2>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <a href="{{ path('admin_dashboard') }}" class="btn-refresh" title="Actualiser">🔄</a>
+            <a href="{{ path('admin_user_new') }}" class="btn-add">+ Ajouter</a>
+            <a href="{{ path('admin_export_pdf') }}" class="btn-green">📄 PDF</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <style>
         .navbar h1 span { color: #E8895A; }
         .navbar-right { display: flex; gap: 10px; align-items: center; }
         .navbar a {
@@ -24,7 +25,7 @@
         }
         .navbar a:hover { background: rgba(232,137,90,0.15); color: #E8895A; border-color: rgba(232,137,90,0.3); }
 
-        .content { padding: 30px 40px; }
+        .content { padding: 0; }
 
         .top-bar {
             display: flex; justify-content: space-between; align-items: center;
@@ -74,24 +75,24 @@
         }
         .filters button:hover { background: #d4784a; }
 
-        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
         .stat-card {
-            background: #162232; padding: 20px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05); text-align: center;
+            background: var(--card-bg); padding: 0.9rem 1rem; border-radius: var(--radius-md);
+            border: 1px solid var(--border-color); text-align: center;
             transition: transform 0.2s; position: relative; overflow: hidden;
         }
-        .stat-card:hover { transform: translateY(-3px); }
-        .stat-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+        .stat-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+        .stat-card::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
         .stat-card.total::before { background: #E8895A; }
         .stat-card.admins::before { background: #9b59b6; }
         .stat-card.coachs::before { background: #3498db; }
         .stat-card.patients::before { background: #27ae60; }
-        .stat-card .number { font-size: 32px; font-weight: 700; }
+        .stat-card .number { font-size: 1.6rem; font-weight: 700; line-height: 1; }
         .stat-card.total .number { color: #E8895A; }
         .stat-card.admins .number { color: #9b59b6; }
         .stat-card.coachs .number { color: #3498db; }
         .stat-card.patients .number { color: #27ae60; }
-        .stat-card .label { font-size: 12px; color: #8899AA; margin-top: 4px; }
+        .stat-card .label { font-size: 0.72rem; color: #8899AA; margin-top: 0.25rem; }
 
         table {
             width: 100%; background: #162232; border-radius: 14px;
@@ -175,7 +176,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
-</head>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -198,8 +198,6 @@ function closeFaceModal() {
 }
 </script>
 
-<body>
-
 {% if app.session.get('show_face_id_prompt') %}
 <div class="modal-overlay" id="faceIdModal">
     <div class="modal-box">
@@ -214,24 +212,7 @@ function closeFaceModal() {
 </div>
 {% endif %}
 
-<nav class="navbar">
-    <h1>Echo<span>Care</span> · Admin</h1>
-    <div class="navbar-right">
-        <a href="{{ path('admin_analytics') }}">📊 Analytics</a>
-        <a href="{{ path('admin_security') }}">🔐 Securite</a>
-        <a href="{{ path('app_logout') }}">🚪 Deconnexion</a>
-    </div>
-</nav>
-
 <div class="content">
-    <div class="top-bar">
-        <h2>👥 Gestion des Utilisateurs</h2>
-        <div style="display:flex;gap:10px;align-items:center;">
-            <a href="{{ path('admin_dashboard') }}" class="btn-refresh" title="Actualiser">🔄</a>
-            <a href="{{ path('admin_user_new') }}" class="btn-add">+ Ajouter</a>
-            <a href="{{ path('admin_export_pdf') }}" class="btn-green">📄 PDF</a>
-        </div>
-    </div>
 
     <div class="stats">
         <div class="stat-card total">
@@ -265,6 +246,7 @@ function closeFaceModal() {
         <button type="submit">Filtrer</button>
     </form>
 
+    <div style="overflow-x: auto; border-radius: 14px;">
     <table>
         <thead>
             <tr>
@@ -287,10 +269,14 @@ function closeFaceModal() {
                     <td>{{ user.email }}</td>
                     <td>{{ user.numTel ?? '—' }}</td>
                     <td>
+                        {% if user.role %}
                         <span class="badge badge-{{ user.role|lower }}">
                             {% if user.role == 'Admin' %}👑{% elseif user.role == 'Coach' %}🏋️{% else %}🌿{% endif %}
                             {{ user.role }}
                         </span>
+                        {% else %}
+                        <span class="badge" style="background:rgba(255,255,255,0.05);color:#4A5568;border:1px solid rgba(255,255,255,0.08);">❓ N/A</span>
+                        {% endif %}
                     </td>
                     <td>
                         <div class="actions">
@@ -307,6 +293,7 @@ function closeFaceModal() {
             {% endif %}
         </tbody>
     </table>
+    </div>
 
     {% if totalPages > 1 %}
     <div class="pagination-wrap">
@@ -351,5 +338,4 @@ function closeFaceModal() {
     {% endif %}
 </div>
 
-</body>
-</html>
+{% endblock %}

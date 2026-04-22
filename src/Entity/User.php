@@ -78,6 +78,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $faceDescriptor = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isBanned = false;
+
     public function getId(): ?int { return $this->id; }
     public function getNom(): ?string { return $this->nom; }
     public function setNom(string $nom): static { $this->nom = $nom; return $this; }
@@ -109,10 +112,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeviceToken(?string $t): static { $this->deviceToken = $t; return $this; }
     public function getFaceDescriptor(): ?string { return $this->faceDescriptor; }
     public function setFaceDescriptor(?string $f): static { $this->faceDescriptor = $f; return $this; }
+    public function isBanned(): bool { return $this->isBanned; }
+    public function setIsBanned(bool $b): static { $this->isBanned = $b; return $this; }
 
     public function getRoles(): array
     {
-        return ['ROLE_' . strtoupper($this->role ?? 'PATIENT')];
+        return ['ROLE_' . strtoupper($this->role ?? 'PATIENT'), 'ROLE_USER'];
     }
 
     public function getUserIdentifier(): string 

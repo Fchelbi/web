@@ -71,14 +71,9 @@
     border-radius: 22px;
     flex-direction: column;
     overflow: hidden;
-    background: rgba(10, 14, 24, 0.92);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(232, 117, 154, 0.18);
-    box-shadow:
-        0 32px 80px rgba(0, 0, 0, 0.65),
-        0 0 0 1px rgba(255, 255, 255, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     opacity: 0;
     transform: scale(0.88) translateY(14px);
     transform-origin: bottom right;
@@ -97,8 +92,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 18px;
-    background: linear-gradient(135deg, rgba(232, 117, 154, 0.07) 0%, rgba(126, 200, 227, 0.04) 100%);
-    border-bottom: 1px solid rgba(232, 117, 154, 0.1);
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
     flex-shrink: 0;
 }
 
@@ -123,14 +118,14 @@
 }
 
 .aicb-title {
-    color: #f1f5f9;
+    color: #0f172a;
     font-size: 0.92rem;
     font-weight: 700;
     letter-spacing: -0.2px;
 }
 
 .aicb-subtitle {
-    color: #475569;
+    color: #64748b;
     font-size: 0.72rem;
     font-weight: 500;
     margin-top: 2px;
@@ -154,8 +149,8 @@
     width: 28px;
     height: 28px;
     border-radius: 8px;
-    border: 1px solid rgba(232, 117, 154, 0.15);
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
     color: #64748b;
     display: flex;
     align-items: center;
@@ -166,9 +161,9 @@
 }
 
 .aicb-close:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.35);
-    color: #f87171;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #334155;
     transform: rotate(90deg);
 }
 
@@ -219,11 +214,11 @@
 .aicb-textarea {
     width: 100%;
     resize: none;
-    background: rgba(255, 255, 255, 0.033);
-    border: 1px solid rgba(232, 117, 154, 0.14);
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
     border-radius: 12px;
     padding: 12px 14px;
-    color: #e2e8f0;
+    color: #0f172a;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 0.87rem;
     line-height: 1.55;
@@ -234,13 +229,13 @@
 }
 
 .aicb-textarea:focus {
-    border-color: rgba(232, 117, 154, 0.48);
-    background: rgba(255, 255, 255, 0.052);
-    box-shadow: 0 0 0 3px rgba(232, 117, 154, 0.07);
+    border-color: #e8759a;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(232, 117, 154, 0.15);
 }
 
 .aicb-textarea::placeholder {
-    color: #334155;
+    color: #94a3b8;
     font-size: 0.83rem;
 }
 
@@ -359,7 +354,7 @@
 }
 
 .aicb-loading-title {
-    color: #94a3b8;
+    color: #0f172a;
     font-size: 0.88rem;
     font-weight: 600;
     margin: 0;
@@ -384,7 +379,7 @@
 }
 
 .aicb-loading-hint {
-    color: #334155;
+    color: #64748b;
     font-size: 0.73rem;
     margin: 0;
     text-align: center;
@@ -441,8 +436,8 @@
     display: flex;
     gap: 10px;
     padding: 14px 16px;
-    border-top: 1px solid rgba(232, 117, 154, 0.08);
-    background: rgba(10, 14, 24, 0.5);
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
     flex-shrink: 0;
 }
 
@@ -450,9 +445,9 @@
     flex: 1;
     padding: 10px 14px;
     border-radius: 10px;
-    border: 1px solid rgba(232, 117, 154, 0.18);
-    background: rgba(255, 255, 255, 0.03);
-    color: #64748b;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
@@ -465,9 +460,9 @@
 }
 
 .aicb-btn-back:hover {
-    background: rgba(255, 255, 255, 0.07);
-    color: #94a3b8;
-    border-color: rgba(232, 117, 154, 0.3);
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
 }
 
 .aicb-btn-post {

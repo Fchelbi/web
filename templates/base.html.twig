@@ -10,21 +10,131 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="/css/style.css">
-        <link rel="stylesheet" href="/css/ai-chatbot.css">
+        <link rel="stylesheet" href="/css/ai-chatbot.css?v=2">
         <script src="https://unpkg.com/lucide@latest"></script>
+        
+        <!-- PACE.js for Lazy-Loading Progress Bar -->
+        <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default/tmpl/pace-theme-minimal.css">
+        
+        <style>
+            /* Custom Pace UI & Smooth Page Transitions */
+            body { animation: smoothPageLoad 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+            @keyframes smoothPageLoad {
+                from { opacity: 0; transform: translateY(8px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            /* Calming Page Transition Overlay */
+            #page-transition-curtain {
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                z-index: 999999; pointer-events: none;
+                background-color: #0d1321;
+                background-image: url('/images/autumn-transition.png');
+                background-repeat: no-repeat; background-position: center center;
+                background-size: cover; 
+                transform: translate(-100%, 100%); opacity: 0; visibility: hidden;
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                box-shadow: 0 0 50px rgba(0,0,0,0.15);
+            }
+            #page-transition-curtain::after {
+                content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+                background: linear-gradient(135deg, rgba(15,22,35,0.7) 0%, rgba(126,200,227,0.2) 100%);
+                z-index: 1;
+            }
+            .transition-content {
+                position: relative; z-index: 2; text-align: center; color: white;
+                font-family: 'Inter', sans-serif;
+            }
+            .transition-logo {
+                font-size: 2rem; font-weight: 600; letter-spacing: 1px; margin: 0;
+                text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            }
+            .transition-subtitle {
+                font-size: 1.1rem; font-weight: 400; color: #cbd5e0; margin-top: 12px;
+                letter-spacing: 0.5px; opacity: 0.9;
+            }
+        </style>
 
         {% block javascripts %}{% endblock %}
     </head>
     <body>
+        <div id="page-transition-curtain">
+            <div class="transition-content">
+                <h2 class="transition-logo">EchoCare</h2>
+                <p class="transition-subtitle">Take a deep breath...</p>
+            </div>
+        </div>
+
         {% block body %}{% endblock %}
 
         <script>
+            // --- Calming Page Transition Logic ---
+            document.addEventListener('DOMContentLoaded', () => {
+                const curtain = document.getElementById('page-transition-curtain');
+                if (curtain) {
+                    // Immediately ensure curtain is hidden on page load
+                    curtain.style.transition = 'opacity 0.4s ease';
+                    curtain.style.opacity = '0';
+                    setTimeout(() => {
+                        curtain.style.visibility = 'hidden';
+                        curtain.style.transition = 'none';
+                        curtain.style.transform = 'translate(-100%, 100%)';
+                    }, 450);
+                }
+
+                // Intercept navigation links for elegant slow slide IN
+                document.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const href = link.getAttribute('href');
+                        if (href && href.startsWith('/') && !href.startsWith('#') && !e.ctrlKey && !e.metaKey && link.target !== '_blank' && !link.hasAttribute('data-bs-toggle') && !link.closest('.no-transition')) {
+                            e.preventDefault();
+                            
+                            // Reset offscreen to bottom-left
+                            curtain.style.transition = 'none';
+                            curtain.style.visibility = 'visible';
+                            curtain.style.opacity = '1';
+                            curtain.style.transform = 'translate(-100%, 100%)';
+                            void curtain.offsetWidth; // Force reflow
+                            
+                            // Smooth, calming diagonal slide in
+                            curtain.style.transition = 'transform 1s cubic-bezier(0.25, 1, 0.5, 1)';
+                            curtain.style.transform = 'translate(0, 0)';
+                            
+                            setTimeout(() => { window.location.href = href; }, 950); 
+                        }
+                    });
+                });
+            });
+            
+            // Handle browser Back/Forward (BfCache)
+            window.addEventListener('pageshow', (e) => {
+                if(e.persisted) {
+                    const curtain = document.getElementById('page-transition-curtain');
+                    curtain.style.transition = 'opacity 1s ease';
+                    curtain.style.opacity = '0';
+                    setTimeout(() => { curtain.style.visibility = 'hidden'; curtain.style.transform = 'translate(-100%, 100%)'; }, 1000);
+                }
+            });
+
             // Initialize Lucide icons
             document.addEventListener('DOMContentLoaded', function() {
                 if (typeof lucide !== 'undefined') {
                     lucide.createIcons();
                 }
+
+                // FIX: Aggressively remove layout-breaking extension elements
+                const cleanupExtensions = () => {
+                    const selectors = ['chatgpt-sidebar', '#chatgpt-sidebar', '.chatgpt-sidebar', '[data-rendered="true"][data-gpts-theme]'];
+                    selectors.forEach(sel => {
+                        document.querySelectorAll(sel).forEach(el => el.remove());
+                    });
+                };
+                cleanupExtensions();
+                const observer = new MutationObserver(cleanupExtensions);
+                observer.observe(document.body, { childList: true, subtree: true });
             });
         </script>
+
+        {% include 'components/_forum_sidebar.html.twig' %}
     </body>
 </html>
