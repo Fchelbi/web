@@ -68,7 +68,7 @@
             </button>
 
             <!-- Panel -->
-            <div id="aicb-panel" class="aicb-panel" style="display:none;" role="dialog" aria-label="AI Post Assistant">
+            <div id="aicb-panel" class="aicb-panel" style="display:none;" role="dialog" aria-label="AI Post Assistant" data-api-key="{{ gemini_api_key }}">
                 <!-- Header -->
                 <div class="aicb-header">
                     <div class="aicb-header-left">
@@ -84,16 +84,6 @@
                 <!-- ── FORM STATE ── -->
                 <div id="aicb-form" class="aicb-body">
                     <p class="aicb-welcome">What would you like to share today?</p>
-
-                    <!-- API Key -->
-                    <div class="aicb-api-section">
-                        <label class="aicb-api-label">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                            API Key
-                        </label>
-                        <input type="password" id="aicb-api-key" class="aicb-api-input" placeholder="Paste your Gemini API key…" autocomplete="off">
-                        <p class="aicb-api-hint">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></p>
-                    </div>
 
                     <!-- Prompt -->
                     <div class="aicb-input-wrapper">

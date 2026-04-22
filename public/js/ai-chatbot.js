@@ -4,12 +4,10 @@
     var BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
     var panelOpen = false;
 
-    /* ── Get / Set API Key from localStorage ─────────────────── */
+    /* ── Get API Key from the panel data attribute ────────────── */
     function getApiKey() {
-        return localStorage.getItem('echocare_gemini_key') || '';
-    }
-    function setApiKey(key) {
-        localStorage.setItem('echocare_gemini_key', key.trim());
+        var panel = document.getElementById('aicb-panel');
+        return panel ? panel.getAttribute('data-api-key') || '' : '';
     }
 
     /* ── Toggle panel ───────────────────────────────────────── */
@@ -19,10 +17,6 @@
 
         if (!panelOpen) {
             panel.style.display = 'flex';
-            // Pre-fill API key input
-            var keyInput = document.getElementById('aicb-api-key');
-            if (keyInput) keyInput.value = getApiKey();
-
             requestAnimationFrame(function () {
                 requestAnimationFrame(function () {
                     panel.classList.add('aicb-visible');
@@ -44,12 +38,10 @@
     window.generateAICBPost = async function () {
         var promptEl = document.getElementById('aicb-prompt');
         var prompt   = promptEl.value.trim();
-        var keyInput = document.getElementById('aicb-api-key');
-        var apiKey   = keyInput ? keyInput.value.trim() : '';
+        var apiKey   = getApiKey();
 
         if (!apiKey) {
-            aicbToast('Please enter your Gemini API key first', 'error');
-            if (keyInput) keyInput.focus();
+            aicbToast('API key not configured. Please set GEMINI_API_KEY in your .env file.', 'error');
             return;
         }
 
@@ -59,8 +51,6 @@
             return;
         }
 
-        // Save the key for future use
-        setApiKey(apiKey);
         aicbState('loading');
 
         try {
@@ -178,11 +168,9 @@
                     titleInput.value = savedTitle;
                     contentInput.value = savedContent;
 
-                    // Clear so it doesn't auto-fill again on refresh
                     sessionStorage.removeItem('ai_post_title');
                     sessionStorage.removeItem('ai_post_content');
 
-                    // Show a notification
                     setTimeout(function() {
                         aicbToast('AI Post drafted successfully! Review and publish.', 'success');
                     }, 500);
@@ -194,20 +182,13 @@
     /* ============================================================
        TEXT-TO-SPEECH (TTS) — Global utility
        ============================================================ */
-    var currentUtterance = null;
-    var currentTTSBtn    = null;
+    var currentTTSBtn = null;
 
     window.ttsSpeak = function (text, btn) {
-        // If already speaking — stop
         if (window.speechSynthesis.speaking) {
             window.speechSynthesis.cancel();
             if (currentTTSBtn) currentTTSBtn.classList.remove('tts-playing');
-
-            // If same button clicked, just stop
-            if (currentTTSBtn === btn) {
-                currentTTSBtn = null;
-                return;
-            }
+            if (currentTTSBtn === btn) { currentTTSBtn = null; return; }
         }
 
         if (!text || !text.trim()) return;
@@ -217,36 +198,24 @@
         utterance.rate  = 0.95;
         utterance.pitch = 1.0;
 
-        // Try to pick a nice voice
         var voices = window.speechSynthesis.getVoices();
         var preferred = voices.find(function(v) {
             return v.lang.startsWith('en') && v.name.toLowerCase().includes('google');
-        }) || voices.find(function(v) {
-            return v.lang.startsWith('en');
-        });
+        }) || voices.find(function(v) { return v.lang.startsWith('en'); });
         if (preferred) utterance.voice = preferred;
 
         btn.classList.add('tts-playing');
         currentTTSBtn = btn;
 
-        utterance.onend = function () {
-            btn.classList.remove('tts-playing');
-            currentTTSBtn = null;
-        };
-        utterance.onerror = function () {
-            btn.classList.remove('tts-playing');
-            currentTTSBtn = null;
-        };
+        utterance.onend = function () { btn.classList.remove('tts-playing'); currentTTSBtn = null; };
+        utterance.onerror = function () { btn.classList.remove('tts-playing'); currentTTSBtn = null; };
 
         window.speechSynthesis.speak(utterance);
     };
 
-    // Pre-load voices (some browsers need this)
     if (window.speechSynthesis) {
         window.speechSynthesis.getVoices();
-        window.speechSynthesis.onvoiceschanged = function() {
-            window.speechSynthesis.getVoices();
-        };
+        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
     }
 
 })();

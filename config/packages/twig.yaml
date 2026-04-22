@@ -1,5 +1,7 @@
 twig:
     file_name_pattern: '*.twig'
+    globals:
+        gemini_api_key: '%env(GEMINI_API_KEY)%'
 
 when@test:
     twig:
