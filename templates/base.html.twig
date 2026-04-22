@@ -67,6 +67,72 @@
 
         {% block body %}{% endblock %}
 
+        <!-- ================================================================
+             AI IMAGE STUDIO — Floating Widget
+             ================================================================ -->
+        <div class="aicb-widget">
+            <!-- Trigger bubble -->
+            <button id="aicb-trigger" class="aicb-trigger" onclick="toggleAIChatbot()" aria-label="Open AI Post Assistant">
+                <span class="aicb-trigger-icon">✦</span>
+            </button>
+
+            <!-- Panel -->
+            <div id="aicb-panel" class="aicb-panel" style="display:none;" role="dialog" aria-label="AI Post Assistant">
+                <!-- Header -->
+                <div class="aicb-header">
+                    <div class="aicb-header-left">
+                        <div class="aicb-header-orb">✦</div>
+                        <div>
+                            <p class="aicb-header-title">EchoCare AI</p>
+                            <p class="aicb-header-status">Ready to assist</p>
+                        </div>
+                    </div>
+                    <button class="aicb-btn-close" onclick="toggleAIChatbot()" aria-label="Close Assistant">×</button>
+                </div>
+
+                <!-- ── FORM STATE ── -->
+                <div id="aicb-form" class="aicb-body">
+                    <p class="aicb-welcome">What would you like to share today?</p>
+                    <div class="aicb-input-wrapper">
+                        <textarea id="aicb-prompt" class="aicb-textarea" placeholder="e.g. Tips for morning anxiety..."></textarea>
+                        <div class="aicb-glow"></div>
+                    </div>
+                    <button class="aicb-btn-generate" onclick="generateAICBPost()">
+                        Generate Support Post
+                        <span class="aicb-sparkle">✦</span>
+                    </button>
+                </div>
+
+                <!-- ── LOADING STATE ── -->
+                <div id="aicb-loading" class="aicb-body aicb-body-center" style="display:none; flex-direction:column;">
+                    <div class="aicb-spinner">
+                        <div class="aicb-ring aicb-ring-1"></div>
+                        <div class="aicb-ring aicb-ring-2"></div>
+                        <div class="aicb-ring aicb-ring-3"></div>
+                        <div class="aicb-core"></div>
+                    </div>
+                    <p class="aicb-loading-title">Drafting your post…</p>
+                    <div class="aicb-progress">
+                        <div class="aicb-progress-bar"></div>
+                    </div>
+                    <p class="aicb-loading-hint">This usually takes just a few seconds</p>
+                </div>
+
+                <!-- ── RESULT STATE (Used for Errors now) ── -->
+                <div id="aicb-result" class="aicb-result-wrap" style="display:none; flex-direction:column; padding: 20px; text-align: center;">
+                    <p id="aicb-error-text" style="color: var(--danger); font-size: 0.9rem; margin-bottom: 20px;"></p>
+                    <div class="aicb-result-actions">
+                        <button class="aicb-btn-back" onclick="resetAICBForm()" style="width: 100%; justify-content: center;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M19 12H5M12 5l-7 7 7 7"/>
+                            </svg>
+                            Go Back
+                        </button>
+                    </div>
+                </div>
+            </div><!-- /panel -->
+        </div><!-- /aicb-widget -->
+
         <script>
             // --- Calming Page Transition Logic ---
             document.addEventListener('DOMContentLoaded', () => {
@@ -135,6 +201,5 @@
             });
         </script>
 
-        {% include 'components/_forum_sidebar.html.twig' %}
     </body>
 </html>
