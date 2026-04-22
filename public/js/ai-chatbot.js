@@ -72,7 +72,7 @@
 
     /* ── Gemini text generation ─────────────────────────────── */
     async function callGeminiText(prompt, apiKey) {
-        var url = BASE_URL + 'gemini-1.5-flash:generateContent?key=' + apiKey;
+        var url = BASE_URL + 'gemini-1.5-flash-latest:generateContent?key=' + apiKey;
 
         var systemPrompt = "You are a supportive, professional AI assistant for a psychology and mental health community forum called EchoCare. Write an engaging, empathetic, and helpful forum post based on the user's prompt. Keep it structured and easy to read.";
 
