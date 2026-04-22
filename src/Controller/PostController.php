@@ -368,4 +368,52 @@ class PostController extends AbstractController
 
         return $this->redirectToRoute('app_post_show', ['id' => $post->getId()]);
     }
+    #[Route('/api/advice', name: 'api_deepseek_advice', methods: ['GET'])]
+    public function getAdvice(): JsonResponse
+    {
+        $apiKey = $_ENV['DEEPSEEK_API_KEY'] ?? '';
+        if (!$apiKey) {
+            return new JsonResponse(['error' => 'API key missing'], 500);
+        }
+
+        $ch = curl_init('https://api.deepseek.com/v1/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        
+        $headers = [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $apiKey
+        ];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        
+        $data = [
+            'model' => 'deepseek-chat',
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => 'Give me one short sentence of random wisdom, advice, or motivational thought. Do not use quotes or introductory text.'
+                ]
+            ],
+            'max_tokens' => 50,
+            'temperature' => 0.7
+        ];
+        
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        if ($httpCode === 200 && $response) {
+            $responseData = json_decode($response, true);
+            if (isset($responseData['choices'][0]['message']['content'])) {
+                return new JsonResponse([
+                    'advice' => trim($responseData['choices'][0]['message']['content'], ' "')
+                ]);
+            }
+        }
+        
+        return new JsonResponse(['error' => 'Failed to generate advice'], 500);
+    }
 }
