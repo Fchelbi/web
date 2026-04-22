@@ -4,10 +4,10 @@
 
 /* Widget container — anchored to bottom-right */
 .aicb-widget {
-    position: fixed;
-    bottom: 32px;
-    right: 32px;
-    z-index: 9000;
+    position: fixed !important;
+    bottom: 32px !important;
+    right: 32px !important;
+    z-index: 99999 !important;
 }
 
 /* ── Trigger bubble ────────────────────────────────────────── */

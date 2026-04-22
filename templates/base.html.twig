@@ -58,15 +58,6 @@
         {% block javascripts %}{% endblock %}
     </head>
     <body>
-        <div id="page-transition-curtain">
-            <div class="transition-content">
-                <h2 class="transition-logo">EchoCare</h2>
-                <p class="transition-subtitle">Take a deep breath...</p>
-            </div>
-        </div>
-
-        {% block body %}{% endblock %}
-
         <!-- ================================================================
              AI IMAGE STUDIO — Floating Widget
              ================================================================ -->
@@ -132,6 +123,17 @@
                 </div>
             </div><!-- /panel -->
         </div><!-- /aicb-widget -->
+
+        <div id="page-transition-curtain">
+            <div class="transition-content">
+                <h2 class="transition-logo">EchoCare</h2>
+                <p class="transition-subtitle">Take a deep breath...</p>
+            </div>
+        </div>
+
+        {% block body %}{% endblock %}
+
+
 
         <script>
             // --- Calming Page Transition Logic ---
