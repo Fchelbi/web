@@ -18,6 +18,76 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
+    <script>
+/**
+ * Trigger Touch ID / WebAuthn authentication.
+ * Returns a Promise that resolves to true (authenticated) or false (cancelled/failed).
+ * Works on Chrome localhost with Touch ID enabled MacBooks.
+ */
+async function requireTouchID(actionName) {
+  // Check if WebAuthn is supported
+  if (!window.PublicKeyCredential) {
+    alert('Votre navigateur ne supporte pas l\'authentification biométrique. Utilisez Chrome.');
+    return false;
+  }
+
+  // Check if platform authenticator (Touch ID) is available
+  const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  if (!available) {
+    alert('Touch ID n\'est pas disponible sur cet appareil.');
+    return false;
+  }
+
+  try {
+    // Create a challenge (random bytes)
+    const challenge = new Uint8Array(32);
+    window.crypto.getRandomValues(challenge);
+
+    // Request credential creation — this triggers Touch ID
+    const credential = await navigator.credentials.create({
+      publicKey: {
+        challenge: challenge,
+        rp: {
+          name: "EchoCare",
+          id: "localhost"
+        },
+        user: {
+          id: new Uint8Array(16),
+          name: "echocare-user",
+          displayName: "EchoCare User"
+        },
+        pubKeyCredParams: [
+          { alg: -7, type: "public-key" },   // ES256
+          { alg: -257, type: "public-key" }   // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: "platform",  // Forces Touch ID (not USB key)
+          userVerification: "required",         // Requires biometric
+          residentKey: "discouraged"
+        },
+        timeout: 60000,
+        attestation: "none"
+      }
+    });
+
+    if (credential) {
+      console.log('✅ Touch ID authenticated for:', actionName);
+      return true;
+    }
+    return false;
+
+  } catch (error) {
+    if (error.name === 'NotAllowedError') {
+      // User cancelled Touch ID
+      console.log('❌ Touch ID cancelled');
+      return false;
+    }
+    console.error('Touch ID error:', error);
+    // Fallback: allow action if Touch ID has technical issues
+    return confirm('Touch ID non disponible. Voulez-vous continuer sans authentification biométrique ?');
+  }
+}
+</script>
     <body>
         {% block body %}{% endblock %}
     </body>

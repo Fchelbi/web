@@ -6,14 +6,13 @@
   :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
-  .form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);width:100%;max-width:600px;overflow:hidden}
-  .form-header{background:linear-gradient(135deg,var(--blue-dark),var(--blue-mid,#1a4a7a));padding:28px 32px}
+  .form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);width:100%;max-width:680px;overflow:hidden}
+  .form-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:28px 32px}
   .form-logo{font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px}.form-logo span{color:var(--orange)}
   .form-title{font-size:22px;font-weight:800;color:var(--white)}
   .form-body{padding:32px}
   .field{margin-bottom:22px}
   .field label{display:block;font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
-  .field label .required{color:var(--orange);margin-left:3px}
   .form-input{width:100%;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;color:var(--gray-700);outline:none;transition:.2s;background:var(--white)}
   .form-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(45,125,210,.1)}
   .form-input.error{border-color:#ef4444;background:#fff8f8}
@@ -26,6 +25,42 @@
   .btn-submit:hover{background:#e06d47;transform:translateY(-1px)}
   .btn-cancel{background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:.2s}
   .btn-cancel:hover{background:var(--gray-200)}
+
+  .yt-search-section{margin-top:14px}
+  .yt-search-bar{display:flex;gap:8px;align-items:center;position:relative}
+  .yt-search-input{flex:1;padding:12px 16px 12px 42px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:.2s;background:var(--white);color:var(--gray-700)}
+  .yt-search-input:focus{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+  .yt-search-input::placeholder{color:var(--gray-400)}
+  .yt-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;z-index:2}
+  .yt-search-btn{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit;white-space:nowrap}
+  .yt-search-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(239,68,68,.3)}
+  .yt-search-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+  .yt-results{margin-top:10px;border:1.5px solid var(--gray-200);border-radius:12px;overflow:hidden;display:none;max-height:420px;overflow-y:auto;background:var(--white);box-shadow:0 8px 32px rgba(15,42,74,.12)}
+  .yt-results.visible{display:block}
+
+  .yt-result-item{display:flex;gap:14px;padding:14px 16px;border-bottom:1px solid var(--gray-200);align-items:center}
+  .yt-result-item:last-child{border-bottom:none}
+  .yt-result-item:hover{background:rgba(239,68,68,.03)}
+  .yt-result-thumb{width:120px;height:68px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--gray-200)}
+  .yt-result-info{flex:1;min-width:0}
+  .yt-result-title{font-size:13px;font-weight:700;color:var(--blue-dark);margin-bottom:4px;line-height:1.4}
+  .yt-result-meta{display:flex;gap:10px;font-size:11px;color:var(--gray-400)}
+  .yt-choose-btn{background:#ef4444;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0;font-family:inherit}
+  .yt-choose-btn:hover{background:#dc2626;transform:scale(1.05)}
+
+  .yt-loading{padding:24px;text-align:center;color:var(--gray-400);font-size:13px}
+
+  .yt-selected{margin-top:14px;border:2px solid #34d399;border-radius:12px;overflow:hidden;display:none;position:relative}
+  .yt-selected.visible{display:block}
+  .yt-selected-inner{display:flex;gap:16px;padding:16px;align-items:center;background:rgba(52,211,153,.04)}
+  .yt-selected-thumb{width:140px;height:80px;border-radius:8px;object-fit:cover;flex-shrink:0}
+  .yt-selected-info{flex:1}
+  .yt-selected-title{font-size:14px;font-weight:700;color:var(--blue-dark);margin-bottom:4px}
+  .yt-selected-meta{font-size:12px;color:var(--gray-400);display:flex;gap:10px}
+  .yt-selected-badge{position:absolute;top:10px;right:10px;background:#34d399;color:#fff;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700}
+  .yt-selected-remove{position:absolute;top:10px;left:10px;background:rgba(239,68,68,.1);color:#ef4444;border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit}
+  .yt-selected-remove:hover{background:#ef4444;color:#fff}
 </style>
 
 <div class="form-card">
@@ -60,13 +95,40 @@
         {% endif %}
       </div>
 
+      {# ===== YOUTUBE SEARCH ===== #}
       <div class="field">
-        {{ form_label(form.videoUrl) }}
-        {{ form_widget(form.videoUrl, {'attr': {'class': 'form-input' ~ (form.videoUrl.vars.errors|length > 0 ? ' error' : ''), 'placeholder': 'https://youtube.com/...'}}) }}
-        <div class="hint">🎥 Collez l'URL complète de la vidéo YouTube ou autre</div>
-        {% if form.videoUrl.vars.errors|length > 0 %}
-          <div class="error-msg">⚠️ {{ form_errors(form.videoUrl) }}</div>
-        {% endif %}
+        <label>🎥 Vidéo YouTube</label>
+        {{ form_widget(form.videoUrl, {'attr': {'class': 'form-input', 'id': 'videoUrlInput', 'style': 'display:none'}}) }}
+
+        <div class="yt-search-section">
+          <div class="yt-search-bar">
+            <span class="yt-search-icon">🔍</span>
+            <input type="text" class="yt-search-input" id="ytSearchInput" placeholder="Rechercher une vidéo YouTube…" autocomplete="off">
+            <button type="button" class="yt-search-btn" id="ytSearchBtn" onclick="ytDoSearch()">▶ Rechercher</button>
+          </div>
+
+          <div id="ytResults" class="yt-results"></div>
+
+          <div class="yt-selected" id="ytSelected">
+            <span class="yt-selected-badge">✓ Sélectionnée</span>
+            <button type="button" class="yt-selected-remove" onclick="ytClearSelection()">✕ Retirer</button>
+            <div class="yt-selected-inner">
+              <img class="yt-selected-thumb" id="ytSelThumb" src="" alt="">
+              <div class="yt-selected-info">
+                <div class="yt-selected-title" id="ytSelTitle"></div>
+                <div class="yt-selected-meta">
+                  <span id="ytSelChannel"></span>
+                  <span>⏱️ <span id="ytSelDuration"></span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">🎥 Tapez un mot-clé, cliquez Rechercher, puis cliquez sur une vidéo</div>
+          {% if form.videoUrl.vars.errors|length > 0 %}
+            <div class="error-msg">⚠️ {{ form_errors(form.videoUrl) }}</div>
+          {% endif %}
+        </div>
       </div>
 
       <div class="form-actions">
@@ -79,4 +141,128 @@
     {{ form_end(form) }}
   </div>
 </div>
+
+<script>
+// ============================================================
+// ALL FUNCTIONS ARE GLOBAL — no closures, no IIFE, no modules
+// ============================================================
+
+var ytVideoResults = [];
+
+// Enter key triggers search
+document.getElementById('ytSearchInput').onkeydown = function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); ytDoSearch(); }
+};
+
+// ---- PICK a video by index (called from inline onclick) ----
+function ytPickVideo(index) {
+  var v = ytVideoResults[index];
+  if (!v) return;
+
+  // Find the hidden URL input — try both possible IDs
+  var urlField = document.getElementById('videoUrlInput')
+              || document.getElementById('formation_videoUrl')
+              || document.querySelector('input[id$="videoUrl"]');
+
+  if (!urlField) { alert('Cannot find URL field!'); return; }
+
+  urlField.value = v.url;
+  document.getElementById('ytSelThumb').src = v.thumbnail;
+  document.getElementById('ytSelTitle').textContent = v.title;
+  document.getElementById('ytSelChannel').textContent = v.channel;
+  document.getElementById('ytSelDuration').textContent = v.duration;
+  document.getElementById('ytSelected').classList.add('visible');
+  document.getElementById('ytResults').classList.remove('visible');
+  document.getElementById('ytSearchInput').value = v.title;
+}
+
+// ---- CLEAR selection ----
+function ytClearSelection() {
+  var urlField = document.getElementById('videoUrlInput')
+              || document.getElementById('formation_videoUrl')
+              || document.querySelector('input[id$="videoUrl"]');
+  if (urlField) urlField.value = '';
+  document.getElementById('ytSelected').classList.remove('visible');
+  document.getElementById('ytSearchInput').value = '';
+}
+
+// ---- SEARCH ----
+function ytDoSearch() {
+  var q = document.getElementById('ytSearchInput').value.trim();
+  var btn = document.getElementById('ytSearchBtn');
+  var box = document.getElementById('ytResults');
+
+  if (q.length < 2) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳…';
+  box.innerHTML = '<div class="yt-loading">⏳ Recherche…</div>';
+  box.classList.add('visible');
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/formation/youtube/search?q=' + encodeURIComponent(q));
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState !== 4) return;
+
+    btn.disabled = false;
+    btn.textContent = '▶ Rechercher';
+
+    if (xhr.status !== 200) {
+      box.innerHTML = '<div class="yt-loading">❌ Erreur</div>';
+      return;
+    }
+
+    var data;
+    try { data = JSON.parse(xhr.responseText); } catch(e) {
+      box.innerHTML = '<div class="yt-loading">❌ Réponse invalide</div>';
+      return;
+    }
+
+    ytVideoResults = data;
+
+    if (!data || data.length === 0) {
+      box.innerHTML = '<div class="yt-loading">😔 Aucun résultat</div>';
+      return;
+    }
+
+    // Build HTML with inline onclick="ytPickVideo(i)"
+    var h = '';
+    for (var i = 0; i < data.length; i++) {
+      h += '<div class="yt-result-item" onclick="ytPickVideo(' + i + ')">'
+         + '<img class="yt-result-thumb" src="' + data[i].thumbnail + '">'
+         + '<div class="yt-result-info">'
+         + '<div class="yt-result-title">' + ytEsc(data[i].title) + '</div>'
+         + '<div class="yt-result-meta">'
+         + '<span>📺 ' + ytEsc(data[i].channel) + '</span>'
+         + '<span>⏱ ' + ytEsc(data[i].duration) + '</span>'
+         + '</div></div>'
+         + '<button type="button" class="yt-choose-btn" onclick="ytPickVideo(' + i + ')">Choisir</button>'
+         + '</div>';
+    }
+    box.innerHTML = h;
+  };
+
+  xhr.send();
+}
+
+function ytEsc(s) {
+  if (!s) return '';
+  var d = document.createElement('div');
+  d.appendChild(document.createTextNode(s));
+  return d.innerHTML;
+}
+
+// ---- If editing: show existing video ----
+{% if formation.videoUrl is not null and formation.videoUrl is not empty %}
+(function(){
+  document.getElementById('ytSelThumb').src = '{{ formation.videoThumbnail ?? "" }}';
+  document.getElementById('ytSelTitle').textContent = '{{ formation.videoTitle ?? formation.title }}';
+  document.getElementById('ytSelChannel').textContent = '';
+  document.getElementById('ytSelDuration').textContent = '{{ formation.videoDuration ?? "" }}';
+  document.getElementById('ytSelected').classList.add('visible');
+  document.getElementById('ytSearchInput').value = '{{ formation.videoTitle ?? "" }}';
+})();
+{% endif %}
+</script>
 {% endblock %}

@@ -36,14 +36,27 @@ class Formation
     private ?string $description = null;
 
     #[ORM\Column(type: "string", length: 500, nullable: true, name: "video_url")]
-    #[Assert\Url(message: "L'URL de la vidéo n'est pas valide. Elle doit commencer par https://")]
+    #[Assert\Url(message: "L'URL de la vidéo n'est pas valide.")]
     private ?string $videoUrl = null;
+
+    // ===== NEW FIELDS FOR YOUTUBE API =====
+
+    #[ORM\Column(type: "string", length: 500, nullable: true, name: "video_title")]
+    private ?string $videoTitle = null;
+
+    #[ORM\Column(type: "string", length: 50, nullable: true, name: "video_duration")]
+    private ?string $videoDuration = null;
+
+    #[ORM\Column(type: "string", length: 500, nullable: true, name: "video_thumbnail")]
+    private ?string $videoThumbnail = null;
+
+    // ===== END NEW FIELDS =====
 
     #[ORM\Column(type: "string", length: 100, nullable: true)]
     #[Assert\NotBlank(message: "La catégorie est obligatoire.")]
     #[Assert\Choice(
         choices: ['Nutrition','Sport & Fitness','Santé Mentale','Méditation','Gestion du Stress','Autre'],
-        message: "Catégorie invalide. Choisissez une valeur dans la liste."
+        message: "Catégorie invalide."
     )]
     private ?string $category = null;
 
@@ -66,6 +79,8 @@ class Formation
         $this->quizs          = new ArrayCollection();
         $this->participations = new ArrayCollection();
     }
+
+    // --- Existing getters/setters ---
 
     public function getId(): ?int { return $this->id; }
 
@@ -106,4 +121,15 @@ class Formation
     }
 
     public function getParticipations(): Collection { return $this->participations; }
+
+    // ===== NEW GETTERS/SETTERS =====
+
+    public function getVideoTitle(): ?string { return $this->videoTitle; }
+    public function setVideoTitle(?string $v): self { $this->videoTitle = $v; return $this; }
+
+    public function getVideoDuration(): ?string { return $this->videoDuration; }
+    public function setVideoDuration(?string $v): self { $this->videoDuration = $v; return $this; }
+
+    public function getVideoThumbnail(): ?string { return $this->videoThumbnail; }
+    public function setVideoThumbnail(?string $v): self { $this->videoThumbnail = $v; return $this; }
 }

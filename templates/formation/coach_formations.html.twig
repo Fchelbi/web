@@ -8,8 +8,8 @@
     --accent:#e8734a;--accent-glow:rgba(232,115,74,.25);
     --cyan:#38bdf8;--cyan-pale:rgba(56,189,248,.1);--cyan-glow:rgba(56,189,248,.15);
     --emerald:#34d399;--emerald-pale:rgba(52,211,153,.1);
-    --violet:#a78bfa;--violet-pale:rgba(167,139,250,.1);
     --rose:#fb7185;--rose-pale:rgba(251,113,133,.1);
+    --violet:#a78bfa;--violet-pale:rgba(167,139,250,.1);
     --surface:#f8fafc;--surface-card:#ffffff;
     --border:#e2e8f0;--border-light:#f1f5f9;
     --text-primary:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
@@ -106,6 +106,64 @@
 
   .flash{padding:16px 22px;border-radius:var(--radius-sm);margin-bottom:20px;font-weight:600;animation:fadeInUp .4s ease both;display:flex;align-items:center;gap:10px}
   .flash-success{background:var(--emerald-pale);color:var(--emerald);border:1px solid rgba(52,211,153,.2)}
+
+ /* KnpPaginator styling */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+.pagination span.flex {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pagination a,
+.pagination span:not(.flex) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  text-decoration: none;
+  transition: all .2s;
+}
+.pagination a:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56,189,248,.15);
+}
+/* Current/active page */
+.pagination span.current,
+.pagination em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #0a1628;
+  color: #fff;
+  border: 1.5px solid #0a1628;
+  font-style: normal;
+}
+/* First/Last/Prev/Next arrows */
+.pagination a[rel="prev"],
+.pagination a[rel="next"] {
+  font-size: 16px;
+}
 </style>
 
 <div class="sidebar">
@@ -113,7 +171,8 @@
   <div class="role-badge">👨‍🏫 Coach</div>
   <a href="{{ path('app_formation_index') }}" class="nav-link active"><span>📚</span> Mes Formations</a>
   <a href="#" class="nav-link"><span>👥</span> Mes Patients</a>
-  <a href="#" class="nav-link"><span>📊</span> Statistiques</a>
+  <a href="{{ path('app_feedback_dashboard') }}" class="nav-link"><span>💬</span> Sentiments</a>
+  <a href="{{ path('app_statistics') }}" class="nav-link"><span>📊</span> Statistiques</a>
   <div class="sidebar-bottom">
     <div class="coach-card">
       <div class="coach-avatar">C</div>
@@ -144,7 +203,7 @@
   <div class="cards-grid" id="cardsGrid">
     {% for formation in formations %}
     <div class="formation-card" data-title="{{ formation.title|lower }}" data-cat="{{ formation.category ? formation.category|lower : '' }}">
-      <div class="card-header">
+      <div class="card-header" {% if formation.videoThumbnail %}style="background-image:linear-gradient(135deg,rgba(10,22,40,.85),rgba(19,34,64,.85)),url('{{ formation.videoThumbnail }}');background-size:cover;background-position:center"{% endif %}>
         {% if formation.category is not null %}<div class="card-category">{{ formation.category }}</div>{% endif %}
         <div class="card-title">{{ formation.title }}</div>
       </div>
@@ -170,20 +229,9 @@
 
   <div class="no-cards-msg" id="noCardsMsg">Aucune formation ne correspond à votre recherche.</div>
 
-  {% if totalPages > 1 %}
   <div class="pagination">
-    <a href="{{ path('app_formation_index', {'page': max(1, page-1)}) }}" class="pg-btn {% if page <= 1 %}disabled{% endif %}">‹</a>
-    {% for p in 1..totalPages %}
-      {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
-        <a href="{{ path('app_formation_index', {'page': p}) }}" class="pg-btn {% if p == page %}active{% endif %}">{{ p }}</a>
-      {% elseif p == page - 3 or p == page + 3 %}
-        <span class="pg-btn" style="border:none;background:none;cursor:default">…</span>
-      {% endif %}
-    {% endfor %}
-    <a href="{{ path('app_formation_index', {'page': min(totalPages, page+1)}) }}" class="pg-btn {% if page >= totalPages %}disabled{% endif %}">›</a>
-    <span class="pg-info">Page {{ page }} / {{ totalPages }} — {{ total }} formations</span>
+    {{ knp_pagination_render(formations) }}
   </div>
-  {% endif %}
 
   <div class="section-title">👥 Patients Inscrits & Résultats</div>
   <div class="patients-table">

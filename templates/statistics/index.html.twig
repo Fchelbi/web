@@ -1,0 +1,172 @@
+{% extends 'base.html.twig' %}
+{% block title %}Statistiques | EchoCare{% endblock %}
+{% block body %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--navy:#0a1628;--accent:#e8734a;--cyan:#38bdf8;--emerald:#34d399;--rose:#fb7185;--violet:#a78bfa;--amber:#fbbf24;--surface:#f8fafc;--card:#fff;--border:#f1f5f9;--text:#0f172a;--text2:#64748b;--muted:#94a3b8;--radius:16px;--shadow:0 1px 3px rgba(10,22,40,.06)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text)}
+  .container{max-width:1100px;margin:0 auto;padding:40px 24px}
+  .page-title{font-family:'Outfit',sans-serif;font-size:30px;font-weight:900;margin-bottom:8px}
+  .page-title span{color:var(--cyan)}
+  .page-sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+  .s-card{background:var(--card);border-radius:var(--radius);padding:24px;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border)}
+  .s-icon{font-size:28px;margin-bottom:8px}
+  .s-val{font-family:'Outfit',sans-serif;font-size:34px;font-weight:800}
+  .s-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:4px}
+
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+  .chart-card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--border)}
+  .chart-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  .full-width{grid-column:1/-1}
+
+  @media(max-width:768px){.stats-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}}
+</style>
+
+<div class="container">
+  <div class="page-title">📊 Tableau de Bord <span>Statistiques</span></div>
+  <div class="page-sub">Vue d'ensemble des performances de la plateforme EchoCare</div>
+
+  <div class="stats-grid">
+    <div class="s-card"><div class="s-icon">📚</div><div class="s-val" style="color:var(--cyan)">{{ totalFormations }}</div><div class="s-lbl">Formations</div></div>
+    <div class="s-card"><div class="s-icon">👥</div><div class="s-val" style="color:var(--accent)">{{ totalParticipations }}</div><div class="s-lbl">Inscriptions</div></div>
+    <div class="s-card"><div class="s-icon">📝</div><div class="s-val" style="color:var(--violet)">{{ totalQuizResults }}</div><div class="s-lbl">Quiz Complétés</div></div>
+    <div class="s-card"><div class="s-icon">🏆</div><div class="s-val" style="color:var(--emerald)">{{ totalPassed }}</div><div class="s-lbl">Quiz Réussis</div></div>
+  </div>
+
+  <div class="charts-grid">
+    {# Bar chart — Popular Formations #}
+    <div class="chart-card">
+      <div class="chart-title">📊 Formations les Plus Populaires</div>
+      <canvas id="popularChart" height="250"></canvas>
+    </div>
+
+    {# Pie chart — Category Distribution #}
+    <div class="chart-card">
+      <div class="chart-title">🏷️ Répartition par Catégorie</div>
+      <canvas id="categoryChart" height="250"></canvas>
+    </div>
+
+    {# Line chart — Enrollments Over Time #}
+    <div class="chart-card full-width">
+      <div class="chart-title">📈 Inscriptions au Fil du Temps</div>
+      <canvas id="enrollmentChart" height="180"></canvas>
+    </div>
+
+    {# Horizontal bar — Quiz Success Rate #}
+    <div class="chart-card full-width">
+      <div class="chart-title">✅ Taux de Réussite des Quiz</div>
+      <canvas id="quizChart" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  const colors = {
+    cyan: '#38bdf8', accent: '#e8734a', emerald: '#34d399',
+    rose: '#fb7185', violet: '#a78bfa', amber: '#fbbf24',
+    navy: '#0a1628', teal: '#2dd4bf'
+  };
+  const palette = [colors.cyan, colors.accent, colors.emerald, colors.rose, colors.violet, colors.amber, colors.teal, '#818cf8', '#f472b6', '#a3e635'];
+
+  // 1. Popular Formations Bar Chart
+  new Chart(document.getElementById('popularChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ popularData|map(d => d.title)|json_encode|raw }},
+      datasets: [{
+        label: 'Inscriptions',
+        data: {{ popularData|map(d => d.count)|json_encode|raw }},
+        backgroundColor: palette.slice(0, {{ popularData|length }}),
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+        x: { ticks: { maxRotation: 45, font: { size: 11 } } }
+      }
+    }
+  });
+
+  // 2. Category Pie Chart
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: {{ categoryData|map(d => d.cat)|json_encode|raw }},
+      datasets: [{
+        data: {{ categoryData|map(d => d.count)|json_encode|raw }},
+        backgroundColor: palette.slice(0, {{ categoryData|length }}),
+        borderWidth: 2,
+        borderColor: '#fff',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } }
+      }
+    }
+  });
+
+  // 3. Enrollments Over Time Line Chart
+  new Chart(document.getElementById('enrollmentChart'), {
+    type: 'line',
+    data: {
+      labels: {{ enrollmentData|map(d => d.month)|json_encode|raw }},
+      datasets: [{
+        label: 'Inscriptions',
+        data: {{ enrollmentData|map(d => d.count)|json_encode|raw }},
+        borderColor: colors.cyan,
+        backgroundColor: 'rgba(56,189,248,.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 5,
+        pointBackgroundColor: colors.cyan,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+
+  // 4. Quiz Success Rate Horizontal Bar
+  new Chart(document.getElementById('quizChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ quizData|map(d => d.title)|json_encode|raw }},
+      datasets: [
+        {
+          label: 'Réussi',
+          data: {{ quizData|map(d => d.passed)|json_encode|raw }},
+          backgroundColor: colors.emerald,
+          borderRadius: 6,
+        },
+        {
+          label: 'Échoué',
+          data: {{ quizData|map(d => d.total - d.passed)|json_encode|raw }},
+          backgroundColor: colors.rose,
+          borderRadius: 6,
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        x: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } },
+        y: { stacked: true }
+      }
+    }
+  });
+</script>
+{% endblock %}

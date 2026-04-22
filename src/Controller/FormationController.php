@@ -10,162 +10,360 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Service\YouTubeService;
+use App\Service\GeminiService;
+use App\Entity\Quiz;
+use App\Entity\Question;
+use App\Entity\Reponse;
+use App\Service\RecommendationService;
+use App\Service\CertificateService;
+use App\Entity\Quiz_result;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Service\QrCodeService;
+use App\Service\WeatherService;
+use App\Service\TranslateService;
 
 #[Route('/formation')]
 final class FormationController extends AbstractController
 {
-    #[Route(name: 'app_formation_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        // Hardcode role for testing — replace with $this->getUser()->getRole() later
-        $role = 'Coach'; // Change to 'Coach', 'Admin', or 'Patient' to test
+   
 
-        // --- Pagination setup ---
-        $page    = max(1, (int) $request->query->get('page', 1));
-        $perPage = 6;
+#[Route(name: 'app_formation_index', methods: ['GET'])]
+public function index(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    PaginatorInterface $paginator,
+    WeatherService $weatherService
+): Response {
+    $role = 'Admin'; // Replace with $this->getUser()->getRole()
+    $perPage = 6;
 
-        if ($role === 'Admin') {
-            $repo       = $entityManager->getRepository(Formation::class);
-            $total      = count($repo->findAll());
-            $formations = $repo->findBy([], null, $perPage, ($page - 1) * $perPage);
-            $totalPages = (int) ceil($total / $perPage);
+    if ($role === 'Admin') {
+        $query = $entityManager->getRepository(Formation::class)
+            ->createQueryBuilder('f')
+            ->orderBy('f.id', 'DESC')
+            ->getQuery();
 
-            $users    = $entityManager->getRepository(\App\Entity\User::class)->findAll();
-            $coachMap = [];
-            foreach ($users as $user) {
-                $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
-            }
+        $formations = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
 
-            return $this->render('formation/admin_formations.html.twig', [
-                'formations' => $formations,
-                'coachMap'   => $coachMap,
-                'page'       => $page,
-                'totalPages' => $totalPages,
-                'total'      => $total,
-            ]);
-
-        } elseif ($role === 'Coach') {
-            $coachId    = 1; // Replace with $this->getUser()->getId_user() later
-            $repo       = $entityManager->getRepository(Formation::class);
-            $total      = count($repo->findBy(['coachId' => $coachId]));
-            $formations = $repo->findBy(['coachId' => $coachId], null, $perPage, ($page - 1) * $perPage);
-            $totalPages = (int) ceil($total / $perPage);
-
-            $participations = [];
-            foreach ($formations as $formation) {
-                $parts = $entityManager->getRepository(Participation::class)
-                    ->findBy(['formation_id' => $formation]);
-                $participations[$formation->getId()] = $parts;
-            }
-
-            return $this->render('formation/coach_formations.html.twig', [
-                'formations'    => $formations,
-                'participations'=> $participations,
-                'page'          => $page,
-                'totalPages'    => $totalPages,
-                'total'         => $total,
-            ]);
-
-        } else {
-            // Patient
-            $repo       = $entityManager->getRepository(Formation::class);
-            $total      = count($repo->findAll());
-            $formations = $repo->findBy([], null, $perPage, ($page - 1) * $perPage);
-            $totalPages = (int) ceil($total / $perPage);
-
-            $users    = $entityManager->getRepository(\App\Entity\User::class)->findAll();
-            $coachMap = [];
-            foreach ($users as $user) {
-                $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
-            }
-
-            $patientId        = 1; // Replace with $this->getUser()->getId_user() later
-            $patientUser      = $entityManager->getRepository(\App\Entity\User::class)->find($patientId);
-            $myParticipations = $entityManager->getRepository(Participation::class)
-                ->findBy(['user_id' => $patientUser]);
-            $enrolledIds      = array_map(fn($p) => $p->getFormation_id()->getId(), $myParticipations);
-
-            return $this->render('formation/patient_formations.html.twig', [
-                'formations' => $formations,
-                'enrolledIds'=> $enrolledIds,
-                'coachMap'   => $coachMap,
-                'page'       => $page,
-                'totalPages' => $totalPages,
-                'total'      => $total,
-            ]);
+        $users = $entityManager->getRepository(\App\Entity\User::class)->findAll();
+        $coachMap = [];
+        foreach ($users as $user) {
+            $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
         }
+
+        return $this->render('formation/admin_formations.html.twig', [
+            'formations' => $formations,
+            'coachMap'   => $coachMap,
+        ]);
+
+    } elseif ($role === 'Coach') {
+        $coachId = 1; // Replace with $this->getUser()->getId_user()
+
+        $query = $entityManager->getRepository(Formation::class)
+            ->createQueryBuilder('f')
+            ->where('f.coachId = :cid')
+            ->setParameter('cid', $coachId)
+            ->orderBy('f.id', 'DESC')
+            ->getQuery();
+
+        $formations = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
+
+        $participations = [];
+        foreach ($formations as $formation) {
+            $parts = $entityManager->getRepository(Participation::class)
+                ->findBy(['formation_id' => $formation]);
+            $participations[$formation->getId()] = $parts;
+        }
+
+        return $this->render('formation/coach_formations.html.twig', [
+            'formations'     => $formations,
+            'participations' => $participations,
+        ]);
+
+    } else {
+        // Patient
+        $query = $entityManager->getRepository(Formation::class)
+            ->createQueryBuilder('f')
+            ->orderBy('f.id', 'DESC')
+            ->getQuery();
+
+        $formations = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            $perPage
+        );
+
+        $users = $entityManager->getRepository(\App\Entity\User::class)->findAll();
+        $coachMap = [];
+        foreach ($users as $user) {
+            $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
+        }
+
+        $patientId = 1;
+        $patientUser = $entityManager->getRepository(\App\Entity\User::class)->find($patientId);
+        $myParticipations = $entityManager->getRepository(Participation::class)
+            ->findBy(['user_id' => $patientUser]);
+        $enrolledIds = array_map(fn($p) => $p->getFormation_id()->getId(), $myParticipations);
+        $weather = $weatherService->getWeatherWithTip('Tunis');
+
+        return $this->render('formation/patient_formations.html.twig', [
+            'formations'  => $formations,
+            'enrolledIds' => $enrolledIds,
+            'coachMap'    => $coachMap,
+            'weather' => $weather,
+        ]);
     }
+}
 
     #[Route('/new', name: 'app_formation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $formation = new Formation();
-        $form      = $this->createForm(FormationType::class, $formation);
-        $form->handleRequest($request);
+public function new(Request $request, EntityManagerInterface $entityManager, YouTubeService $youtubeService): Response
+{
+    $formation = new Formation();
+    $form      = $this->createForm(FormationType::class, $formation);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Normalize YouTube URL to embed format if needed
-            $videoUrl = $formation->getVideoUrl();
-            if ($videoUrl) {
+    if ($form->isSubmitted() && $form->isValid()) {
+        $videoUrl = $formation->getVideoUrl();
+        if ($videoUrl) {
+            // Fetch YouTube metadata
+            $details = $youtubeService->getVideoDetails($videoUrl);
+            if ($details) {
+                $formation->setVideoUrl($details['embedUrl']);
+                $formation->setVideoTitle($details['title']);
+                $formation->setVideoDuration($details['duration']);
+                $formation->setVideoThumbnail($details['thumbnail']);
+            } else {
+                // Not a valid YouTube video — just normalize URL
                 $formation->setVideoUrl($this->normalizeYoutubeUrl($videoUrl));
             }
-
-            // Set coach id — replace with $this->getUser()->getId_user() later
-            $formation->setCoachId(1);
-
-            $entityManager->persist($formation);
-            $entityManager->flush();
-            $this->addFlash('success', 'Formation créée avec succès !');
-            return $this->redirectToRoute('app_formation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('formation/new.html.twig', [
-            'formation' => $formation,
-            'form'      => $form,
-        ]);
+        $formation->setCoachId(1); // Replace with $this->getUser()->getId_user()
+
+        $entityManager->persist($formation);
+        $entityManager->flush();
+        $this->addFlash('success', 'Formation créée avec succès !');
+        return $this->redirectToRoute('app_formation_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/{id}', name: 'app_formation_show', methods: ['GET'])]
-    public function show(Formation $formation, EntityManagerInterface $entityManager): Response
+    return $this->render('formation/new.html.twig', [
+        'formation' => $formation,
+        'form'      => $form,
+    ]);
+}
+
+#[Route('/{id}/translate', name: 'app_formation_translate', methods: ['GET'], priority: 15)]
+public function translate(
+    Formation $formation,
+    Request $request,
+    TranslateService $translateService
+): \Symfony\Component\HttpFoundation\JsonResponse {
+    $lang = $request->query->get('lang', 'en');
+
+    $translatedTitle = $translateService->translate($formation->getTitle(), 'fr', $lang);
+    $translatedDesc  = $translateService->translate($formation->getDescription() ?? '', 'fr', $lang);
+
+    return $this->json([
+        'title'       => $translatedTitle,
+        'description' => $translatedDesc,
+        'language'    => $lang,
+    ]);
+}
+
+     #[Route('/youtube/preview', name: 'app_formation_youtube_preview', methods: ['GET'], priority: 20)]
+    public function youtubePreview(Request $request, YouTubeService $youtubeService): \Symfony\Component\HttpFoundation\JsonResponse
     {
-        $coach     = $entityManager->getRepository(\App\Entity\User::class)->find($formation->getCoachId());
-        $coachName = $coach ? $coach->getNom() . ' ' . $coach->getPrenom() : 'Inconnu';
-        $quiz      = $entityManager->getRepository(\App\Entity\Quiz::class)->findOneBy(['formation_id' => $formation]);
+    $url = $request->query->get('url', '');
 
-        // Build embeddable video URL
-        $embedUrl = $formation->getVideoUrl()
-            ? $this->normalizeYoutubeUrl($formation->getVideoUrl())
-            : null;
-
-        return $this->render('formation/show.html.twig', [
-            'formation' => $formation,
-            'coachName' => $coachName,
-            'quiz'      => $quiz,
-            'embedUrl'  => $embedUrl,
-        ]);
+    if (empty($url)) {
+        return $this->json(['error' => 'No URL provided'], 400);
     }
+
+    $details = $youtubeService->getVideoDetails($url);
+
+    if (!$details) {
+        return $this->json(['error' => 'Could not fetch video details'], 404);
+    }
+
+    return $this->json($details);
+    }
+
+    
+
+#[Route('/{id}', name: 'app_formation_show', methods: ['GET'])]
+public function show(
+    Formation $formation,
+    EntityManagerInterface $entityManager,
+    QrCodeService $qrCodeService
+): Response {
+    $coach     = $entityManager->getRepository(\App\Entity\User::class)->find($formation->getCoachId());
+    $coachName = $coach ? $coach->getNom() . ' ' . $coach->getPrenom() : 'Inconnu';
+    $quiz      = $entityManager->getRepository(\App\Entity\Quiz::class)->findOneBy(['formation_id' => $formation]);
+
+    $embedUrl = $formation->getVideoUrl()
+        ? $this->normalizeYoutubeUrl($formation->getVideoUrl())
+        : null;
+
+    // Generate QR code linking to this formation's page
+    $formationUrl = $this->generateUrl('app_formation_show', ['id' => $formation->getId()], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+    $qrCode = $qrCodeService->generateBase64($formationUrl, 180);
+
+    return $this->render('formation/show.html.twig', [
+        'formation' => $formation,
+        'coachName' => $coachName,
+        'quiz'      => $quiz,
+        'embedUrl'  => $embedUrl,
+        'qrCode'    => $qrCode,
+    ]);
+}
+
+    
+
+/**
+ * YouTube Search API — coach searches videos by title.
+ */
+#[Route('/youtube/search', name: 'app_formation_youtube_search', methods: ['GET'], priority: 20)]
+public function youtubeSearch(Request $request, YouTubeService $youtubeService): \Symfony\Component\HttpFoundation\JsonResponse
+{
+    $query = trim($request->query->get('q', ''));
+
+    if (strlen($query) < 2) {
+        return $this->json([]);
+    }
+
+    $results = $youtubeService->searchVideos($query, 5);
+
+    return $this->json($results);
+}
 
     #[Route('/{id}/edit', name: 'app_formation_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Formation $formation, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(FormationType::class, $formation);
-        $form->handleRequest($request);
+public function edit(Request $request, Formation $formation, EntityManagerInterface $entityManager, YouTubeService $youtubeService): Response
+{
+    $oldVideoUrl = $formation->getVideoUrl();
+    $form = $this->createForm(FormationType::class, $formation);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $videoUrl = $formation->getVideoUrl();
-            if ($videoUrl) {
+    if ($form->isSubmitted() && $form->isValid()) {
+        $videoUrl = $formation->getVideoUrl();
+
+        // Only re-fetch if URL changed
+        if ($videoUrl && $videoUrl !== $oldVideoUrl) {
+            $details = $youtubeService->getVideoDetails($videoUrl);
+            if ($details) {
+                $formation->setVideoUrl($details['embedUrl']);
+                $formation->setVideoTitle($details['title']);
+                $formation->setVideoDuration($details['duration']);
+                $formation->setVideoThumbnail($details['thumbnail']);
+            } else {
                 $formation->setVideoUrl($this->normalizeYoutubeUrl($videoUrl));
             }
-            $entityManager->flush();
-            $this->addFlash('success', 'Formation modifiée avec succès !');
-            return $this->redirectToRoute('app_formation_index', [], Response::HTTP_SEE_OTHER);
+        } elseif (!$videoUrl) {
+            // URL was cleared
+            $formation->setVideoTitle(null);
+            $formation->setVideoDuration(null);
+            $formation->setVideoThumbnail(null);
         }
 
-        return $this->render('formation/edit.html.twig', [
-            'formation' => $formation,
-            'form'      => $form,
-        ]);
+        $entityManager->flush();
+        $this->addFlash('success', 'Formation modifiée avec succès !');
+        return $this->redirectToRoute('app_formation_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    return $this->render('formation/edit.html.twig', [
+        'formation' => $formation,
+        'form'      => $form,
+    ]);
+}
+
+    #[Route('/test/gemini', name: 'app_test_gemini', methods: ['GET'], priority: 20)]
+public function testGemini(\App\Service\GeminiService $geminiService): \Symfony\Component\HttpFoundation\JsonResponse
+{
+    $result = $geminiService->generateQuizQuestions('Nutrition et bien-être', 'Formation sur les bases de la nutrition santé', 2);
+    
+    if ($result === null) {
+        return $this->json(['error' => 'Gemini returned null — API key or connection issue']);
+    }
+    
+    return $this->json($result);
+}
+
+/**
+ * AI Quiz Generator — generates questions via Gemini and saves them to the quiz.
+ */
+#[Route('/{id}/quiz/generate', name: 'app_formation_quiz_generate', methods: ['POST'], priority: 15)]
+public function generateQuiz(
+    Formation $formation,
+    EntityManagerInterface $entityManager,
+    GeminiService $geminiService,
+    Request $request
+): Response {
+    // CSRF check
+    if (!$this->isCsrfTokenValid('generate_quiz' . $formation->getId(), $request->request->get('_token'))) {
+        $this->addFlash('error', 'Token CSRF invalide.');
+        return $this->redirectToRoute('app_formation_quiz', ['id' => $formation->getId()]);
+    }
+
+    // Find or create quiz for this formation
+    $quiz = $entityManager->getRepository(Quiz::class)
+        ->findOneBy(['formation_id' => $formation]);
+
+    if (!$quiz) {
+        $quiz = new Quiz();
+        $quiz->setFormation_id($formation);
+        $quiz->setTitle('Quiz : ' . $formation->getTitle());
+        $quiz->setPassingScore(60);
+        $entityManager->persist($quiz);
+    }
+
+    // Call Gemini
+    $generated = $geminiService->generateQuizQuestions(
+        $formation->getTitle(),
+        $formation->getDescription()
+    );
+
+    if (!$generated) {
+        $this->addFlash('error', 'Erreur lors de la génération IA. Réessayez.');
+        return $this->redirectToRoute('app_formation_quiz', ['id' => $formation->getId()]);
+    }
+
+    // Clear existing questions (replace with AI-generated ones)
+    foreach ($quiz->getQuestions() as $existingQ) {
+        $quiz->removeQuestion($existingQ);
+        $entityManager->remove($existingQ);
+    }
+
+    // Save generated questions + answers
+    foreach ($generated as $qData) {
+        $question = new Question();
+        $question->setQuestionText($qData['question']);
+        $question->setPoints($qData['points'] ?? 1);
+        $question->setQuiz($quiz);
+
+        foreach ($qData['answers'] as $aData) {
+            $reponse = new Reponse();
+            $reponse->setOptionText($aData['text']);
+            $reponse->setIsCorrect($aData['correct'] ?? false);
+            $reponse->setQuestion($question);
+            $question->addReponse($reponse);
+        }
+
+        $quiz->addQuestion($question);
+    }
+
+    $entityManager->flush();
+
+    $this->addFlash('success', count($generated) . ' questions générées par IA avec succès !');
+    return $this->redirectToRoute('app_formation_quiz', ['id' => $formation->getId()]);
+}
 
     #[Route('/{id}', name: 'app_formation_delete', methods: ['POST'])]
     public function delete(Request $request, Formation $formation, EntityManagerInterface $entityManager): Response
@@ -269,6 +467,8 @@ public function ajaxSearch(Request $request, EntityManagerInterface $entityManag
             'coach'       => ($f->getCoachId() && isset($coachMap[$f->getCoachId()])) ? $coachMap[$f->getCoachId()] : '—',
             'hasVideo'    => $f->getVideoUrl() !== null,
             'hasQuiz'     => $f->getQuizs()->count() > 0,
+            'videoThumbnail' => $f->getVideoThumbnail(),   
+            'videoDuration'  => $f->getVideoDuration(), 
         ];
     }
 
@@ -307,4 +507,49 @@ public function ajaxSearch(Request $request, EntityManagerInterface $entityManag
         // Not a YouTube URL — return as-is (e.g. Vimeo)
         return $url;
     }
+    #[Route('/{id}/certificate', name: 'app_formation_certificate', methods: ['GET'], priority: 15)]
+public function downloadCertificate(
+    Formation $formation,
+    EntityManagerInterface $entityManager,
+    CertificateService $certificateService
+): Response {
+    $userId = 1; // Replace with $this->getUser()->getId_user()
+
+    // Find the user's best quiz result for this formation
+    $quiz = $entityManager->getRepository(\App\Entity\Quiz::class)
+        ->findOneBy(['formation_id' => $formation]);
+
+    if (!$quiz) {
+        $this->addFlash('error', 'Aucun quiz pour cette formation.');
+        return $this->redirectToRoute('app_formation_show', ['id' => $formation->getId()]);
+    }
+
+    $result = $entityManager->getRepository(Quiz_result::class)
+        ->findOneBy(
+            ['quiz_id' => $quiz, 'user_id' => $userId, 'passed' => true],
+            ['score' => 'DESC']
+        );
+
+    if (!$result) {
+        $this->addFlash('error', 'Vous devez d\'abord réussir le quiz pour obtenir le certificat.');
+        return $this->redirectToRoute('app_formation_show', ['id' => $formation->getId()]);
+    }
+
+    // Get user name
+    $user = $entityManager->getRepository(\App\Entity\User::class)->find($userId);
+    $studentName = $user ? $user->getNom() . ' ' . $user->getPrenom() : 'Participant';
+
+    $pdfContent = $certificateService->generateCertificate(
+        $studentName,
+        $formation->getTitle(),
+        $result->getScore(),
+        $result->getTotal_points(),
+        $result->getCompleted_at()
+    );
+
+    return new Response($pdfContent, 200, [
+        'Content-Type'        => 'application/pdf',
+        'Content-Disposition' => 'attachment; filename="certificat-' . $formation->getId() . '.pdf"',
+    ]);
+}
 }

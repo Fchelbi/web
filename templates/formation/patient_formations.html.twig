@@ -118,6 +118,64 @@
   .pg-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
   .pg-btn.disabled{opacity:.35;pointer-events:none}
   .pg-info{font-size:12px;color:var(--text-muted);margin-left:12px}
+
+  /* KnpPaginator styling */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+.pagination span.flex {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pagination a,
+.pagination span:not(.flex) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  text-decoration: none;
+  transition: all .2s;
+}
+.pagination a:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56,189,248,.15);
+}
+/* Current/active page */
+.pagination span.current,
+.pagination em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #0a1628;
+  color: #fff;
+  border: 1.5px solid #0a1628;
+  font-style: normal;
+}
+/* First/Last/Prev/Next arrows */
+.pagination a[rel="prev"],
+.pagination a[rel="next"] {
+  font-size: 16px;
+}
 </style>
 
 <nav>
@@ -139,6 +197,28 @@
   <div class="hero-sub">Découvrez des formations créées par nos coachs experts pour améliorer votre bien-être au quotidien.</div>
 </div>
 
+{# ---- Weather Health Widget ---- #}
+{% if weather is defined and weather is not null %}
+<div style="max-width:1200px;margin:-20px auto 0;padding:0 44px;position:relative;z-index:10">
+  <div style="background:linear-gradient(135deg,#0f2a4a,#1a4a7a);border-radius:16px;padding:22px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 8px 32px rgba(10,22,40,.2)">
+    <img src="{{ weather.icon }}" alt="" style="width:56px;height:56px">
+    <div>
+      <div style="color:#fff;font-family:Outfit;font-size:28px;font-weight:800">{{ weather.temp }}°C</div>
+      <div style="color:rgba(255,255,255,.6);font-size:12px">{{ weather.city }} — {{ weather.condition }}</div>
+    </div>
+    <div style="display:flex;gap:16px;margin-left:12px">
+      <div style="text-align:center"><div style="color:var(--cyan);font-size:16px;font-weight:700">{{ weather.humidity }}%</div><div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase">Humidité</div></div>
+      <div style="text-align:center"><div style="color:var(--accent);font-size:16px;font-weight:700">{{ weather.wind }} km/h</div><div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase">Vent</div></div>
+      <div style="text-align:center"><div style="color:#fbbf24;font-size:16px;font-weight:700">{{ weather.uv }}</div><div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase">UV</div></div>
+    </div>
+    <div style="flex:1;min-width:200px;background:rgba(255,255,255,.08);border-radius:12px;padding:14px 18px;margin-left:auto;border:1px solid rgba(255,255,255,.06)">
+      <div style="color:#34d399;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">💡 Conseil Santé</div>
+      <div style="color:rgba(255,255,255,.8);font-size:13px;line-height:1.5">{{ weather.healthTip }}</div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <div class="container">
   {% for message in app.flashes('success') %}<div class="flash flash-success">✅ {{ message }}</div>{% endfor %}
   {% for message in app.flashes('info') %}<div class="flash flash-info">ℹ️ {{ message }}</div>{% endfor %}
@@ -156,17 +236,50 @@
     <button class="filter-btn" onclick="filterBy('autre',this)">Autre</button>
   </div>
 
+  {# ---- AI Recommendations ---- #}
+  {% if recommendations is defined and recommendations|length > 0 %}
+  <div style="margin-bottom:36px;animation:fadeInUp .5s ease both;animation-delay:.2s">
+    <div class="section-header">
+      <div class="section-title">🎯 Recommandé pour vous</div>
+      <div class="section-count">{{ recommendations|length }} suggestions</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px">
+      {% for rec in recommendations %}
+      <div style="background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.06));border:1.5px solid rgba(56,189,248,.15);border-radius:var(--radius);padding:20px;transition:all .25s;position:relative;overflow:hidden" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(56,189,248,.15)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <div style="position:absolute;top:10px;right:10px;background:rgba(56,189,248,.1);color:var(--cyan);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.5px">IA</div>
+        {% if rec.videoThumbnail %}
+          <img src="{{ rec.videoThumbnail }}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:12px">
+        {% endif %}
+        {% if rec.category %}<div style="font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">{{ rec.category }}</div>{% endif %}
+        <div style="font-family:Outfit;font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:6px">{{ rec.title }}</div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:14px">{{ rec.description|slice(0,80) }}{% if rec.description|length > 80 %}…{% endif %}</div>
+        <div style="display:flex;gap:8px">
+          <form method="post" action="{{ path('app_formation_enroll', {'id': rec.id}) }}" style="flex:1">
+            <input type="hidden" name="_token" value="{{ csrf_token('enroll' ~ rec.id) }}">
+            <button type="submit" style="width:100%;background:linear-gradient(135deg,var(--cyan),#0ea5e9);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">S'inscrire</button>
+          </form>
+          <a href="{{ path('app_formation_show', {'id': rec.id}) }}" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;color:var(--text-secondary)">Voir</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
   <div class="section-header">
     <div class="section-title">Toutes les Formations</div>
-    <div class="section-count" id="visibleCount">{{ formations|length }} formations</div>
+    <div class="section-count" id="visibleCount">{{ formations.getTotalItemCount }} formations</div>
   </div>
 
   <div class="formations-grid" id="formationsGrid">
     {% for formation in formations %}
     {% set isEnrolled = formation.id in enrolledIds %}
     <div class="formation-card" data-cat="{{ formation.category is not null ? formation.category|lower : '' }}" data-title="{{ formation.title|lower }}" data-desc="{{ formation.description|lower }}">
-      <div class="card-thumb {{ isEnrolled ? 'enrolled' : 'default' }}">
-        📚
+      <div class="card-thumb {{ isEnrolled ? 'enrolled' : 'default' }}" {% if formation.videoThumbnail %}style="background-image:url('{{ formation.videoThumbnail }}');background-size:cover;background-position:center;font-size:0"{% endif %}>
+        {% if not formation.videoThumbnail %}📚{% endif %}
+        {% if formation.videoDuration %}
+          <div style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.75);color:#fff;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700">⏱️ {{ formation.videoDuration }}</div>
+        {% endif %}
         {% if formation.category is not null %}<div class="cat-ribbon">{{ formation.category }}</div>{% endif %}
         {% if isEnrolled %}<div class="enrolled-ribbon">✓ Inscrit</div>{% endif %}
       </div>
@@ -193,20 +306,9 @@
     <div class="no-cards-msg" id="noCardsMsg">Aucune formation ne correspond à votre recherche.</div>
   </div>
 
-  {% if totalPages > 1 %}
   <div class="pagination">
-    <a href="{{ path('app_formation_index', {'page': max(1, page-1)}) }}" class="pg-btn {% if page <= 1 %}disabled{% endif %}">‹</a>
-    {% for p in 1..totalPages %}
-      {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
-        <a href="{{ path('app_formation_index', {'page': p}) }}" class="pg-btn {% if p == page %}active{% endif %}">{{ p }}</a>
-      {% elseif p == page - 3 or p == page + 3 %}
-        <span class="pg-btn" style="border:none;background:none;cursor:default">…</span>
-      {% endif %}
-    {% endfor %}
-    <a href="{{ path('app_formation_index', {'page': min(totalPages, page+1)}) }}" class="pg-btn {% if page >= totalPages %}disabled{% endif %}">›</a>
-    <span class="pg-info">Page {{ page }} / {{ totalPages }}</span>
+    {{ knp_pagination_render(formations) }}
   </div>
-  {% endif %}
 
   <div class="my-section">
     <div class="section-header">

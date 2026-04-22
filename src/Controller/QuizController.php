@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+
+
+
 #[Route('/quiz')]
 final class QuizController extends AbstractController
 {
@@ -23,6 +26,31 @@ final class QuizController extends AbstractController
     //  If the formation already has a quiz → edit it
     //  Otherwise → create a new one
     // ------------------------------------------------------------------
+
+     #[Route('/formation/{id}/quiz/new', name: 'app_quiz_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, Formation $formation, EntityManagerInterface $em): Response
+    {
+        $quiz = new Quiz();
+        $quiz->setFormation($formation);
+        
+        $form = $this->createForm(QuizType::class, $quiz);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($quiz);
+            $em->flush();
+
+            $this->addFlash('success', 'Quiz créé avec succès !');
+            
+            return $this->redirectToRoute('app_formation_show', ['id' => $formation->getId()]);
+        }
+
+        return $this->render('quiz/new.html.twig', [
+            'form' => $form->createView(),
+            'formation' => $formation,
+        ]);
+    }
+    
     #[Route('/{id}/edit', name: 'app_quiz_edit', methods: ['GET', 'POST'])]
     public function edit(
         Formation $formation,

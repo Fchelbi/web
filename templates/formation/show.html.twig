@@ -1,86 +1,4 @@
-{% extends 'base.html.twig' %}
-{% block title %}{{ formation.title }} | EchoCare{% endblock %}
-{% block body %}
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px 20px}
-  .page-wrap{max-width:860px;margin:0 auto}
-  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--blue-light);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:24px;transition:.15s}
-  .back-link:hover{opacity:.75}
-  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px}
-  .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:28px 32px}
-  .card-badge{display:inline-block;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;margin-bottom:10px}
-  .card-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:8px}
-  .card-meta-row{display:flex;gap:16px;flex-wrap:wrap}
-  .meta-item{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);font-size:13px}
-  .card-body{padding:28px 32px}
-  .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-400);margin-bottom:10px}
-  .desc-text{font-size:15px;line-height:1.8;color:var(--gray-700);margin-bottom:28px}
-  /* ---- Embedded video ---- */
-  .video-wrap{border-radius:12px;overflow:hidden;background:#000;position:relative;padding-top:56.25%;margin-bottom:28px}
-  .video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
-  .no-video{background:var(--gray-100);border-radius:12px;padding:32px;text-align:center;color:var(--gray-400);margin-bottom:28px}
-  /* ---- Quiz section ---- */
-  .quiz-card{background:var(--blue-pale);border-radius:var(--radius);padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-  .quiz-title{font-size:16px;font-weight:700;color:var(--blue-dark);margin-bottom:4px}
-  .quiz-sub{font-size:13px;color:var(--gray-400)}
-  .btn-quiz{background:var(--blue-light);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s;box-shadow:0 4px 12px rgba(45,125,210,.3)}
-  .btn-quiz:hover{background:var(--blue-dark)}
-  /* ---- Actions row (edit / back only — NO delete under video) ---- */
-  .actions-row{display:flex;gap:10px;flex-wrap:wrap}
-  .btn-edit{background:var(--orange-soft);color:var(--orange);border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:.2s}
-  .btn-edit:hover{background:var(--orange);color:#fff}
-  .btn-back{background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s}
-  .btn-back:hover{background:var(--gray-200)}
-</style>
-
-<div class="page-wrap">
-  <a href="{{ path('app_formation_index') }}" class="back-link">← Retour aux formations</a>
-
-  {# ---- Formation header ---- #}
-  <div class="card">
-    <div class="card-header">
-      {% if formation.category is not null %}
-        <div class="card-badge">{{ formation.category }}</div>
-      {% endif %}
-      <div class="card-title">{{ formation.title }}</div>
-      <div class="card-meta-row">
-        <div class="meta-item">👨‍🏫 {{ coachName }}</div>
-        {% if formation.videoUrl is not null %}
-          <div class="meta-item">🎥 Vidéo disponible</div>
-        {% endif %}
-        {% if quiz is not null %}
-          <div class="meta-item">📝 Quiz disponible</div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="card-body">
-
-      {# ---- Description ---- #}
-      {% if formation.description %}
-        <div class="section-label">Description</div>
-        <div class="desc-text">{{ formation.description }}</div>
-      {% endif %}
-
-      {# ---- Embedded video — no edit/delete buttons here ---- #}
-      {% if embedUrl is not null and embedUrl is not empty %}
-        <div class="section-label">Vidéo de formation</div>
-        <div class="video-wrap">
-          <iframe
-            src="{{ embedUrl }}"
-            title="{{ formation.title }}"
-            allowfullscreen
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
-          </iframe>
-        </div>
-      {% else %}
-        <div class="no-video">🎬 Aucune vidéo disponible pour cette formation</div>
-      {% endif %}
-
-      {# ---- Quiz ---- #}
+...
       <div class="quiz-card">
         {% if quiz is not null %}
           <div>
@@ -94,15 +12,121 @@
             <div class="quiz-sub">Un quiz sera bientôt ajouté à cette formation</div>
           </div>
         {% endif %}
-      </div>
-
+        {# ---- QR Code ---- #}
+<div style="margin-top:28px;border-top:2px solid var(--gray-200);padding-top:28px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+  <div>
+    <img src="{{ qrCode }}" alt="QR Code" style="width:140px;height:140px;border-radius:12px;border:2px solid #e2e8f0;padding:6px;background:#fff">
+  </div>
+  <div>
+    <div style="font-size:16px;font-weight:700;color:var(--blue-dark);margin-bottom:6px">📱 Partager cette formation</div>
+    <div style="font-size:13px;color:var(--gray-400);line-height:1.6;max-width:300px">
+      Scannez ce QR code avec votre téléphone pour accéder directement à cette formation ou la partager avec d'autres patients.
     </div>
   </div>
-
-  {# ---- Page-level actions: edit & back ONLY (delete is in the list, not here) ---- #}
-  <div class="actions-row">
-    <a href="{{ path('app_formation_index') }}" class="btn-back">← Liste</a>
-    <a href="{{ path('app_formation_edit', {'id': formation.id}) }}" class="btn-edit">✏️ Modifier</a>
-  </div>
 </div>
-{% endblock %}
+      </div>
+
+      {# ---- Translate Button ---- #}
+<div style="margin-bottom:24px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+  <span style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px">🌐 Traduire :</span>
+  <button type="button" onclick="translateFormation('en')" class="translate-btn" style="background:rgba(56,189,248,.08);color:#38bdf8;border:1px solid rgba(56,189,248,.15);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s">🇬🇧 English</button>
+  <button type="button" onclick="translateFormation('ar')" class="translate-btn" style="background:rgba(232,115,74,.08);color:#e8734a;border:1px solid rgba(232,115,74,.15);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s">🇸🇦 العربية</button>
+  <button type="button" onclick="translateFormation('es')" class="translate-btn" style="background:rgba(52,211,153,.08);color:#34d399;border:1px solid rgba(52,211,153,.15);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s">🇪🇸 Español</button>
+  <button type="button" onclick="translateFormation('tr')" class="translate-btn" style="background:rgba(167,139,250,.08);color:#a78bfa;border:1px solid rgba(167,139,250,.15);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s">🇹🇷 Türkçe</button>
+  <button type="button" onclick="showOriginal()" class="translate-btn" style="background:rgba(148,163,184,.08);color:#94a3b8;border:1px solid rgba(148,163,184,.15);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.2s">🇫🇷 Original</button>
+</div>
+
+{# Translated content area (hidden by default) #}
+<div id="translatedContent" style="display:none;background:rgba(56,189,248,.04);border:1.5px solid rgba(56,189,248,.12);border-radius:12px;padding:18px 22px;margin-bottom:24px;animation:fadeIn .3s ease">
+  <div style="font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" id="transLangLabel">🌐 Traduction</div>
+  <div id="transTitle" style="font-size:18px;font-weight:700;color:var(--blue-dark);margin-bottom:8px"></div>
+  <div id="transDesc" style="font-size:14px;color:var(--gray-700);line-height:1.7"></div>
+</div>
+
+<style>
+.translate-btn:hover { transform:translateY(-1px); opacity:.85; }
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+
+<script>
+var originalTitle = '{{ formation.title|e("js") }}';
+var originalDesc  = '{{ (formation.description ?? "")|e("js") }}';
+var formationId   = {{ formation.id }};
+
+function translateFormation(lang) {
+  var box = document.getElementById('translatedContent');
+  var label = document.getElementById('transLangLabel');
+  var tTitle = document.getElementById('transTitle');
+  var tDesc = document.getElementById('transDesc');
+
+  box.style.display = 'block';
+  tTitle.textContent = '⏳ Traduction en cours…';
+  tDesc.textContent = '';
+
+  var langNames = {en:'English',ar:'العربية',es:'Español',de:'Deutsch',it:'Italiano',tr:'Türkçe'};
+  label.textContent = '🌐 Traduction en ' + (langNames[lang] || lang);
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', '/formation/' + formationId + '/translate?lang=' + lang);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var data = JSON.parse(xhr.responseText);
+      tTitle.textContent = data.title || '—';
+      tDesc.textContent = data.description || '—';
+      // For Arabic, set RTL direction
+      if (lang === 'ar') {
+        tTitle.style.direction = 'rtl';
+        tDesc.style.direction = 'rtl';
+      } else {
+        tTitle.style.direction = 'ltr';
+        tDesc.style.direction = 'ltr';
+      }
+    } else {
+      tTitle.textContent = '❌ Erreur de traduction';
+    }
+  };
+  xhr.send();
+}
+
+function showOriginal() {
+  document.getElementById('translatedContent').style.display = 'none';
+}
+</script>
+
+      {# ---- Patient Feedback Form ---- #}
+      <div style="margin-top:28px;border-top:2px solid var(--gray-200);padding-top:28px">
+        <div class="section-label">💬 Laisser un avis</div>
+        <form method="post" action="{{ path('app_feedback_submit', {'id': formation.id}) }}" style="margin-top:12px">
+          
+          <div style="display:flex;gap:6px;margin-bottom:12px" id="starRating">
+            {% for i in 1..5 %}
+              <button type="button" class="star-btn" data-val="{{ i }}" onclick="setRating({{ i }})"
+                style="background:none;border:none;font-size:28px;cursor:pointer;transition:.15s;filter:grayscale(1);opacity:.4">
+                ⭐
+              </button>
+            {% endfor %}
+            <input type="hidden" name="rating" id="ratingInput" value="0">
+          </div>
+
+          <textarea name="comment"
+            placeholder="Partagez votre expérience avec cette formation…"
+            required minlength="5"
+            style="width:100%;padding:14px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:inherit;font-size:14px;resize:vertical;min-height:80px;outline:none;transition:.2s"
+            onfocus="this.style.borderColor='#2d7dd2'"
+            onblur="this.style.borderColor='#eef2f7'"></textarea>
+
+          <button type="submit"
+            style="margin-top:10px;background:linear-gradient(135deg,#2d7dd2,#1a5a9e);color:#fff;border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit">
+            📤 Envoyer mon avis
+          </button>
+          <a href="{{ path('app_formation_certificate', {'id': formation.id}) }}"
+   style="background:linear-gradient(135deg,#34d399,#059669);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:700;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(52,211,153,.3)"
+   onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+  🏆 Télécharger Certificat
+</a>
+        </form>
+      </div>
+
+    </div> {# END card-body #}
+  </div>
+...
