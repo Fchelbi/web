@@ -12,112 +12,11 @@
     }
 </style>
 <div class="layout-wrapper">
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Menu">
-        <i data-lucide="menu" style="width:22px;height:22px;"></i>
-    </button>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar glassmorphism">
-        <div class="sidebar-header">
-            <h2 class="sidebar-logo">Community</h2>
-            <p class="sidebar-subtitle">Professional Network</p>
-        </div>
-
-
-
-        <nav class="sidebar-nav">
-            {% if not is_granted('ROLE_ADMIN') %}
-            <!-- User Space -->
-            <div class="nav-section">
-                <h3 class="nav-section-title">
-                    <i data-lucide="layout-grid" style="width:14px;height:14px"></i>
-                    User Space
-                </h3>
-                <a href="{{ path('patient_dashboard') }}" class="nav-item">
-                    <span class="nav-icon"><i data-lucide="home"></i></span>
-                    <span class="nav-label">Main Dashboard</span>
-                </a>
-                <a href="{{ path('app_post_index') }}" class="nav-item {% if 'post_index' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="newspaper"></i></span>
-                    <span class="nav-label">Forum Feed</span>
-                </a>
-                <a href="{{ path('app_post_new') }}" class="nav-item {% if 'post_new' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="plus-circle"></i></span>
-                    <span class="nav-label">Create Post</span>
-                </a>
-                <a href="{{ path('app_category_index') }}" class="nav-item {% if 'category' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="tag"></i></span>
-                    <span class="nav-label">Categories</span>
-                </a>
-            </div>
-            {% endif %}
-
-            {% if is_granted('ROLE_ADMIN') %}
-            <!-- Admin Space -->
-            <div class="nav-section">
-                <h3 class="nav-section-title nav-section-divider">
-                    <i data-lucide="shield" style="width:14px;height:14px"></i>
-                    Admin Space
-                </h3>
-                <a href="{{ path('app_admin_dashboard') }}" class="nav-item {% if 'app_admin_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
-                    <span class="nav-label">Dashboard</span>
-                </a>
-                <a href="{{ path('admin_analytics') }}" class="nav-item {% if 'admin_analytics' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="pie-chart"></i></span>
-                    <span class="nav-label">Analytics</span>
-                </a>
-                <a href="{{ path('admin_dashboard') }}" class="nav-item {% if 'admin_dashboard' in app.request.attributes.get('_route') or 'admin_user_' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="users"></i></span>
-                    <span class="nav-label">User Management</span>
-                </a>
-                <a href="{{ path('app_admin_forum') }}" class="nav-item {% if 'admin_forum' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="message-square-warning"></i></span>
-                    <span class="nav-label">Forum Admin</span>
-                </a>
-                <a href="{{ path('app_admin_moderation') }}" class="nav-item {% if 'admin_moderation' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="shield-check"></i></span>
-                    <span class="nav-label">Moderation</span>
-                </a>
-                <a href="{{ path('admin_security') }}" class="nav-item {% if 'admin_security' in app.request.attributes.get('_route') %}active{% endif %}">
-                    <span class="nav-icon"><i data-lucide="lock"></i></span>
-                    <span class="nav-label">Security</span>
-                </a>
-                
-                <!-- Link back to public forum -->
-                <a href="{{ path('app_post_index') }}" class="nav-item" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
-                    <span class="nav-icon"><i data-lucide="external-link"></i></span>
-                    <span class="nav-label" style="color: #6B9FD4;">Public Forum feed</span>
-                </a>
-            </div>
-            {% endif %}
-        </nav>
-
-        {% if app.user %}
-        <div class="sidebar-footer">
-            <div class="sidebar-user" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0;">
-                    <div class="avatar-placeholder" style="width:38px;height:38px;font-size:0.8rem; flex-shrink: 0;">{{ app.user.prenom|slice(0,1)|upper }}</div>
-                    <div class="sidebar-user-info" style="min-width: 0;">
-                        <p class="sidebar-user-name" style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ app.user.prenom ~ ' ' ~ app.user.nom }}</p>
-                        <p class="sidebar-user-role" style="margin: 0; font-size: 0.75rem; color: var(--text-subtle);">{% if is_granted('ROLE_ADMIN') %}Administrator{% else %}Member{% endif %}</p>
-                    </div>
-                </div>
-                <a href="{{ path('app_logout') }}" class="logout-btn" title="Deconnexion" style="color: var(--text-muted); padding: 0.5rem; border-radius: 8px; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
-                    <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
-                </a>
-            </div>
-        </div>
-        {% endif %}
-    </aside>
-
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" style="padding-top:0;">
         <div class="content-container">
             {% block topbar %}
-            <nav class="navbar glassmorphism" style="border-radius: 0 0 16px 16px; border-top:none;">
+            <nav class="navbar glassmorphism" style="border-radius: 0 0 16px 16px; border-top:none; margin-top:0;">
                 <div class="navbar-logo">Echo<span>Care</span></div>
                 
                 <div class="top-bar-search">
@@ -134,7 +33,33 @@
                 <div class="navbar-links">
                     <a href="{{ path('patient_dashboard') }}" class="{% if 'patient_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">Accueil</a>
                     <a href="{{ path('patient_bien_etre') }}" class="{% if 'bien_etre' in app.request.attributes.get('_route') %}active{% endif %}">Bien-etre</a>
-                    <a href="{{ path('app_post_index') }}" class="{% if 'post' in app.request.attributes.get('_route') or 'category' in app.request.attributes.get('_route') %}active{% endif %}">Forum</a>
+                    
+                    <div class="nav-dropdown">
+                        <a href="{{ path('app_post_index') }}" class="nav-dropbtn {% if 'post' in app.request.attributes.get('_route') or 'category' in app.request.attributes.get('_route') %}active{% endif %}" style="display:flex; align-items:center; gap:4px;">
+                            Forum <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+                        </a>
+                        <div class="dropdown-menu glassmorphism">
+                            <a href="{{ path('app_post_index') }}">
+                                <i data-lucide="newspaper"></i> Forum Feed
+                            </a>
+                            <a href="{{ path('app_post_new') }}">
+                                <i data-lucide="plus-circle"></i> Create Post
+                            </a>
+                            <a href="{{ path('app_category_index') }}">
+                                <i data-lucide="tag"></i> Categories
+                            </a>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <div class="dropdown-divider"></div>
+                                <a href="{{ path('app_admin_dashboard') }}">
+                                    <i data-lucide="bar-chart-3"></i> Admin Dashboard
+                                </a>
+                                <a href="{{ path('app_admin_moderation') }}">
+                                    <i data-lucide="shield-check"></i> Moderation
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <a href="{{ path('patient_profile') }}" class="{% if 'profile' in app.request.attributes.get('_route') %}active{% endif %}">Mon profil</a>
                 </div>
 
@@ -143,6 +68,9 @@
                         <div class="avatar">{{ app.user.prenom|slice(0,1)|upper }}</div>
                         <span>{{ app.user.prenom }}</span>
                     </div>
+                    <a href="{{ path('app_logout') }}" class="btn-logout-nav" title="Deconnexion">
+                        <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+                    </a>
                 </div>
             </nav>
             {% endblock %}
@@ -663,58 +591,76 @@
         transform: scale(1.1);
     }
 
-    /* Global Navbar Integration */
-    .navbar {
-        background: #162232;
-        padding: 0 40px;
-        height: 70px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        width: 100%;
-        margin-bottom: 1.5rem;
+    /* Dropdown Styles */
+    .nav-dropdown {
+        position: relative;
+        display: inline-block;
     }
-    .navbar-logo { font-size: 20px; font-weight: 700; color: white; }
-    .navbar-logo span { color: #E8895A; }
-    .navbar-links { display: flex; gap: 24px; align-items: center; }
-    .navbar-links a {
-        color: #8899AA; text-decoration: none; font-size: 13px;
-        font-weight: 500; transition: color 0.2s; position: relative;
-    }
-    .navbar-links a::after {
-        content: ''; position: absolute; bottom: -4px; left: 0;
-        width: 0; height: 2px; background: #E8895A; transition: width 0.3s;
-    }
-    .navbar-links a:hover { color: white; }
-    .navbar-links a:hover::after, .navbar-links a.active::after { width: 100%; }
-    .navbar-links a.active { color: white; font-weight: 600; }
-    .navbar-right { display: flex; align-items: center; gap: 16px; }
-    .user-pill-nav {
-        display: flex; align-items: center; gap: 8px;
-        background: rgba(255,255,255,0.05); padding: 6px 14px;
-        border-radius: 30px; border: 1px solid rgba(255,255,255,0.08);
-    }
-    .user-pill-nav .avatar {
-        width: 28px; height: 28px; background: #E8895A;
-        border-radius: 50%; display: flex; align-items: center;
-        justify-content: center; color: white; font-size: 12px; font-weight: 700;
-    }
-    .user-pill-nav span { font-size: 12px; color: #CBD5E0; font-weight: 600; }
-    .btn-logout-nav {
-        padding: 6px 14px; background: rgba(231,76,60,0.15); color: #e74c3c;
-        border-radius: 8px; text-decoration: none; font-size: 12px;
-        font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
-    }
-    .btn-logout-nav:hover { background: rgba(231,76,60,0.3); }
 
-    .top-bar-search {
-        flex: 1;
-        max-width: 400px;
-        margin: 0 2rem;
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 220px;
+        background: rgba(22, 34, 50, 0.95);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 0.8rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        z-index: 1000;
+        margin-top: 10px;
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+        display: block;
+        animation: slideInDown 0.2s ease forwards;
+    }
+
+    .dropdown-menu a {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        padding: 0.8rem 1rem !important;
+        color: var(--text-subtle) !important;
+        text-decoration: none;
+        font-size: 0.9rem !important;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+    .dropdown-menu a:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white !important;
+        transform: translateX(5px);
+    }
+
+    .dropdown-menu a i {
+        width: 16px;
+        height: 16px;
+        color: var(--primary-color);
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.05);
+        margin: 0.6rem 0.5rem;
+    }
+
+    @keyframes slideInDown {
+        from { opacity: 0; transform: translate(-50%, -10px); }
+        to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* Main Content Full Width */
+    .main-content {
+        padding: 0 2rem 2rem !important;
+    }
+
+    .content-container {
+        max-width: 1200px !important;
     }
 </style>
 
