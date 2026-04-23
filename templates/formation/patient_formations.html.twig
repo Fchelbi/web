@@ -192,9 +192,15 @@
           {# ── FIX 1: use rec.id (not formation.id which was the outer loop var)   ── #}
           {# ── FIX 2: plain submit button — enrollWithTouchID() was never defined  ── #}
           {% if rec.id not in enrolledIds %}
-            <form method="post" action="{{ path('app_formation_enroll', {'id': rec.id}) }}" style="flex:1">
+            <form method="post"
+                  action="{{ path('app_formation_enroll', {'id': rec.id}) }}"
+                  style="flex:1"
+                  id="enrollForm{{ rec.id }}">
               <input type="hidden" name="_token" value="{{ csrf_token('enroll' ~ rec.id) }}">
-              <button type="submit" class="btn-enroll" style="width:100%">🎯 S'inscrire</button>
+              <button type="button" class="btn-enroll" style="width:100%"
+                      onclick="enrollWithTouchID({{ rec.id }})">
+                🔐 S'inscrire
+              </button>
             </form>
           {% else %}
             <div class="btn-enrolled" style="flex:1">✓ Déjà inscrit</div>
@@ -237,15 +243,12 @@
           {% if isEnrolled %}
             <div class="btn-enrolled">✓ Déjà inscrit</div>
           {% else %}
-            {# Touch ID protected enrollment form #}
             <form method="post"
                   action="{{ path('app_formation_enroll', {'id': formation.id}) }}"
                   style="flex:1"
                   id="enrollForm{{ formation.id }}">
               <input type="hidden" name="_token" value="{{ csrf_token('enroll' ~ formation.id) }}">
-              <button type="button"
-                      class="btn-enroll"
-                      style="width:100%"
+              <button type="button" class="btn-enroll" style="width:100%"
                       onclick="enrollWithTouchID({{ formation.id }})">
                 🔐 S'inscrire
               </button>
@@ -253,26 +256,6 @@
           {% endif %}
           <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-view">Voir</a>
         </div>
-
-{# ── 2. ALSO replace the AI recommendations enroll button (uses rec.id) ── #}
-
-          {% if rec.id not in enrolledIds %}
-            <form method="post"
-                  action="{{ path('app_formation_enroll', {'id': rec.id}) }}"
-                  style="flex:1"
-                  id="enrollForm{{ rec.id }}">
-              <input type="hidden" name="_token" value="{{ csrf_token('enroll' ~ rec.id) }}">
-              <button type="button"
-                      class="btn-enroll"
-                      style="width:100%"
-                      onclick="enrollWithTouchID({{ rec.id }})">
-                🔐 S'inscrire
-              </button>
-            </form>
-          {% else %}
-            <div class="btn-enrolled" style="flex:1">✓ Déjà inscrit</div>
-          {% endif %}
-
       </div>
     </div>
     {% else %}
@@ -317,11 +300,8 @@ let activeSearch='',activeCat='';
 function applyFilters(){let v=0;document.querySelectorAll('#formationsGrid .formation-card').forEach(c=>{const mS=!activeSearch||(c.dataset.title||'').includes(activeSearch)||(c.dataset.desc||'').includes(activeSearch);const mC=!activeCat||(c.dataset.cat||'')===activeCat;const show=mS&&mC;c.classList.toggle('hidden',!show);if(show)v++;});const msg=document.getElementById('noCardsMsg');if(msg)msg.style.display=v===0?'block':'none';const cnt=document.getElementById('visibleCount');if(cnt)cnt.textContent=v+' formation'+(v!==1?'s':'');}
 document.getElementById('searchInput').addEventListener('input',function(){activeSearch=this.value.toLowerCase().trim();applyFilters();});
 function filterBy(cat,btn){activeCat=cat.toLowerCase();document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');applyFilters();}
-</script>
 
-<script>
 async function enrollWithTouchID(formationId) {
-  // Touch ID via WebAuthn
   if (window.PublicKeyCredential) {
     try {
       const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
@@ -332,26 +312,14 @@ async function enrollWithTouchID(formationId) {
           publicKey: {
             challenge,
             rp: { name: 'EchoCare', id: 'localhost' },
-            user: {
-              id: new Uint8Array(16),
-              name: 'echocare-user',
-              displayName: 'EchoCare Patient'
-            },
-            pubKeyCredParams: [
-              { alg: -7,   type: 'public-key' },
-              { alg: -257, type: 'public-key' }
-            ],
-            authenticatorSelection: {
-              authenticatorAttachment: 'platform',
-              userVerification: 'required',
-              residentKey: 'discouraged'
-            },
+            user: { id: new Uint8Array(16), name: 'echocare-user', displayName: 'EchoCare Patient' },
+            pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+            authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
             timeout: 60000,
             attestation: 'none'
           }
         });
         if (credential) {
-          // Authenticated — submit the form
           document.getElementById('enrollForm' + formationId).submit();
         }
         return;
@@ -361,15 +329,10 @@ async function enrollWithTouchID(formationId) {
         alert('❌ Touch ID annulé. Inscription refusée.');
         return;
       }
-      // Touch ID has a technical error — offer fallback
-      if (!confirm('Touch ID non disponible. Voulez-vous continuer sans authentification biométrique ?')) {
-        return;
-      }
+      if (!confirm('Touch ID non disponible. Continuer sans authentification biométrique ?')) return;
     }
   }
-  // WebAuthn not supported at all — submit directly
   document.getElementById('enrollForm' + formationId).submit();
 }
 </script>
-
 {% endblock %}
