@@ -48,6 +48,11 @@
 <div class="page-wrap">
   <a href="{{ path('app_formation_index') }}" class="back-link">← Retour aux formations</a>
   {% for message in app.flashes('success') %}<div class="flash flash-success">✅ {{ message }}</div>{% endfor %}
+  {% for message in app.flashes('error') %}
+  <div class="flash" style="background:var(--red-pale);color:var(--red);border:1px solid rgba(239,68,68,.2);padding:14px 20px;border-radius:10px;margin-bottom:20px;font-weight:600;display:flex;align-items:center;gap:8px">
+    ❌ {{ message }}
+  </div>
+{% endfor %}
 
   <div class="card">
     <div class="card-header">

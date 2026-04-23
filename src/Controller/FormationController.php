@@ -36,7 +36,7 @@ final class FormationController extends AbstractController
     // =========================================================================
     private function getUserRole(): string
     {
-        return 'Admin'; // ← change to 'Coach' or 'Patient' to test
+        return 'Patient'; // ← change to 'Coach' or 'Patient' to test
         // TODO: return $this->getUser()->getRole();
     }
 
@@ -242,8 +242,7 @@ public function show(
         : null;
 
     // ✅ IMPORTANT: use current host (IP or localhost)
-    $host = $request->getSchemeAndHttpHost();
-
+     $host = 'http://192.168.1.160:8000';
     $formationUrl = $host . $this->generateUrl(
         'app_formation_show',
         ['id' => $formation->getId()]
@@ -463,11 +462,10 @@ public function manageQuiz(
     $videoUrl = $formation->getVideoUrl();
     $embedUrl = $videoUrl ? $this->normalizeYoutubeUrl($videoUrl) : null;  // ← always defined
 
-    $formationUrl = $this->generateUrl(
-        'app_formation_show',
-        ['id' => $formation->getId()],
-        \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
-    );
+    $formationUrl = 'http://192.168.1.160:8000' . $this->generateUrl(
+    'app_formation_show',
+    ['id' => $formation->getId()]
+);
     $qrCode = $qrCodeService->generateBase64($formationUrl, 180);
 
     return $this->render('formation/quiz.html.twig', [

@@ -108,7 +108,7 @@
 
               {% for reponse in question.reponses %}
               <label class="answer-option" onclick="selectOption(this)">
-              <input type="radio" name="answers[{{ question.id }}]" value="{{ reponse.id }}">
+              <input type="radio" name="question_{{ question.id }}" value="{{ reponse.id }}">
 
                 {{ reponse.optionText }}
               </label>
