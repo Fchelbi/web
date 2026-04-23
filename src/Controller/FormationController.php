@@ -22,6 +22,7 @@ use Knp\Component\Pager\PaginatorInterface;
 use App\Service\QrCodeService;
 use App\Service\WeatherService;
 use App\Service\TranslateService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/formation')]
 final class FormationController extends AbstractController
@@ -221,38 +222,44 @@ final class FormationController extends AbstractController
     // =========================================================================
     // SHOW  ← role-aware: Admin | Coach | Patient
     // =========================================================================
-    #[Route('/{id}', name: 'app_formation_show', methods: ['GET'])]
-    public function show(
-        Formation $formation,
-        EntityManagerInterface $entityManager,
-        QrCodeService $qrCodeService
-    ): Response {
-        $role = $this->getUserRole(); // ← uses the single helper above
+    
 
-        $coach     = $entityManager->getRepository(\App\Entity\User::class)->find($formation->getCoachId());
-        $coachName = $coach ? $coach->getNom() . ' ' . $coach->getPrenom() : 'Inconnu';
-        $quiz      = $entityManager->getRepository(\App\Entity\Quiz::class)->findOneBy(['formation_id' => $formation]);
+#[Route('/{id}', name: 'app_formation_show', methods: ['GET'])]
+public function show(
+    Formation $formation,
+    EntityManagerInterface $entityManager,
+    QrCodeService $qrCodeService,
+    Request $request // ✅ ADD THIS
+): Response {
+    $role = $this->getUserRole();
 
-        $embedUrl = $formation->getVideoUrl()
-            ? $this->normalizeYoutubeUrl($formation->getVideoUrl())
-            : null;
+    $coach     = $entityManager->getRepository(\App\Entity\User::class)->find($formation->getCoachId());
+    $coachName = $coach ? $coach->getNom() . ' ' . $coach->getPrenom() : 'Inconnu';
+    $quiz      = $entityManager->getRepository(\App\Entity\Quiz::class)->findOneBy(['formation_id' => $formation]);
 
-        $formationUrl = $this->generateUrl(
-            'app_formation_show',
-            ['id' => $formation->getId()],
-            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
-        );
-        $qrCode = $qrCodeService->generateBase64($formationUrl, 180);
+    $embedUrl = $formation->getVideoUrl()
+        ? $this->normalizeYoutubeUrl($formation->getVideoUrl())
+        : null;
 
-        return $this->render('formation/show.html.twig', [
-            'formation' => $formation,
-            'coachName' => $coachName,
-            'quiz'      => $quiz,
-            'embedUrl'  => $embedUrl,
-            'qrCode'    => $qrCode,
-            'role'      => $role, // ← tells the template which view to render
-        ]);
-    }
+    // ✅ IMPORTANT: use current host (IP or localhost)
+    $host = $request->getSchemeAndHttpHost();
+
+    $formationUrl = $host . $this->generateUrl(
+        'app_formation_show',
+        ['id' => $formation->getId()]
+    );
+
+    $qrCode = $qrCodeService->generateBase64($formationUrl, 180);
+
+    return $this->render('formation/show.html.twig', [
+        'formation' => $formation,
+        'coachName' => $coachName,
+        'quiz'      => $quiz,
+        'embedUrl'  => $embedUrl,
+        'qrCode'    => $qrCode,
+        'role'      => $role,
+    ]);
+}
 
     // =========================================================================
     // YOUTUBE SEARCH (AJAX)
@@ -596,4 +603,32 @@ public function manageQuiz(
 
         return $url;
     }
+    #[Route('/{id}/chat', name: 'app_formation_chat', methods: ['POST'], priority: 15)]
+    public function chat(
+        Formation $formation,
+        \Symfony\Component\HttpFoundation\Request $request,
+        \App\Service\GeminiService $geminiService
+    ): \Symfony\Component\HttpFoundation\JsonResponse {
+        $body    = json_decode($request->getContent(), true);
+        $message = trim($body['message'] ?? '');
+        $history = $body['history'] ?? [];
+ 
+        if (!$message) {
+            return $this->json(['reply' => 'Veuillez écrire un message.']);
+        }
+ 
+        $reply = $geminiService->chatAboutFormation(
+            $formation->getTitle(),
+            $formation->getDescription(),
+            $formation->getCategory(),
+            $message,
+            $history
+        );
+ 
+        return $this->json([
+            'reply' => $reply ?? 'Je ne peux pas répondre pour le moment. Réessayez.',
+        ]);
+    }
+    
+    
 }

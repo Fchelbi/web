@@ -202,6 +202,105 @@
           </div>
         </div>
 
+        {# ── AI Chatbot (Patient only) ── #}
+        <div style="margin-top:28px;border-top:2px solid var(--gray-200);padding-top:24px">
+          <div class="section-label">🤖 Assistant IA — Posez vos questions</div>
+          <div style="background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(56,189,248,.04));border:1.5px solid rgba(167,139,250,.15);border-radius:12px;overflow:hidden">
+
+            {# Chat messages area #}
+            <div id="chatMessages" style="padding:18px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+              <div style="align-self:flex-start;background:#fff;border:1px solid var(--gray-200);border-radius:12px 12px 12px 4px;padding:12px 16px;max-width:85%;font-size:13px;line-height:1.6;color:var(--gray-700)">
+                👋 Bonjour ! Je suis votre assistant pour la formation <strong>{{ formation.title }}</strong>. Posez-moi vos questions !
+              </div>
+            </div>
+
+            {# Input area #}
+            <div style="border-top:1px solid rgba(167,139,250,.15);padding:14px 18px;display:flex;gap:10px;background:rgba(255,255,255,.5)">
+              <input type="text" id="chatInput"
+                placeholder="Ex: De quoi parle cette formation ?"
+                style="flex:1;padding:10px 16px;border:1.5px solid var(--gray-200);border-radius:10px;font-family:inherit;font-size:13px;outline:none;transition:.2s"
+                onfocus="this.style.borderColor='#a78bfa'"
+                onblur="this.style.borderColor='#eef2f7'"
+                onkeydown="if(event.key==='Enter')sendChat()">
+              <button onclick="sendChat()" id="chatSendBtn"
+                style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s;white-space:nowrap">
+                Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <script>
+        var chatHistory = [];
+        var formationId  = {{ formation.id }};
+        var chatMessages = document.getElementById('chatMessages');
+
+        function appendMsg(text, isUser) {
+          var div = document.createElement('div');
+          div.style.cssText = isUser
+            ? 'align-self:flex-end;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border-radius:12px 12px 4px 12px;padding:10px 16px;max-width:85%;font-size:13px;line-height:1.6'
+            : 'align-self:flex-start;background:#fff;border:1px solid #eef2f7;border-radius:12px 12px 12px 4px;padding:12px 16px;max-width:85%;font-size:13px;line-height:1.6;color:#374151';
+          div.textContent = text;
+          chatMessages.appendChild(div);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendTyping() {
+          var div = document.createElement('div');
+          div.id = 'typingIndicator';
+          div.style.cssText = 'align-self:flex-start;background:#fff;border:1px solid #eef2f7;border-radius:12px 12px 12px 4px;padding:10px 16px;font-size:13px;color:#94a3b8';
+          div.textContent = '⏳ L\'IA réfléchit…';
+          chatMessages.appendChild(div);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+          var el = document.getElementById('typingIndicator');
+          if (el) el.remove();
+        }
+
+        async function sendChat() {
+          var input = document.getElementById('chatInput');
+          var btn   = document.getElementById('chatSendBtn');
+          var msg   = input.value.trim();
+          if (!msg) return;
+
+          input.value = '';
+          btn.disabled = true;
+          btn.textContent = '…';
+
+          appendMsg(msg, true);
+          appendTyping();
+
+          try {
+            var resp = await fetch('/formation/' + formationId + '/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: msg, history: chatHistory })
+            });
+            var data = await resp.json();
+            removeTyping();
+
+            var reply = data.reply || '❌ Pas de réponse.';
+            appendMsg(reply, false);
+
+            chatHistory.push({ role: 'user',      text: msg   });
+            chatHistory.push({ role: 'assistant',  text: reply });
+
+            // Keep history short (last 6 messages)
+            if (chatHistory.length > 6) chatHistory = chatHistory.slice(-6);
+
+          } catch(e) {
+            removeTyping();
+            appendMsg('❌ Erreur de connexion. Réessayez.', false);
+          }
+
+          btn.disabled = false;
+          btn.textContent = 'Envoyer';
+        }
+        </script>
+
+
         {# Feedback + Certificate #}
         <div style="margin-top:28px;border-top:2px solid var(--gray-200);padding-top:28px">
           <div class="section-label">💬 Laisser un avis</div>

@@ -35,7 +35,7 @@ Règles :
 - Niveau adapté à des patients (pas trop technique)
 - Chaque question vaut 1 point
 
-Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans backticks, sous ce format exact :
+Réponds UNIQUEMENT avec un tableau JSON valide, sans markdown, sans backticks, sous ce format exact :
 [
   {
     "question": "Texte de la question ?",
@@ -51,14 +51,16 @@ Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans backticks, sous ce 
 PROMPT;
 
         $text = $this->callAI($prompt);
-        if (!$text) return null;
+        if (!$text) {
+            error_log('[GeminiService] callAI returned null for generateQuizQuestions');
+            return null;
+        }
 
-        // Clean markdown fences
-        $text = preg_replace('/^```(?:json)?\s*/', '', trim($text));
-        $text = preg_replace('/\s*```$/', '', $text);
-
-        $questions = json_decode($text, true);
-        if (!is_array($questions) || empty($questions)) return null;
+        $questions = $this->extractJsonArray($text);
+        if (!$questions) {
+            error_log('[GeminiService] JSON parse failed. Raw response: ' . substr($text, 0, 500));
+            return null;
+        }
 
         return $questions;
     }
@@ -76,7 +78,7 @@ Tu es un analyseur de sentiments pour une plateforme de santé EchoCare.
 Analyse le sentiment du feedback patient suivant :
 "{$escaped}"
 
-Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans backticks :
+Réponds UNIQUEMENT avec un objet JSON valide, sans markdown, sans backticks :
 {
   "sentiment": "positive",
   "confidence": 0.85,
@@ -89,11 +91,8 @@ PROMPT;
         $text = $this->callAI($prompt, 0.3, 256);
         if (!$text) return null;
 
-        $text = preg_replace('/^```(?:json)?\s*/', '', trim($text));
-        $text = preg_replace('/\s*```$/', '', $text);
-
-        $result = json_decode($text, true);
-        if (!is_array($result) || !isset($result['sentiment'])) return null;
+        $result = $this->extractJsonObject($text);
+        if (!$result || !isset($result['sentiment'])) return null;
 
         return $result;
     }
@@ -117,12 +116,10 @@ PROMPT;
             . "Réponds en français, sois concis (3-4 phrases max), reste dans le contexte de la formation. "
             . "Sois encourageant et bienveillant. Ne fournis jamais de diagnostic médical.";
 
-        // Build messages array for OpenRouter
         $messages = [
             ['role' => 'system', 'content' => $systemPrompt],
         ];
 
-        // Add history
         foreach ($history as $msg) {
             $messages[] = [
                 'role'    => $msg['role'] === 'user' ? 'user' : 'assistant',
@@ -130,36 +127,100 @@ PROMPT;
             ];
         }
 
-        // Add current message
         $messages[] = ['role' => 'user', 'content' => $userMessage];
 
         return $this->callAIChat($messages);
     }
 
-    /**
-     * Call OpenRouter API with a single prompt.
-     */
-    private function callAI(string $prompt, float $temperature = 0.7, int $maxTokens = 2048): ?string
-    {
-        $messages = [
-            ['role' => 'user', 'content' => $prompt],
-        ];
+    // =========================================================================
+    // PRIVATE HELPERS
+    // =========================================================================
 
-        return $this->callAIChat($messages, $temperature, $maxTokens);
+    /**
+     * Extract a JSON array from a string that may contain markdown fences,
+     * extra text before/after the array, or thinking tags.
+     */
+    private function extractJsonArray(string $text): ?array
+    {
+        // Strip <think>...</think> blocks (some models include these)
+        $text = preg_replace('/<think>.*?<\/think>/s', '', $text);
+
+        // Strip markdown fences
+        $text = preg_replace('/```(?:json)?\s*/i', '', $text);
+        $text = preg_replace('/```/', '', $text);
+        $text = trim($text);
+
+        // Try direct decode first
+        $decoded = json_decode($text, true);
+        if (is_array($decoded) && !empty($decoded)) {
+            return $decoded;
+        }
+
+        // Find the first [ ... ] block in the text
+        $start = strpos($text, '[');
+        $end   = strrpos($text, ']');
+        if ($start !== false && $end !== false && $end > $start) {
+            $json    = substr($text, $start, $end - $start + 1);
+            $decoded = json_decode($json, true);
+            if (is_array($decoded) && !empty($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Call OpenRouter API with messages array.
-     * Uses free models: google/gemini-2.0-flash-exp:free or meta-llama/llama-3.1-8b-instruct:free
+     * Extract a JSON object from a string that may contain extra text.
+     */
+    private function extractJsonObject(string $text): ?array
+    {
+        $text = preg_replace('/<think>.*?<\/think>/s', '', $text);
+        $text = preg_replace('/```(?:json)?\s*/i', '', $text);
+        $text = preg_replace('/```/', '', $text);
+        $text = trim($text);
+
+        $decoded = json_decode($text, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        $start = strpos($text, '{');
+        $end   = strrpos($text, '}');
+        if ($start !== false && $end !== false && $end > $start) {
+            $json    = substr($text, $start, $end - $start + 1);
+            $decoded = json_decode($json, true);
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Call API with a single user prompt.
+     */
+    private function callAI(string $prompt, float $temperature = 0.7, int $maxTokens = 2048): ?string
+    {
+        return $this->callAIChat(
+            [['role' => 'user', 'content' => $prompt]],
+            $temperature,
+            $maxTokens
+        );
+    }
+
+    /**
+     * Call OpenRouter API — tries multiple free models in order until one works.
      */
     private function callAIChat(array $messages, float $temperature = 0.7, int $maxTokens = 2048): ?string
     {
-        // Try multiple free models in order
         $models = [
-            'google/gemini-2.0-flash-exp:free',
+            'meta-llama/llama-3.1-8b-instruct:free',
             'meta-llama/llama-4-scout:free',
             'deepseek/deepseek-chat-v3-0324:free',
             'qwen/qwen3-8b:free',
+            'mistralai/mistral-7b-instruct:free',
         ];
 
         foreach ($models as $model) {
@@ -177,21 +238,30 @@ PROMPT;
                         'temperature' => $temperature,
                         'max_tokens'  => $maxTokens,
                     ],
+                    'timeout' => 30,
                 ]);
 
                 $data = $response->toArray();
 
+                // Check for API-level error
+                if (isset($data['error'])) {
+                    error_log("[GeminiService] Model {$model} error: " . json_encode($data['error']));
+                    continue;
+                }
+
                 $text = $data['choices'][0]['message']['content'] ?? null;
                 if ($text) {
+                    error_log("[GeminiService] Success with model: {$model}");
                     return $text;
                 }
 
             } catch (\Exception $e) {
-                // Try next model
+                error_log("[GeminiService] Model {$model} exception: " . $e->getMessage());
                 continue;
             }
         }
 
+        error_log('[GeminiService] All models failed.');
         return null;
     }
 }
