@@ -36,7 +36,7 @@ final class FormationController extends AbstractController
     // =========================================================================
     private function getUserRole(): string
     {
-        return 'Patient'; // ← change to 'Coach' or 'Patient' to test
+        return 'Admin'; // ← change to 'Coach' or 'Patient' to test
         // TODO: return $this->getUser()->getRole();
     }
 

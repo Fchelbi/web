@@ -215,53 +215,35 @@ PROMPT;
      */
     private function callAIChat(array $messages, float $temperature = 0.7, int $maxTokens = 2048): ?string
     {
-        $models = [
-            'meta-llama/llama-3.1-8b-instruct:free',
-            'meta-llama/llama-4-scout:free',
-            'deepseek/deepseek-chat-v3-0324:free',
-            'qwen/qwen3-8b:free',
-            'mistralai/mistral-7b-instruct:free',
-        ];
+        try {
+            $response = $this->httpClient->request('POST', 'https://openrouter.ai/api/v1/chat/completions', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->apiKey,
+                    'Content-Type'  => 'application/json',
+                    'HTTP-Referer'  => 'https://echocare.local',
+                    'X-Title'       => 'EchoCare',
+                ],
+                'json' => [
+                    'model'       => 'openrouter/auto',
+                    'messages'    => $messages,
+                    'temperature' => $temperature,
+                    'max_tokens'  => $maxTokens,
+                ],
+                'timeout' => 30,
+            ]);
 
-        foreach ($models as $model) {
-            try {
-                $response = $this->httpClient->request('POST', 'https://openrouter.ai/api/v1/chat/completions', [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->apiKey,
-                        'Content-Type'  => 'application/json',
-                        'HTTP-Referer'  => 'https://echocare.local',
-                        'X-Title'       => 'EchoCare',
-                    ],
-                    'json' => [
-                        'model'       => $model,
-                        'messages'    => $messages,
-                        'temperature' => $temperature,
-                        'max_tokens'  => $maxTokens,
-                    ],
-                    'timeout' => 30,
-                ]);
+            $data = $response->toArray();
 
-                $data = $response->toArray();
-
-                // Check for API-level error
-                if (isset($data['error'])) {
-                    error_log("[GeminiService] Model {$model} error: " . json_encode($data['error']));
-                    continue;
-                }
-
-                $text = $data['choices'][0]['message']['content'] ?? null;
-                if ($text) {
-                    error_log("[GeminiService] Success with model: {$model}");
-                    return $text;
-                }
-
-            } catch (\Exception $e) {
-                error_log("[GeminiService] Model {$model} exception: " . $e->getMessage());
-                continue;
+            if (isset($data['error'])) {
+                error_log('[GeminiService] API error: ' . json_encode($data['error']));
+                return null;
             }
-        }
 
-        error_log('[GeminiService] All models failed.');
-        return null;
+            return $data['choices'][0]['message']['content'] ?? null;
+
+        } catch (\Exception $e) {
+            error_log('[GeminiService] Exception: ' . $e->getMessage());
+            return null;
+        }
     }
 }
