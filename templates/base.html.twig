@@ -89,6 +89,17 @@ async function requireTouchID(actionName) {
 }
 </script>
     <body>
-        {% block body %}{% endblock %}
+        {% block body %}
+        <script>
+async function enrollWithTouchID(formationId) {
+  var authenticated = await requireTouchID('Inscription formation #' + formationId);
+  if (authenticated) {
+    document.getElementById('enrollForm' + formationId).submit();
+  } else {
+    alert('❌ Authentification Touch ID requise pour s\'inscrire.');
+  }
+}
+</script>
+        {% endblock %}
     </body>
 </html>

@@ -3,36 +3,77 @@
 {% block body %}
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  :root{
+    --blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;
+    --orange:#f4845f;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;
+    --gray-400:#94a3b8;--gray-700:#374151;
+    --emerald:#34d399;--emerald-pale:rgba(52,211,153,.1);
+    --radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)
+  }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px 20px}
   .page-wrap{max-width:760px;margin:0 auto}
   .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--blue-light);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:24px}
+  .back-link:hover{opacity:.75}
+
+  /* Header card */
   .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px}
-  .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:28px 30px}
-  .card-header small{color:rgba(255,255,255,.6);font-size:13px;display:block;margin-bottom:4px}
-  .card-title{font-size:24px;font-weight:800;color:#fff}
+  .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:24px 30px}
+  .card-header small{color:rgba(255,255,255,.6);font-size:13px}
+  .card-title{font-size:22px;font-weight:800;color:#fff;margin-top:4px}
   .card-body{padding:30px}
-  .progress-bar{background:var(--gray-200);border-radius:20px;height:8px;margin-bottom:24px;overflow:hidden}
-  .progress-fill{height:100%;background:var(--blue-light);border-radius:20px;transition:width .3s}
-  .progress-text{font-size:12px;color:var(--gray-400);text-align:right;margin-bottom:10px}
-  .question-block{border:1.5px solid var(--gray-200);border-radius:12px;padding:24px;margin-bottom:20px;transition:.2s}
-  .question-block.answered{border-color:var(--blue-light);background:rgba(45,125,210,.02)}
-  .q-number{font-size:12px;font-weight:700;color:var(--blue-light);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
-  .q-text{font-size:16px;font-weight:700;color:var(--blue-dark);margin-bottom:16px;line-height:1.5}
-  .option-label{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:.15s;font-size:14px}
-  .option-label:hover{border-color:var(--blue-light);background:var(--blue-pale)}
-  .option-label input{accent-color:var(--blue-light);width:18px;height:18px;cursor:pointer}
-  .option-label.selected{border-color:var(--blue-light);background:var(--blue-pale);font-weight:600}
-  .form-actions{display:flex;gap:12px;padding-top:20px;border-top:1px solid var(--gray-200)}
-  .btn-submit{flex:1;background:linear-gradient(135deg,var(--orange),#e06d47);color:#fff;border:none;border-radius:10px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 4px 14px rgba(244,132,95,.4)}
-  .btn-submit:hover{transform:translateY(-2px)}
-  .btn-cancel{background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;padding:14px 22px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;text-align:center;transition:.2s}
-  .btn-cancel:hover{background:var(--gray-200)}
+
+  /* Progress bar */
+  .progress-wrap{margin-bottom:28px}
+  .progress-label{display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--gray-400);margin-bottom:8px}
+  .progress-bar{height:6px;background:var(--gray-200);border-radius:99px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--blue-light),#34d399);border-radius:99px;transition:width .4s ease}
+
+  /* Info pills */
+  .info-row{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap}
+  .info-pill{background:var(--blue-pale);color:var(--blue-light);border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600}
+
+  /* Question card */
+  .question-block{display:none}
+  .question-block.active{display:block}
+  .question-card{background:var(--gray-100);border-radius:12px;padding:24px;margin-bottom:20px;border:1.5px solid var(--gray-200)}
+  .q-number{font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .q-text{font-size:16px;font-weight:700;color:var(--blue-dark);margin-bottom:20px;line-height:1.5}
+
+  /* Answer options — radio styled as cards */
+  .answer-option{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:10px;border:1.5px solid var(--gray-200);background:#fff;margin-bottom:10px;cursor:pointer;transition:all .2s;font-size:14px;font-weight:500;color:var(--gray-700)}
+  .answer-option:hover{border-color:var(--blue-light);background:var(--blue-pale)}
+  .answer-option input[type=radio]{width:18px;height:18px;accent-color:var(--blue-light);flex-shrink:0;cursor:pointer}
+  .answer-option.selected{border-color:var(--blue-light);background:var(--blue-pale);color:var(--blue-dark);font-weight:600}
+
+  /* Navigation buttons */
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px}
+  .btn{border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:6px;font-family:inherit}
+  .btn-prev{background:var(--gray-200);color:var(--gray-700)}.btn-prev:hover{background:#d1d5db}
+  .btn-next{background:linear-gradient(135deg,var(--blue-light),#1a5a9e);color:#fff;box-shadow:0 4px 12px rgba(45,125,210,.25)}.btn-next:hover{transform:translateY(-2px)}
+  .btn-submit{background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;box-shadow:0 4px 12px rgba(52,211,153,.3)}.btn-submit:hover{transform:translateY(-2px)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+  /* Result screen */
+  #resultScreen{display:none;text-align:center;padding:40px 30px}
+  .result-emoji{font-size:64px;margin-bottom:16px}
+  .result-score{font-size:48px;font-weight:800;color:var(--blue-dark);margin-bottom:8px}
+  .result-label{font-size:16px;color:var(--gray-400);margin-bottom:24px}
+  .result-badge{display:inline-flex;align-items:center;gap:8px;border-radius:24px;padding:10px 24px;font-size:15px;font-weight:700;margin-bottom:28px}
+  .badge-pass{background:var(--emerald-pale);color:var(--emerald);border:1px solid rgba(52,211,153,.2)}
+  .badge-fail{background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.15)}
+  .result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn-cert{background:linear-gradient(135deg,#34d399,#059669);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(52,211,153,.3)}
+  .btn-back{background:var(--blue-pale);color:var(--blue-light);border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer;font-family:inherit}
+
+  .flash{padding:14px 20px;border-radius:10px;margin-bottom:20px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+  .flash-error{background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.15)}
 </style>
 
 <div class="page-wrap">
   <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="back-link">← Retour à la formation</a>
+
+  {% for message in app.flashes('error') %}<div class="flash flash-error">❌ {{ message }}</div>{% endfor %}
 
   <div class="card">
     <div class="card-header">
@@ -40,60 +81,130 @@
       <div class="card-title">📝 {{ quiz.title }}</div>
     </div>
     <div class="card-body">
-      <div class="progress-text" id="progressText">0 / {{ quiz.questions|length }} répondues</div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 
-      <form method="post" action="{{ path('app_quiz_submit', {'id': formation.id}) }}" id="quizForm">
-        {% for question in quiz.questions %}
-          <div class="question-block" id="qblock_{{ question.id }}">
-            <div class="q-number">Question {{ loop.index }} — {{ question.points }} pt{{ question.points > 1 ? 's' : '' }}</div>
-            <div class="q-text">{{ question.questionText }}</div>
+      {# ── Quiz form (questions) ── #}
+      <div id="quizScreen">
+        <div class="info-row">
+          <div class="info-pill">📝 {{ quiz.questions|length }} question{{ quiz.questions|length > 1 ? 's' : '' }}</div>
+          <div class="info-pill">🎯 Score requis : {{ quiz.passingScore }}%</div>
+        </div>
 
-            {% for reponse in question.reponses %}
-              <label class="option-label" id="opt_{{ reponse.id }}">
-                <input type="radio"
-                       name="question_{{ question.id }}"
-                       value="{{ reponse.id }}"
-                       onchange="markAnswered({{ question.id }}, {{ reponse.id }})">
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="progressText">Question 1 / {{ quiz.questions|length }}</span>
+            <span id="progressPercent">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        </div>
+
+        <form id="quizForm" method="post" action="{{ path('app_quiz_submit', {'id': formation.id}) }}">
+          <input type="hidden" name="_token" value="{{ csrf_token('quiz_submit_' ~ quiz.id) }}">
+
+          {% for question in quiz.questions %}
+          <div class="question-block {% if loop.first %}active{% endif %}" data-index="{{ loop.index0 }}">
+            <div class="question-card">
+              <div class="q-number">Question {{ loop.index }} sur {{ quiz.questions|length }}</div>
+              <div class="q-text">{{ question.questionText }}</div>
+
+              {% for reponse in question.reponses %}
+              <label class="answer-option" onclick="selectOption(this)">
+              <input type="radio" name="answers[{{ question.id }}]" value="{{ reponse.id }}">
+
                 {{ reponse.optionText }}
               </label>
-            {% endfor %}
-          </div>
-        {% endfor %}
+              {% endfor %}
+            </div>
 
-        <div class="form-actions">
-          <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-cancel">Annuler</a>
-          <button type="submit" class="btn-submit" id="submitBtn">📩 Soumettre le Quiz</button>
+            <div class="nav-row">
+              {% if not loop.first %}
+                <button type="button" class="btn btn-prev" onclick="goTo({{ loop.index0 - 1 }})">← Précédent</button>
+              {% else %}
+                <span></span>
+              {% endif %}
+
+              {% if not loop.last %}
+                <button type="button" class="btn btn-next" id="nextBtn{{ loop.index0 }}" onclick="nextQuestion({{ loop.index0 }})" disabled>
+                  Suivant →
+                </button>
+              {% else %}
+                <button type="submit" class="btn btn-submit" id="submitBtn" disabled>
+                  ✅ Terminer le Quiz
+                </button>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+
+        </form>
+      </div>
+
+      {# ── Result screen (shown after JS grading or server redirect) ── #}
+      <div id="resultScreen">
+        <div class="result-emoji" id="resultEmoji">🎉</div>
+        <div class="result-score" id="resultScore">—</div>
+        <div class="result-label">votre score</div>
+        <div class="result-badge" id="resultBadge"></div>
+        <div class="result-actions">
+          <a href="{{ path('app_formation_certificate', {'id': formation.id}) }}" class="btn-cert" id="certBtn" style="display:none">🏆 Télécharger Certificat</a>
+          <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-back">← Retour à la formation</a>
         </div>
-      </form>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script>
 const totalQuestions = {{ quiz.questions|length }};
-let answered = new Set();
+let current = 0;
+const answered = {};
 
-function markAnswered(qId, rId) {
-  answered.add(qId);
-  // Highlight the question block
-  const block = document.getElementById('qblock_' + qId);
-  if (block) block.classList.add('answered');
+function selectOption(label) {
+  const block = label.closest('.question-block');
+  block.querySelectorAll('.answer-option').forEach(l => l.classList.remove('selected'));
+  label.classList.add('selected');
 
-  // Highlight selected option
-  block.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
-  document.getElementById('opt_' + rId).classList.add('selected');
+  const idx = parseInt(block.dataset.index);
+  answered[idx] = true;
 
-  // Update progress
-  const pct = Math.round((answered.size / totalQuestions) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = answered.size + ' / ' + totalQuestions + ' répondues';
+  const nextBtn = document.getElementById('nextBtn' + idx);
+  const submitBtn = document.getElementById('submitBtn');
+  if (nextBtn) nextBtn.disabled = false;
+  if (submitBtn && idx === totalQuestions - 1) submitBtn.disabled = false;
+
+  updateProgress();
 }
 
+function goTo(index) {
+  document.querySelectorAll('.question-block').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.question-block')[index].classList.add('active');
+  current = index;
+  updateProgress();
+}
+
+function nextQuestion(currentIdx) {
+  if (!answered[currentIdx]) return;
+  goTo(currentIdx + 1);
+}
+
+function updateProgress() {
+  const answeredCount = Object.keys(answered).length;
+  const pct = Math.round((answeredCount / totalQuestions) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPercent').textContent = pct + '%';
+  document.getElementById('progressText').textContent =
+    'Question ' + (current + 1) + ' / ' + totalQuestions;
+}
+
+// Validate ALL questions answered before final submit
 document.getElementById('quizForm').addEventListener('submit', function(e) {
-  if (answered.size < totalQuestions) {
-    e.preventDefault();
-    alert('Veuillez répondre à toutes les questions avant de soumettre.');
+  for (let i = 0; i < totalQuestions; i++) {
+    if (!answered[i]) {
+      e.preventDefault();
+      alert('Veuillez répondre à toutes les questions avant de soumettre.');
+      goTo(i); // jump to first unanswered question
+      return;
+    }
   }
 });
 </script>

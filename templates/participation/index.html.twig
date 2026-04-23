@@ -1,0 +1,351 @@
+{# templates/participation/index.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Mes Patients | EchoCare{% endblock %}
+{% block body %}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#0a1628;--navy-mid:#132240;--accent:#e8734a;--accent-glow:rgba(232,115,74,.25);--cyan:#38bdf8;--cyan-pale:rgba(56,189,248,.1);--cyan-glow:rgba(56,189,248,.15);--emerald:#34d399;--emerald-pale:rgba(52,211,153,.1);--rose:#fb7185;--rose-pale:rgba(251,113,133,.1);--violet:#a78bfa;--violet-pale:rgba(167,139,250,.1);--surface:#f8fafc;--surface-card:#ffffff;--border:#e2e8f0;--border-light:#f1f5f9;--text-primary:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;--radius:16px;--radius-sm:10px;--radius-xs:8px;--shadow-sm:0 1px 3px rgba(10,22,40,.06);--shadow-md:0 4px 16px rgba(10,22,40,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text-primary);-webkit-font-smoothing:antialiased}
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.4)}70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}}
+
+  .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:var(--navy);display:flex;flex-direction:column;padding:32px 24px;z-index:100}
+  .logo{font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:2px}
+  .logo span{background:linear-gradient(135deg,var(--accent),#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .role-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,115,74,.15);border:1px solid rgba(232,115,74,.2);color:var(--accent);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:36px}
+  .nav-link{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:var(--radius-sm);color:rgba(255,255,255,.5);font-size:14px;font-weight:500;text-decoration:none;margin-bottom:4px;transition:all .2s;position:relative}
+  .nav-link::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);border-radius:0 4px 4px 0;opacity:0;transition:.2s}
+  .nav-link:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05)}
+  .nav-link.active{color:#fff;background:rgba(56,189,248,.1)}
+  .nav-link.active::before{opacity:1}
+  .sidebar-bottom{margin-top:auto}
+  .coach-card{display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(255,255,255,.04);border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,.06)}
+  .coach-avatar{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:16px}
+
+  .main{margin-left:260px;padding:36px 44px;min-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;animation:fadeInUp .5s ease both}
+  .page-title{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.5px}
+  .page-title span{background:linear-gradient(135deg,var(--accent),#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+  .touchid-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(52,211,153,.08),rgba(56,189,248,.08));border:1px solid rgba(52,211,153,.15);color:#34d399;border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
+  .stat-card{background:var(--surface-card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:18px;border:1px solid var(--border-light);animation:fadeInUp .5s ease both}
+  .stat-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:var(--cyan-pale)}
+
+  .stat-value{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.5px}
+  .stat-label{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+  .search-bar{background:var(--surface-card);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--border-light);margin-bottom:24px}
+  .search-wrap{position:relative}
+  .search-wrap input{width:100%;padding:12px 18px 12px 46px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;transition:.25s;background:var(--surface);color:var(--text-primary)}
+  .search-wrap input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow);background:#fff}
+  .search-wrap input::placeholder{color:var(--text-muted)}
+  .search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none}
+
+  .table-card{background:var(--surface-card);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;border:1px solid var(--border-light);animation:fadeInUp .5s ease both;animation-delay:.2s}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:var(--navy);color:rgba(255,255,255,.7);padding:14px 22px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+  tbody tr{border-bottom:1px solid var(--border-light);transition:.2s}
+  tbody tr:hover{background:linear-gradient(90deg,var(--cyan-pale),transparent)}
+  tbody td{padding:16px 22px;font-size:14px;font-weight:500;vertical-align:middle}
+
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:24px;font-size:11px;font-weight:700}
+  .badge-cyan{background:var(--cyan-pale);color:var(--cyan)}
+  .badge-green{background:var(--emerald-pale);color:var(--emerald)}
+  .badge-red{background:var(--rose-pale);color:var(--rose)}
+  .badge-gray{background:var(--border-light);color:var(--text-muted)}
+
+  .score-bar-wrap{display:flex;align-items:center;gap:10px;min-width:140px}
+  .score-bar{flex:1;height:6px;background:var(--border-light);border-radius:3px;overflow:hidden}
+  .score-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .score-text{font-size:12px;font-weight:700;min-width:36px;text-align:right}
+
+  .btn-action{border:none;border-radius:var(--radius-xs);padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;transition:.2s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+  .btn-view{background:var(--cyan-pale);color:var(--cyan)}.btn-view:hover{background:var(--cyan);color:#fff}
+  .btn-del{background:var(--rose-pale);color:var(--rose)}.btn-del:hover{background:var(--rose);color:#fff}
+  .btn-touchid{background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(56,189,248,.08));color:#0d9b6b;border:1px solid rgba(52,211,153,.25);border-radius:var(--radius-xs);padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:.2s;font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+  .btn-touchid:hover{background:linear-gradient(135deg,var(--emerald),#059669);color:#fff;border-color:var(--emerald);animation:pulse .8s ease}
+
+  .flash{padding:16px 22px;border-radius:var(--radius-sm);margin-bottom:20px;font-weight:600;display:flex;align-items:center;gap:10px}
+  .flash-success{background:var(--emerald-pale);color:var(--emerald);border:1px solid rgba(52,211,153,.2)}
+
+  /* Results modal overlay */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(10,22,40,.6);z-index:200;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  .modal{background:#fff;border-radius:var(--radius);padding:32px;max-width:520px;width:90%;box-shadow:0 24px 64px rgba(10,22,40,.2);animation:fadeInUp .3s ease both;position:relative}
+  .modal-close{position:absolute;top:16px;right:16px;background:var(--border-light);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .modal-close:hover{background:var(--rose-pale);color:var(--rose)}
+  .modal-title{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;color:#0f172a;margin-bottom:4px}
+  .modal-sub{font-size:13px;color:var(--text-muted);margin-bottom:24px}
+  .result-row{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:10px;margin-bottom:8px;border:1px solid var(--border-light)}
+  .result-row.passed{background:var(--emerald-pale);border-color:rgba(52,211,153,.2)}
+  .result-row.failed{background:var(--rose-pale);border-color:rgba(251,113,133,.15)}
+  .result-score-big{font-family:'Outfit',sans-serif;font-size:28px;font-weight:900}
+  .result-score-big.passed{color:var(--emerald)}
+  .result-score-big.failed{color:var(--rose)}
+
+  .pagination{display:flex;align-items:center;justify-content:center;padding:24px 0}
+  .pagination a,.pagination span:not(.flex){display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 12px;border-radius:8px;font-size:14px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;transition:.2s}
+  .pagination a:hover{border-color:#38bdf8;color:#38bdf8}
+  .pagination span.current,.pagination em{background:#0a1628;color:#fff;border:1.5px solid #0a1628;font-style:normal}
+  .pagination span.flex{display:flex;align-items:center;gap:4px}
+</style>
+
+<div class="sidebar">
+  <div class="logo">Echo<span>Care</span></div>
+  <div class="role-badge">👨‍🏫 Coach</div>
+  <a href="{{ path('app_formation_index') }}" class="nav-link"><span>📚</span> Mes Formations</a>
+  <a href="{{ path('app_participation_index') }}" class="nav-link active"><span>👥</span> Mes Patients</a>
+  <a href="{{ path('app_feedback_dashboard') }}" class="nav-link"><span>💬</span> Sentiments</a>
+  <a href="{{ path('app_statistics') }}" class="nav-link"><span>📊</span> Statistiques</a>
+  <div class="sidebar-bottom">
+    <div class="coach-card">
+      <div class="coach-avatar">C</div>
+      <div><div style="color:#fff;font-size:13px;font-weight:600">Mon Profil</div><div style="color:var(--text-muted);font-size:11px">Coach certifié</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  {% for message in app.flashes('success') %}<div class="flash flash-success">✅ {{ message }}</div>{% endfor %}
+
+  <div class="topbar">
+    <div>
+      <div class="page-title">Mes <span>Patients</span></div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px">
+        Patients inscrits à vos formations &nbsp;
+        <span class="touchid-badge">🔐 Résultats protégés par Touch ID</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card" style="animation-delay:.1s">
+      <div class="stat-icon">👥</div>
+      <div><div class="stat-value">{{ participations.getTotalItemCount }}</div><div class="stat-label">Total inscriptions</div></div>
+    </div>
+    <div class="stat-card" style="animation-delay:.2s">
+      <div class="stat-icon" style="background:var(--emerald-pale)">📚</div>
+      <div><div class="stat-value">{{ formationMap|length }}</div><div class="stat-label">Mes formations</div></div>
+    </div>
+    <div class="stat-card" style="animation-delay:.3s">
+      <div class="stat-icon" style="background:var(--violet-pale)">🔐</div>
+      <div><div class="stat-value" style="font-size:18px;color:#a78bfa">Touch ID</div><div class="stat-label">Accès sécurisé</div></div>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <div class="search-wrap">
+      <input type="text" id="patientSearch" placeholder="Rechercher par patient ou formation…">
+      <span class="search-icon">🔍</span>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Formation</th>
+          <th>Date inscription</th>
+          <th>Score Quiz</th>
+          <th>Résultat</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        {% for participation in participations %}
+          {% set fid = participation.getFormation_id().getId() %}
+          {% set formationTitle = formationMap[fid] ?? '—' %}
+          {% set patient = participation.getUser_id() %}
+
+          {# Fetch quiz result for this patient + formation #}
+          {% set quizResult = participation.getFormation_id().getQuizs()|first ?? null %}
+
+        <tr class="data-row"
+            data-patient="{{ patient.getNom()|lower }} {{ patient.getPrenom()|lower }}"
+            data-formation="{{ formationTitle|lower }}">
+
+          <td>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">
+                {{ patient.getNom()|first|upper }}
+              </div>
+              <div>
+                <strong>{{ patient.getNom() }} {{ patient.getPrenom() }}</strong>
+                <div style="font-size:11px;color:var(--text-muted)">#{{ patient.getId_user() }}</div>
+              </div>
+            </div>
+          </td>
+
+          <td><span class="badge badge-cyan">{{ formationTitle }}</span></td>
+
+          <td style="color:var(--text-secondary)">
+            {{ participation.getDate_inscription() is not null
+               ? participation.getDate_inscription()|date('d/m/Y')
+               : '—' }}
+          </td>
+
+          {# Score column — hidden until Touch ID unlocks #}
+          <td class="score-cell-{{ participation.getId() }}">
+            <span class="badge badge-gray" style="cursor:pointer" onclick="unlockResults({{ participation.getId() }}, {{ patient.getId_user() }}, '{{ patient.getNom() }} {{ patient.getPrenom() }}', '{{ formationTitle }}')">
+              🔐 Voir score
+            </span>
+          </td>
+
+          {# Result column — hidden until unlocked #}
+          <td class="result-cell-{{ participation.getId() }}">
+            <span class="badge badge-gray">—</span>
+          </td>
+
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <a href="{{ path('app_formation_show', {'id': fid}) }}" class="btn-action btn-view">📚 Formation</a>
+              {# Touch ID protected quiz results button #}
+              <button type="button" class="btn-touchid"
+                onclick="unlockResults({{ participation.getId() }}, {{ patient.getId_user() }}, '{{ patient.getNom() }} {{ patient.getPrenom() }}', '{{ formationTitle }}')">
+                🔐 Résultats
+              </button>
+              <form method="post" action="{{ path('app_participation_delete', {'id': participation.getId()}) }}"
+                    onsubmit="return confirm('Désinscrire ce patient ?')" style="display:inline">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete_participation_' ~ participation.getId()) }}">
+                <button class="btn-action btn-del">✕</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align:center;padding:48px;color:var(--text-muted)">
+            Aucun patient inscrit pour l'instant.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">{{ knp_pagination_render(participations) }}</div>
+</div>
+
+{# ── Results Modal (hidden by default) ── #}
+<div class="modal-backdrop" id="resultsModal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalPatientName">—</div>
+    <div class="modal-sub" id="modalFormationName">—</div>
+    <div id="modalContent" style="text-align:center;padding:24px;color:var(--text-muted)">Chargement…</div>
+  </div>
+</div>
+
+<script>
+/* ─── Touch ID + Results unlock ─── */
+async function unlockResults(participationId, userId, patientName, formationTitle) {
+  // Touch ID check
+  if (window.PublicKeyCredential) {
+    try {
+      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (available) {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const credential = await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: { name: 'EchoCare', id: 'localhost' },
+            user: { id: new Uint8Array(16), name: 'echocare-user', displayName: 'EchoCare Coach' },
+            pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+            authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' },
+            timeout: 60000,
+            attestation: 'none'
+          }
+        });
+        if (!credential) return;
+      }
+    } catch(e) {
+      if (e.name === 'NotAllowedError') {
+        alert('❌ Touch ID annulé. Accès refusé.');
+        return;
+      }
+      // Touch ID unavailable → ask confirm fallback
+      if (!confirm('Touch ID non disponible. Continuer sans authentification biométrique ?')) return;
+    }
+  }
+
+  // Touch ID passed — show modal and fetch results via AJAX
+  document.getElementById('modalPatientName').textContent = '👤 ' + patientName;
+  document.getElementById('modalFormationName').textContent = formationTitle;
+  document.getElementById('modalContent').innerHTML = '<div style="padding:24px;color:var(--text-muted)">⏳ Chargement des résultats…</div>';
+  document.getElementById('resultsModal').style.display = 'flex';
+
+  try {
+    const resp = await fetch('/participation/results/' + userId + '/' + participationId);
+    const data = await resp.json();
+    renderResults(data, participationId);
+  } catch(err) {
+    document.getElementById('modalContent').innerHTML = '<div style="color:var(--rose);padding:16px">❌ Erreur lors du chargement.</div>';
+  }
+}
+
+function renderResults(data, participationId) {
+  if (!data || data.length === 0) {
+    document.getElementById('modalContent').innerHTML =
+      '<div style="text-align:center;padding:32px;color:var(--text-muted)">' +
+      '<div style="font-size:40px;margin-bottom:12px">📭</div>' +
+      '<p>Ce patient n\'a pas encore passé de quiz.</p></div>';
+
+    // Update inline cells too
+    document.querySelector('.score-cell-' + participationId).innerHTML = '<span class="badge badge-gray">Pas encore</span>';
+    document.querySelector('.result-cell-' + participationId).innerHTML = '<span class="badge badge-gray">—</span>';
+    return;
+  }
+
+  // Best result (highest score)
+  const best = data.reduce((a, b) => a.score > b.score ? a : b);
+  const pct  = best.total > 0 ? Math.round((best.score / best.total) * 100) : 0;
+  const passed = best.passed;
+
+  // Update inline score bar in the table row
+  const color = passed ? '#34d399' : '#fb7185';
+  document.querySelector('.score-cell-' + participationId).innerHTML =
+    '<div class="score-bar-wrap">' +
+    '<div class="score-bar"><div class="score-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+    '<span class="score-text" style="color:' + color + '">' + pct + '%</span></div>';
+  document.querySelector('.result-cell-' + participationId).innerHTML =
+    passed
+      ? '<span class="badge badge-green">✅ Réussi</span>'
+      : '<span class="badge badge-red">❌ Échoué</span>';
+
+  // Build modal content
+  let html = '';
+  data.forEach(function(r, i) {
+    const p   = r.total > 0 ? Math.round((r.score / r.total) * 100) : 0;
+    const cls = r.passed ? 'passed' : 'failed';
+    html += '<div class="result-row ' + cls + '">' +
+      '<div>' +
+        '<div style="font-size:13px;font-weight:700;color:#0f172a">Tentative ' + (i + 1) + '</div>' +
+        '<div style="font-size:11px;color:var(--text-muted)">' + (r.date || '') + '</div>' +
+      '</div>' +
+      '<div style="text-align:right">' +
+        '<div class="result-score-big ' + cls + '">' + p + '%</div>' +
+        '<div style="font-size:11px;color:var(--text-muted)">' + r.score + ' / ' + r.total + ' pts</div>' +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('modalContent').innerHTML = html;
+}
+
+function closeModal() {
+  document.getElementById('resultsModal').style.display = 'none';
+}
+
+/* ─── Search filter ─── */
+document.getElementById('patientSearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  document.querySelectorAll('#tableBody .data-row').forEach(row => {
+    const match = !q || (row.dataset.patient||'').includes(q) || (row.dataset.formation||'').includes(q);
+    row.style.display = match ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

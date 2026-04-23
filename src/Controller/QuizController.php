@@ -27,30 +27,46 @@ final class QuizController extends AbstractController
     //  Otherwise → create a new one
     // ------------------------------------------------------------------
 
-     #[Route('/formation/{id}/quiz/new', name: 'app_quiz_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, Formation $formation, EntityManagerInterface $em): Response
-    {
-        $quiz = new Quiz();
-        $quiz->setFormation($formation);
-        
-        $form = $this->createForm(QuizType::class, $quiz);
-        $form->handleRequest($request);
+     #[Route('/{id}/new', name: 'app_quiz_new', methods: ['GET', 'POST'])]
+public function new(Request $request, Formation $formation, EntityManagerInterface $em): Response
+{
+    $quiz = new Quiz();
+    $quiz->setFormation_id($formation);
+    $quiz->setTitle('Quiz — ' . $formation->getTitle());
+    $quiz->setPassingScore(60);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($quiz);
-            $em->flush();
+    // Seed one empty question with 2 answers
+    $q = new Question();
+    $q->setQuestionText('');
+    $q->setPoints(1);
+    $r1 = new Reponse();
+    $r1->setOptionText('');
+    $r1->setIsCorrect(true);
+    $r2 = new Reponse();
+    $r2->setOptionText('');
+    $r2->setIsCorrect(false);
+    $q->addReponse($r1);
+    $q->addReponse($r2);
+    $quiz->addQuestion($q);
 
-            $this->addFlash('success', 'Quiz créé avec succès !');
-            
-            return $this->redirectToRoute('app_formation_show', ['id' => $formation->getId()]);
-        }
+    $form = $this->createForm(QuizType::class, $quiz);
+    $form->handleRequest($request);
 
-        return $this->render('quiz/new.html.twig', [
-            'form' => $form->createView(),
-            'formation' => $formation,
-        ]);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->persist($quiz);
+        $em->flush();
+        $this->addFlash('success', 'Quiz créé avec succès !');
+        return $this->redirectToRoute('app_formation_quiz', ['id' => $formation->getId()]);
     }
-    
+
+    return $this->render('quiz/edit.html.twig', [
+        'formation' => $formation,
+        'quiz'      => $quiz,
+        'form'      => $form,
+        'isNew'     => true,
+    ]);
+}
+
     #[Route('/{id}/edit', name: 'app_quiz_edit', methods: ['GET', 'POST'])]
     public function edit(
         Formation $formation,

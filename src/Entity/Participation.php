@@ -10,9 +10,10 @@ use App\Entity\Formation;
 class Participation
 {
 
-    #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id;
+   #[ORM\Id]
+#[ORM\GeneratedValue]
+#[ORM\Column(type: "integer")]
+private ?int $id = null;
 
         #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "participations")]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
