@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Vich\UploaderBundle\Handler\UploadHandler;
 
 #[IsGranted('ROLE_PATIENT')]
 class ProfileController extends AbstractController
@@ -18,40 +19,62 @@ class ProfileController extends AbstractController
     public function index(
         Request $request,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $hasher
+        UserPasswordHasherInterface $hasher,
+        UploadHandler $uploadHandler
     ): Response {
-        $user = $this->getUser();
+        $user    = $this->getUser();
         $success = null;
-        $error = null;
+        $error   = null;
 
         if ($request->isMethod('POST')) {
             $user->setNom($request->request->get('nom'));
             $user->setPrenom($request->request->get('prenom'));
             $user->setNumTel($request->request->get('num_tel'));
 
-            $pw = $request->request->get('password');
-            $confirm = $request->request->get('confirm_password');
-
-            if ($pw) {
-                if ($pw !== $confirm) {
-                    $error = 'Les mots de passe ne correspondent pas !';
-                } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/', $pw)) {
-                    $error = 'Mot de passe trop faible !';
+            // Email modifiable
+            $newEmail = $request->request->get('email');
+            if ($newEmail && $newEmail !== $user->getEmail()) {
+                $existing = $em->getRepository(User::class)->findOneBy(['email' => $newEmail]);
+                if ($existing) {
+                    $error = 'Cet email est deja utilise !';
                 } else {
-                    $user->setPassword($hasher->hashPassword($user, $pw));
+                    $user->setEmail($newEmail);
+                }
+            }
+
+            // Photo de profil
+            $photoFile = $request->files->get('photo');
+            if ($photoFile) {
+                $user->setPhotoFile($photoFile);
+                $uploadHandler->upload($user, 'photoFile');
+            }
+
+            // Mot de passe
+            if (!$error) {
+                $pw      = $request->request->get('password');
+                $confirm = $request->request->get('confirm_password');
+
+                if ($pw) {
+                    if ($pw !== $confirm) {
+                        $error = 'Les mots de passe ne correspondent pas !';
+                    } elseif (!preg_match('/^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/', $pw)) {
+                        $error = 'Mot de passe trop faible !';
+                    } else {
+                        $user->setPassword($hasher->hashPassword($user, $pw));
+                    }
                 }
             }
 
             if (!$error) {
                 $em->flush();
-                $success = 'Profil mis à jour avec succès !';
+                $success = 'Profil mis a jour avec succes ! ✅';
             }
         }
 
         return $this->render('profile/index.html.twig', [
-            'user' => $user,
+            'user'    => $user,
             'success' => $success,
-            'error' => $error,
+            'error'   => $error,
         ]);
     }
 }

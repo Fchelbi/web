@@ -48,6 +48,15 @@ class FaceIdController extends AbstractController
         $request->getSession()->remove('show_face_id_prompt');
         return new JsonResponse(['ok' => true]);
     }
+    
+    #[Route('/admin/face-check', name: 'face_check')]
+    public function faceCheck(): JsonResponse
+    {
+        $user = $this->getUser();
+        return new JsonResponse([
+            'hasDescriptor' => $user && $user->getFaceDescriptor() !== null
+        ]);
+    }
 
     #[Route('/login/face', name: 'face_login')]
     public function faceLogin(): Response
@@ -55,7 +64,6 @@ class FaceIdController extends AbstractController
         return $this->render('face_id/login.html.twig');
     }
 
-    #[Route('/login/face/verify', name: 'face_login_verify', methods: ['POST'])]
     #[Route('/login/face/verify', name: 'face_login_verify', methods: ['POST'])]
     public function verifyFace(
         Request $request,

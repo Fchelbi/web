@@ -8,10 +8,13 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé !')]
+#[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -78,6 +81,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $faceDescriptor = null;
 
+    #[Vich\UploadableField(mapping: 'user_photo', fileNameProperty: 'photo')]
+    private ?File $photoFile = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $banned = false;
+
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private int $badWordsCount = 0;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTime $bannedAt = null;
+
     public function getId(): ?int { return $this->id; }
     public function getNom(): ?string { return $this->nom; }
     public function setNom(string $nom): static { $this->nom = $nom; return $this; }
@@ -110,6 +128,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getFaceDescriptor(): ?string { return $this->faceDescriptor; }
     public function setFaceDescriptor(?string $f): static { $this->faceDescriptor = $f; return $this; }
 
+
     public function getRoles(): array
     {
         return ['ROLE_' . strtoupper($this->role ?? 'PATIENT')];
@@ -125,4 +144,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->prenom . ' ' . $this->nom;
     }
+    public function getPhotoFile(): ?File { return $this->photoFile; }
+    public function setPhotoFile(?File $file): static {
+        $this->photoFile = $file;
+        if ($file) $this->updatedAt = new \DateTimeImmutable();
+        return $this;
+    }
+    public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
+    public function setUpdatedAt(?\DateTimeImmutable $t): static { $this->updatedAt = $t; return $this; }
+    public function isBanned(): bool { return $this->banned; }
+    public function setBanned(bool $banned): static { $this->banned = $banned; return $this; }
+    public function getBadWordsCount(): int { return $this->badWordsCount; }
+    public function setBadWordsCount(int $count): static { $this->badWordsCount = $count; return $this; }
+    public function incrementBadWordsCount(): static { $this->badWordsCount++; return $this; }
+    public function getBannedAt(): ?\DateTime { return $this->bannedAt; }
+    public function setBannedAt(?\DateTime $t): static { $this->bannedAt = $t; return $this; }
 }

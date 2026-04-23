@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TwoFactorController extends AbstractController
 {
@@ -17,17 +20,17 @@ class TwoFactorController extends AbstractController
     public function twoFactor(
         Request $request,
         EntityManagerInterface $em,
-        MailService $mailService
+        MailService $mailService,
+        EventDispatcherInterface $dispatcher
     ): Response {
         $session = $request->getSession();
-        $userId = $session->get('2fa_user_id');
+        $userId  = $session->get('2fa_user_id');
 
         if (!$userId) {
             return $this->redirectToRoute('app_login');
         }
 
         $user = $em->getRepository(User::class)->find($userId);
-
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
@@ -44,7 +47,7 @@ class TwoFactorController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $code = $request->request->get('code');
+            $code       = $request->request->get('code');
             $saveDevice = $request->request->get('save_device');
 
             if ($code === $user->getTwoFactorCode() &&
@@ -55,14 +58,19 @@ class TwoFactorController extends AbstractController
                 $em->flush();
                 $session->remove('2fa_user_id');
 
+                // ✅ Authentifie le user dans Symfony
+                $token = new UsernamePasswordToken($user, 'main', $user->getRoles());
+                $this->container->get('security.token_storage')->setToken($token);
+                $session->set('_security_main', serialize($token));
+
+                // Dispatch login event
+                $loginEvent = new InteractiveLoginEvent($request, $token);
+                $dispatcher->dispatch($loginEvent, 'security.interactive_login');
+
                 // Redirect selon rôle
                 $role = $user->getRole();
                 if ($role === 'Admin') {
-                    if (!$user->getFaceDescriptor()) {
-                        $route = 'face_id_prompt';
-                    } else {
-                        $route = 'admin_dashboard';
-                    }
+                    $route = !$user->getFaceDescriptor() ? 'face_id_prompt' : 'admin_dashboard';
                 } elseif ($role === 'Coach') {
                     $route = 'coach_dashboard';
                 } else {
@@ -79,7 +87,7 @@ class TwoFactorController extends AbstractController
 
                     $cookie = Cookie::create('device_token_' . $user->getId())
                         ->withValue($deviceToken)
-                        ->withExpires(new \DateTimeImmutable('+10 days'))
+                        ->withExpires(new \DateTimeImmutable('+15 days'))
                         ->withPath('/')
                         ->withHttpOnly(true);
 
@@ -89,7 +97,7 @@ class TwoFactorController extends AbstractController
                 return $response;
 
             } else {
-                $error = 'Code incorrect ou expiré !';
+                $error = 'Code incorrect ou expire !';
             }
         }
 
@@ -106,13 +114,16 @@ class TwoFactorController extends AbstractController
         MailService $mailService
     ): Response {
         $session = $request->getSession();
-        $userId = $session->get('2fa_user_id');
+        $userId  = $session->get('2fa_user_id');
 
         if (!$userId) {
             return $this->redirectToRoute('app_login');
         }
 
         $user = $em->getRepository(User::class)->find($userId);
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
 
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $user->setTwoFactorCode($code);

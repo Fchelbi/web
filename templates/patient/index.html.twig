@@ -44,6 +44,18 @@
             font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
         }
         .btn-logout:hover { background: rgba(231,76,60,0.3); }
+
+        /* MSG BADGE */
+        .msg-badge {
+            position: relative; display: inline-block;
+        }
+        .msg-badge .badge-count {
+            position: absolute; top: -8px; right: -10px;
+            background: #E8895A; color: white; border-radius: 50%;
+            width: 18px; height: 18px; font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+
         .hero {
             background: linear-gradient(135deg, #162232 0%, #0D1B2A 100%);
             padding: 60px 60px; position: relative; overflow: hidden;
@@ -203,6 +215,48 @@
             border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;
         }
         .btn-edit-profile:hover { background: rgba(74,111,165,0.3); color: white; }
+
+        /* NOTIFICATIONS */
+        .notif-bar {
+            position: fixed; top: 80px; right: 20px; z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .notif-popup {
+            background: #162232; border: 1px solid rgba(232,137,90,0.4);
+            border-radius: 14px; padding: 14px 18px;
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 300px; max-width: 340px;
+            animation: slideInRight 0.3s ease; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .notif-popup:hover { border-color: #E8895A; }
+        .notif-avatar {
+            width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #E8895A, #4A6FA5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700; color: white;
+        }
+        .notif-dot {
+            width: 10px; height: 10px; background: #E8895A;
+            border-radius: 50%; flex-shrink: 0; animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-sender { font-size: 13px; font-weight: 700; color: white; }
+        .notif-msg { font-size: 12px; color: #8899AA; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .notif-time { font-size: 11px; color: #4A5568; margin-top: 3px; }
+        .notif-close {
+            font-size: 16px; color: #4A5568; cursor: pointer;
+            flex-shrink: 0; padding: 4px; transition: color 0.2s;
+        }
+        .notif-close:hover { color: white; }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         .animate { animation: fadeInUp 0.6s ease both; }
@@ -213,12 +267,18 @@
 </head>
 <body>
 
+<!-- Notifications container -->
+<div class="notif-bar" id="notifBar"></div>
+
 <nav class="navbar">
     <div class="navbar-logo">Echo<span>Care</span></div>
     <div class="navbar-links">
         <a href="{{ path('patient_dashboard') }}" class="active">Accueil</a>
         <a href="#">Mes seances</a>
-        <a href="#">Messages</a>
+        <a href="{{ path('messagerie') }}" class="msg-badge">
+            Messages
+            <span class="badge-count" id="msgBadge" style="display:none;">0</span>
+        </a>
         <a href="{{ path('patient_bien_etre') }}">Bien-etre</a>
         <a href="{{ path('patient_profile') }}">Mon profil</a>
     </div>
@@ -255,7 +315,7 @@
     </div>
     <div class="stat-item">
         <div class="icon">💬</div>
-        <div class="number">0</div>
+        <div class="number" id="statUnread">0</div>
         <div class="label">Messages</div>
     </div>
     <div class="stat-item">
@@ -372,19 +432,94 @@
 <script>
 // Fix bouton retour apres deconnexion
 window.addEventListener('pageshow', function(e) {
-    if (e.persisted) {
-        window.location.reload();
-    }
+    if (e.persisted) window.location.reload();
 });
 
 // Verifie si session active
 fetch('/check-auth')
     .then(r => r.json())
     .then(data => {
-        if (!data.authenticated) {
-            window.location.href = '/login';
-        }
+        if (!data.authenticated) window.location.href = '/login';
     }).catch(() => {});
+
+// Demande permission notifications
+if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+}
+
+let lastNotifId  = 0;
+let shownIds     = new Set();
+
+async function checkNewMessages() {
+    try {
+        const res  = await fetch('/messagerie/notifications/check');
+        const data = await res.json();
+
+        let unread = data.messages.length;
+
+        // Badge dans navbar
+        const badge = document.getElementById('msgBadge');
+        const stat  = document.getElementById('statUnread');
+        if (unread > 0) {
+            badge.style.display = 'flex';
+            badge.textContent   = unread;
+            stat.textContent    = unread;
+        } else {
+            badge.style.display = 'none';
+            stat.textContent    = '0';
+        }
+
+        // Affiche notifications pour les nouveaux messages
+        data.messages.forEach(msg => {
+            if (!shownIds.has(msg.id)) {
+                shownIds.add(msg.id);
+                showNotifPopup(msg);
+
+                // Notification navigateur
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    const n = new Notification('💬 ' + msg.senderName, {
+                        body: msg.contenu,
+                        icon: '/favicon.ico',
+                    });
+                    n.onclick = () => {
+                        window.focus();
+                        window.location.href = '/messagerie/' + msg.senderId;
+                    };
+                }
+            }
+        });
+    } catch(e) {}
+}
+
+function showNotifPopup(msg) {
+    const bar = document.getElementById('notifBar');
+    const div = document.createElement('div');
+    div.className = 'notif-popup';
+
+    div.innerHTML = `
+        <div class="notif-avatar">${msg.senderName.charAt(0).toUpperCase()}</div>
+        <div class="notif-content">
+            <div class="notif-sender">💬 ${msg.senderName}</div>
+            <div class="notif-msg">${msg.contenu}</div>
+            <div class="notif-time">A l'instant</div>
+        </div>
+        <div class="notif-dot"></div>
+        <span class="notif-close" onclick="this.closest('.notif-popup').remove()">✕</span>
+    `;
+
+    div.onclick = (e) => {
+        if (!e.target.classList.contains('notif-close')) {
+            window.location.href = '/messagerie/' + msg.senderId;
+        }
+    };
+
+    bar.appendChild(div);
+    setTimeout(() => { if (div.parentNode) div.remove(); }, 6000);
+}
+
+// Check toutes les 5 secondes
+checkNewMessages();
+setInterval(checkNewMessages, 5000);
 
 {% if last is defined and last %}
 fetch('/spotify/playlist/{{ last.mood }}')

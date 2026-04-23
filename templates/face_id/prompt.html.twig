@@ -36,7 +36,6 @@
         }
         h1 { font-size: 26px; font-weight: 700; color: white; margin-bottom: 12px; }
         p { font-size: 15px; color: #8899AA; line-height: 1.7; margin-bottom: 32px; }
-
         .features { display: flex; gap: 12px; margin-bottom: 32px; }
         .feature {
             flex: 1; background: rgba(255,255,255,0.03);
@@ -46,7 +45,6 @@
         }
         .feature .f-icon { font-size: 24px; margin-bottom: 8px; }
         .feature h4 { font-size: 12px; font-weight: 700; color: white; margin-bottom: 4px; }
-
         .buttons { display: flex; flex-direction: column; gap: 12px; }
         .btn-yes {
             padding: 16px; background: #E8895A; color: white;
@@ -63,10 +61,33 @@
         }
         .btn-no:hover { background: rgba(255,255,255,0.05); color: white; }
         .skip { font-size: 12px; color: #4A5568; margin-top: 16px; }
+
+        /* Success overlay */
+        .success-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: #0D1B2A; z-index: 999;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .success-overlay.show { display: flex; }
+        .success-icon { font-size: 80px; margin-bottom: 24px; animation: bounceIn 0.5s ease; }
+        .success-overlay h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 12px; }
+        .success-overlay p { font-size: 15px; color: #8899AA; }
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
-<div class="card">
+
+<div class="success-overlay" id="successOverlay">
+    <div class="success-icon">✅</div>
+    <h2>Face ID enregistre !</h2>
+    <p>Redirection vers le dashboard...</p>
+</div>
+
+<div class="card" id="promptCard">
     <div class="logo">Echo<span>Care</span></div>
     <div class="icon-wrap">👁️</div>
     <h1>Configurez votre Face ID</h1>
@@ -91,10 +112,38 @@
     </div>
 
     <div class="buttons">
-        <a href="{{ path('face_register') }}" class="btn-yes">📸 Oui, enregistrer mon visage</a>
-        <a href="{{ path('admin_dashboard') }}" class="btn-no">⏭️ Plus tard</a>
+        <a href="{{ path('face_register') }}" class="btn-yes" id="btnRegister">
+            📸 Oui, enregistrer mon visage
+        </a>
+        <a href="{{ path('admin_dashboard') }}" class="btn-no" id="btnSkip">
+            ⏭️ Plus tard
+        </a>
     </div>
     <p class="skip">Vous pourrez le configurer depuis le dashboard</p>
 </div>
+
+<script>
+// Si on revient sur cette page après enregistrement réussi
+// Vérifie si le face descriptor est déjà enregistré
+fetch('/admin/face-check')
+    .then(r => r.json())
+    .then(data => {
+        if (data.hasDescriptor) {
+            // Déjà enregistré → redirige directement
+            document.getElementById('promptCard').style.display = 'none';
+            document.getElementById('successOverlay').classList.add('show');
+            setTimeout(() => window.location.href = '/admin/dashboard', 1500);
+        }
+    }).catch(() => {});
+
+// Bouton "Plus tard" → marque la session
+document.getElementById('btnSkip').addEventListener('click', function(e) {
+    e.preventDefault();
+    fetch('/clear-face-prompt', { method: 'GET' })
+        .then(() => window.location.href = '/admin/dashboard')
+        .catch(() => window.location.href = '/admin/dashboard');
+});
+</script>
+
 </body>
 </html>

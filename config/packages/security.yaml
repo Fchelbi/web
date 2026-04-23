@@ -42,6 +42,10 @@ security:
         - { path: ^/2fa, roles: PUBLIC_ACCESS }
         - { path: ^/spotify, roles: PUBLIC_ACCESS }
         - { path: ^/login/face, roles: PUBLIC_ACCESS }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/coach, roles: ROLE_COACH }
-        - { path: ^/patient, roles: ROLE_PATIENT }
+        - { path: ^/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+        - { path: ^/messagerie/notifications, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/messagerie, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/admin, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/coach, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/patient, roles: IS_AUTHENTICATED_FULLY }

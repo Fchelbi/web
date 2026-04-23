@@ -73,7 +73,7 @@
         input::placeholder { color: #4A5568; }
         select option { background: #162232; color: white; }
         input:focus, select:focus { border-color: #E8895A; background: rgba(232,137,90,0.05); }
-        input.error { border-color: #e74c3c; }
+        input.error, select.error { border-color: #e74c3c; }
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-right: 44px; }
         .toggle-pw {
@@ -127,8 +127,8 @@
                 <p>Creez votre espace personnel</p>
             </div>
             <div class="feature-item">
-                <h3>3 profils disponibles</h3>
-                <p>Admin · Coach · Patient</p>
+                <h3>2 profils disponibles</h3>
+                <p>Coach · Patient</p>
             </div>
             <div class="feature-item">
                 <h3>100% securise</h3>
@@ -202,7 +202,6 @@
                     <option value="">-- Choisir un role --</option>
                     <option value="Patient">🌿 Patient</option>
                     <option value="Coach">🏋️ Coach</option>
-                    <option value="Admin">👑 Admin</option>
                 </select>
                 <span class="error-msg" id="role-error">Veuillez choisir un role</span>
             </div>
@@ -215,51 +214,69 @@
 </div>
 
 <script>
-    function togglePw(id, el) {
-        const input = document.getElementById(id);
-        input.type = input.type === 'password' ? 'text' : 'password';
-        el.textContent = input.type === 'password' ? '👁️' : '🙈';
-    }
-    document.getElementById('password').addEventListener('input', function () {
-        const val = this.value;
-        const fill = document.getElementById('strength-fill');
-        const text = document.getElementById('strength-text');
-        let score = 0;
-        if (val.length >= 8) score++;
-        if (/[A-Z]/.test(val)) score++;
-        if (/[0-9]/.test(val)) score++;
-        if (/[^A-Za-z0-9]/.test(val)) score++;
-        const levels = [
-            { w: '0%', c: 'transparent', t: '' },
-            { w: '25%', c: '#e74c3c', t: '🔴 Tres faible' },
-            { w: '50%', c: '#e67e22', t: '🟠 Faible' },
-            { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
-            { w: '100%', c: '#2ecc71', t: '🟢 Fort' },
-        ];
-        fill.style.width = levels[score].w;
-        fill.style.background = levels[score].c;
-        text.textContent = levels[score].t;
-    });
-    document.getElementById('signupForm').addEventListener('submit', function (e) {
-        let valid = true;
-        const nom = document.getElementById('nom');
-        const prenom = document.getElementById('prenom');
-        const email = document.getElementById('email');
-        const tel = document.getElementById('num_tel');
-        const pw = document.getElementById('password');
-        const cpw = document.getElementById('confirm_password');
-        const role = document.getElementById('role');
-        const show = (id) => { document.getElementById(id).style.display = 'block'; };
-        const hide = (id) => { document.getElementById(id).style.display = 'none'; };
-        if (nom.value.trim().length < 2) { nom.classList.add('error'); show('nom-error'); valid = false; } else { nom.classList.remove('error'); hide('nom-error'); }
-        if (prenom.value.trim().length < 2) { prenom.classList.add('error'); show('prenom-error'); valid = false; } else { prenom.classList.remove('error'); hide('prenom-error'); }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.classList.add('error'); show('email-error'); valid = false; } else { email.classList.remove('error'); hide('email-error'); }
-        if (tel.value && !/^\d{8}$/.test(tel.value.replace(/\s/g, ''))) { tel.classList.add('error'); show('tel-error'); valid = false; } else { tel.classList.remove('error'); hide('tel-error'); }
-        if (!/^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(pw.value)) { pw.classList.add('error'); show('pw-error'); valid = false; } else { pw.classList.remove('error'); hide('pw-error'); }
-        if (pw.value !== cpw.value) { cpw.classList.add('error'); show('confirm-error'); valid = false; } else { cpw.classList.remove('error'); hide('confirm-error'); }
-        if (!role.value) { role.classList.add('error'); show('role-error'); valid = false; } else { role.classList.remove('error'); hide('role-error'); }
-        if (!valid) e.preventDefault();
-    });
+function togglePw(id, el) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+    el.textContent = input.type === 'password' ? '👁️' : '🙈';
+}
+
+document.getElementById('password').addEventListener('input', function () {
+    const val  = this.value;
+    const fill = document.getElementById('strength-fill');
+    const text = document.getElementById('strength-text');
+    let score  = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = [
+        { w: '0%', c: 'transparent', t: '' },
+        { w: '25%', c: '#e74c3c', t: '🔴 Tres faible' },
+        { w: '50%', c: '#e67e22', t: '🟠 Faible' },
+        { w: '75%', c: '#f1c40f', t: '🟡 Moyen' },
+        { w: '100%', c: '#2ecc71', t: '🟢 Fort' },
+    ];
+    fill.style.width      = levels[score].w;
+    fill.style.background = levels[score].c;
+    text.textContent      = levels[score].t;
+});
+
+document.getElementById('signupForm').addEventListener('submit', function (e) {
+    let valid  = true;
+    const nom  = document.getElementById('nom');
+    const prenom = document.getElementById('prenom');
+    const email  = document.getElementById('email');
+    const tel    = document.getElementById('num_tel');
+    const pw     = document.getElementById('password');
+    const cpw    = document.getElementById('confirm_password');
+    const role   = document.getElementById('role');
+
+    const show = (id) => { document.getElementById(id).style.display = 'block'; };
+    const hide = (id) => { document.getElementById(id).style.display = 'none'; };
+
+    if (nom.value.trim().length < 2) { nom.classList.add('error'); show('nom-error'); valid = false; }
+    else { nom.classList.remove('error'); hide('nom-error'); }
+
+    if (prenom.value.trim().length < 2) { prenom.classList.add('error'); show('prenom-error'); valid = false; }
+    else { prenom.classList.remove('error'); hide('prenom-error'); }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { email.classList.add('error'); show('email-error'); valid = false; }
+    else { email.classList.remove('error'); hide('email-error'); }
+
+    if (tel.value && !/^\d{8}$/.test(tel.value.replace(/\s/g, ''))) { tel.classList.add('error'); show('tel-error'); valid = false; }
+    else { tel.classList.remove('error'); hide('tel-error'); }
+
+    if (!/^(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$/.test(pw.value)) { pw.classList.add('error'); show('pw-error'); valid = false; }
+    else { pw.classList.remove('error'); hide('pw-error'); }
+
+    if (pw.value !== cpw.value) { cpw.classList.add('error'); show('confirm-error'); valid = false; }
+    else { cpw.classList.remove('error'); hide('confirm-error'); }
+
+    if (!role.value) { role.classList.add('error'); show('role-error'); valid = false; }
+    else { role.classList.remove('error'); hide('role-error'); }
+
+    if (!valid) e.preventDefault();
+});
 </script>
 </body>
 </html>
