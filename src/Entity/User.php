@@ -96,6 +96,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTime $bannedAt = null;
 
+    // ✅ Fix sérialisation - exclut photoFile
+    public function __sleep(): array
+    {
+        return [
+            'id', 'nom', 'prenom', 'email', 'password', 'role',
+            'numTel', 'photo', 'resetToken', 'resetTokenExpiresAt',
+            'isVerified', 'verificationToken', 'twoFactorCode',
+            'twoFactorExpiresAt', 'deviceToken', 'faceDescriptor',
+            'updatedAt', 'banned', 'badWordsCount', 'bannedAt'
+        ];
+    }
+
+    public function __wakeup(): void
+    {
+        $this->photoFile = null;
+    }
+
     public function getId(): ?int { return $this->id; }
     public function getNom(): ?string { return $this->nom; }
     public function setNom(string $nom): static { $this->nom = $nom; return $this; }
@@ -127,23 +144,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDeviceToken(?string $t): static { $this->deviceToken = $t; return $this; }
     public function getFaceDescriptor(): ?string { return $this->faceDescriptor; }
     public function setFaceDescriptor(?string $f): static { $this->faceDescriptor = $f; return $this; }
-
-
-    public function getRoles(): array
-    {
-        return ['ROLE_' . strtoupper($this->role ?? 'PATIENT')];
-    }
-
-    public function getUserIdentifier(): string 
-    { 
-        return (string) $this->email; 
-    }
-    public function eraseCredentials(): void {}
-
-    public function __toString(): string
-    {
-        return $this->prenom . ' ' . $this->nom;
-    }
     public function getPhotoFile(): ?File { return $this->photoFile; }
     public function setPhotoFile(?File $file): static {
         $this->photoFile = $file;
@@ -159,4 +159,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function incrementBadWordsCount(): static { $this->badWordsCount++; return $this; }
     public function getBannedAt(): ?\DateTime { return $this->bannedAt; }
     public function setBannedAt(?\DateTime $t): static { $this->bannedAt = $t; return $this; }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_' . strtoupper($this->role ?? 'PATIENT')];
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function eraseCredentials(): void {}
+
+    public function __toString(): string
+    {
+        return $this->prenom . ' ' . $this->nom;
+    }
 }

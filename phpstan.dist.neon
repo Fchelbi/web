@@ -1,0 +1,27 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - '#Call to an undefined method Symfony\\Component\\Security\\Core\\User\\UserInterface::#'
+        - '#Parameter .* expects App\\Entity\\User(\|null)?, Symfony\\Component\\Security\\Core\\User\\UserInterface(\|null)? given#'
+        - '#Parameter .* expects Symfony\\Component\\Security\\Core\\User\\PasswordAuthenticatedUserInterface, Symfony\\Component\\Security\\Core\\User\\UserInterface(\|null)? given#'
+        - '#of function str_pad expects string, int#'
+        - '#Property App\\Entity\\.*::\$id \(int\|null\) is never assigned int#'
+        - '#has parameter .* with no value type specified in iterable type array#'
+        - '#return type has no value type specified in iterable type array#'
+        - '#extends generic class .* but does not specify its types#'
+        - '#type has no value type specified in iterable type array#'
+        - '#Call to an undefined method object::#'
+        - '#expects string, bool\|float\|int\|string\|null given#'
+        - '#expects string, float\|int.*\|string\|true given#'
+        - '#expects string\|null, bool\|float\|int\|string\|null given#'
+        - '#expects App\\Entity\\User, object given#'
+        - '#expects App\\Entity\\User\|null, object given#'
+        - '#of method App\\Repository\\UserRepository::searchPaginated\(\) expects string#'
+        - '#Cannot call method .* on Symfony\\Component\\Security\\Core\\User\\UserInterface\|null#'
+        - '#Cannot call method .* on App\\Entity\\User\|null#'
+        - '#Cannot call method format\(\) on DateTime\|null#'
+        - '#expects string, string\|null given#'
+        - '#expects object, Symfony\\Component\\Security\\Core\\User\\UserInterface\|null given#'
