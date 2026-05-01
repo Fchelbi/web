@@ -82,7 +82,10 @@ class Formation
 
     // --- Existing getters/setters ---
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+     { 
+        return $this->id; 
+        }
 
     public function getTitle(): string { return $this->title; }
     public function setTitle(string $v): self { $this->title = $v; return $this; }
