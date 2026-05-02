@@ -52,7 +52,7 @@ class LoginSuccessHandler implements AuthenticationSuccessHandlerInterface
             if ($request && !$user->getFaceDescriptor()) {
                 $request->getSession()->set('show_face_id_prompt', true);
             }
-            return new RedirectResponse($this->router->generate('admin_dashboard'));
+            return new RedirectResponse($this->router->generate('app_admin_dashboard'));
         } elseif ($role === 'Coach') {
             return new RedirectResponse($this->router->generate('coach_dashboard'));
         } else {

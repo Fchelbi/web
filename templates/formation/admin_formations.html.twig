@@ -1,13 +1,6 @@
-{# ============================================================
-   FIXED: admin_formations.html.twig
-   BUG FIXED: Quiz was a standalone <td> making 8 columns vs 7 headers.
-              Moved Quiz link INTO the Actions cell (last column).
-              Table now has exactly 7 <td> per row matching the 7 <th> headers:
-              Titre | Description | Catégorie | Coach | Vidéo | Quiz | Actions
-   ============================================================ #}
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% block title %}Admin — Formations | EchoCare{% endblock %}
-{% block body %}
+{% block content %}
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -17,45 +10,22 @@
     --emerald:#34d399;--emerald-pale:rgba(52,211,153,.1);
     --rose:#fb7185;--rose-pale:rgba(251,113,133,.1);
     --violet:#a78bfa;--violet-pale:rgba(167,139,250,.1);
-    --surface:#f8fafc;--surface-card:#ffffff;
-    --border:#e2e8f0;--border-light:#f1f5f9;
+--surface:#0D1B2A;--surface-card:#162232;   
+ --border:#e2e8f0;--border-light:#f1f5f9;
     --text-primary:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
     --radius:16px;--radius-sm:10px;--radius-xs:8px;
     --shadow-sm:0 1px 3px rgba(10,22,40,.06),0 1px 2px rgba(10,22,40,.04);
     --shadow-md:0 4px 16px rgba(10,22,40,.08),0 2px 4px rgba(10,22,40,.04);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text-primary);-webkit-font-smoothing:antialiased}
-
-  .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:var(--navy);display:flex;flex-direction:column;padding:32px 24px;z-index:100;overflow:hidden}
-  .sidebar::before{content:'';position:absolute;top:-80px;right:-80px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.08),transparent);pointer-events:none}
-  .logo{font-family:'Outfit',sans-serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:-.5px;margin-bottom:2px}
-  .logo span{background:linear-gradient(135deg,var(--accent),#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .logo-sub{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:40px;font-weight:600}
-  .nav-section{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 10px;font-weight:700}
-  .nav-link{display:flex;align-items:center;gap:12px;padding:11px 16px;border-radius:var(--radius-sm);color:rgba(255,255,255,.5);font-size:14px;font-weight:500;text-decoration:none;margin-bottom:4px;transition:all .2s ease;position:relative}
-  .nav-link::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:0 4px 4px 0;opacity:0;transition:.2s}
-  .nav-link:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05)}
-  .nav-link.active{color:#fff;background:rgba(56,189,248,.1)}
-  .nav-link.active::before{opacity:1}
-  .sidebar-bottom{margin-top:auto}
-  .admin-card{background:linear-gradient(135deg,rgba(232,115,74,.15),rgba(232,115,74,.05));border:1px solid rgba(232,115,74,.2);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px}
-  .admin-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#f59e0b);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff}
-  .admin-name{color:#fff;font-size:13px;font-weight:600}.admin-role{color:var(--accent);font-size:11px;font-weight:600}
-
-  .main{margin-left:260px;padding:36px 44px;min-height:100vh}
-
   @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
   .anim-up{animation:fadeInUp .5s ease both}
-
   .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;animation:fadeInUp .5s ease both}
   .page-title{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;color:var(--text-primary);letter-spacing:-.5px}
   .page-title span{color:var(--cyan)}
   .page-subtitle{font-size:13px;color:var(--text-muted);margin-top:4px;font-weight:500}
   .btn-new{background:linear-gradient(135deg,var(--accent),#d4613b);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:8px;transition:all .25s ease;box-shadow:0 4px 16px var(--accent-glow);font-family:inherit}
   .btn-new:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--accent-glow)}
-
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-bottom:28px}
   .stat-card{background:var(--surface-card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);display:flex;align-items:center;gap:18px;border:1px solid var(--border-light);transition:all .25s ease;position:relative;overflow:hidden}
   .stat-card::after{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.4;pointer-events:none}
@@ -67,7 +37,6 @@
   .si-cyan{background:var(--cyan-pale)}.si-accent{background:rgba(232,115,74,.1)}.si-emerald{background:var(--emerald-pale)}
   .stat-value{font-family:'Outfit',sans-serif;font-size:30px;font-weight:800;letter-spacing:-.5px}
   .stat-label{font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
-
   .toolbar{background:var(--surface-card);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow-sm);margin-bottom:24px;border:1px solid var(--border-light)}
   .toolbar-row1{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
   .toolbar-row2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:16px}
@@ -76,25 +45,21 @@
   .search-wrap input{width:100%;padding:11px 16px 11px 44px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;transition:all .25s;background:var(--surface);color:var(--text-primary)}
   .search-wrap input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow);background:#fff}
   .search-wrap input::placeholder{color:var(--text-muted)}
-  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:16px;pointer-events:none;transition:.2s}
-  .search-wrap input:focus ~ .search-icon{color:var(--cyan)}
+  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:16px;pointer-events:none}
   .filter-select{padding:11px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;color:var(--text-primary);outline:none;background:var(--surface);cursor:pointer;transition:all .2s;appearance:none;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
   .filter-select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-glow)}
   .btn-pdf{background:var(--surface);color:var(--text-secondary);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;font-family:inherit;text-decoration:none}
   .btn-pdf:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-
   .chip{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:24px;font-size:13px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text-secondary);cursor:pointer;transition:all .2s;user-select:none;font-family:inherit}
   .chip:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-1px)}
   .chip.active-green{background:var(--emerald);color:#fff;border-color:var(--emerald);box-shadow:0 4px 12px rgba(52,211,153,.25)}
   .chip.active-orange{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px var(--accent-glow)}
-
-  .active-filters{display:none;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;animation:slideDown .3s ease}
+  .active-filters{display:none;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
   .active-filters.visible{display:flex}
   .af-tag{display:inline-flex;align-items:center;gap:6px;background:var(--cyan-pale);color:var(--cyan);border-radius:24px;padding:5px 12px;font-size:12px;font-weight:600;border:1px solid rgba(56,189,248,.2)}
   .af-tag button{background:none;border:none;cursor:pointer;color:inherit;font-size:14px;line-height:1;padding:0}
   .btn-clear-all{background:none;border:none;cursor:pointer;font-size:12px;font-weight:600;color:var(--text-muted);text-decoration:underline;margin-left:4px}
   .results-count{font-size:12px;color:var(--text-muted);margin-left:auto;font-weight:600}
-
   .table-card{background:var(--surface-card);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;border:1px solid var(--border-light)}
   table{width:100%;border-collapse:collapse}
   thead th{background:var(--navy);color:rgba(255,255,255,.7);padding:14px 22px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
@@ -112,50 +77,18 @@
   .btn-edit{background:rgba(251,191,36,.1);color:#f59e0b}.btn-edit:hover{background:#f59e0b;color:#fff}
   .btn-quiz{background:var(--violet-pale);color:var(--violet)}.btn-quiz:hover{background:var(--violet);color:#fff}
   .btn-del{background:var(--rose-pale);color:var(--rose)}.btn-del:hover{background:var(--rose);color:#fff}
-
   tbody tr{animation:fadeInUp .4s ease both}
-  tbody tr:nth-child(1){animation-delay:.05s}
-  tbody tr:nth-child(2){animation-delay:.1s}
-  tbody tr:nth-child(3){animation-delay:.15s}
-  tbody tr:nth-child(4){animation-delay:.2s}
-  tbody tr:nth-child(5){animation-delay:.25s}
-  tbody tr:nth-child(6){animation-delay:.3s}
-
+  tbody tr:nth-child(1){animation-delay:.05s}tbody tr:nth-child(2){animation-delay:.1s}tbody tr:nth-child(3){animation-delay:.15s}tbody tr:nth-child(4){animation-delay:.2s}tbody tr:nth-child(5){animation-delay:.25s}tbody tr:nth-child(6){animation-delay:.3s}
   .flash{padding:16px 22px;border-radius:var(--radius-sm);margin-bottom:20px;font-weight:600;animation:slideDown .4s ease both;display:flex;align-items:center;gap:10px}
   .flash-success{background:var(--emerald-pale);color:var(--emerald);border:1px solid rgba(52,211,153,.2)}
-
-  .pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:24px 0 6px}
-  .pg-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:var(--radius-xs);font-size:14px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text-secondary);text-decoration:none;transition:all .2s}
-  .pg-btn:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-1px)}
-  .pg-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .pg-btn.disabled{opacity:.35;pointer-events:none}
-  .no-results-row{display:none;text-align:center;padding:48px;color:var(--text-muted)}
-
+  .no-results-row{text-align:center;padding:48px;color:var(--text-muted)}
   .pagination{display:flex;align-items:center;justify-content:center;padding:24px 0}
-  .pagination span.flex{display:flex;align-items:center;gap:4px}
   .pagination a,.pagination span:not(.flex){display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 12px;border-radius:8px;font-size:14px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;transition:all .2s}
-  .pagination a:hover{border-color:#38bdf8;color:#38bdf8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(56,189,248,.15)}
+  .pagination a:hover{border-color:#38bdf8;color:#38bdf8;transform:translateY(-1px)}
   .pagination span.current,.pagination em{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 12px;border-radius:8px;font-size:14px;font-weight:700;background:#0a1628;color:#fff;border:1.5px solid #0a1628;font-style:normal}
 </style>
 
-<div class="sidebar">
-  <div class="logo">Echo<span>Care</span></div>
-  <div class="logo-sub">Administration</div>
-  <div class="nav-section">Navigation</div>
-  <a href="{{ path('app_formation_index') }}" class="nav-link active"><span>📚</span> Formations</a>
-  <a href="#" class="nav-link"><span>👥</span> Utilisateurs</a>
-  <a href="#" class="nav-link"><span>📊</span> Rapports</a>
-  <a href="{{ path('app_statistics') }}" class="nav-link"><span>📊</span> Statistiques</a>
-  <a href="#" class="nav-link"><span>⚙️</span> Paramètres</a>
-  <div class="sidebar-bottom">
-    <div class="admin-card">
-      <div class="admin-avatar">A</div>
-      <div><div class="admin-name">Administrateur</div><div class="admin-role">Super Admin</div></div>
-    </div>
-  </div>
-</div>
-
-<div class="main">
+<div style="padding:36px 44px;">
   {% for message in app.flashes('success') %}<div class="flash flash-success">✅ {{ message }}</div>{% endfor %}
 
   <div class="topbar">
@@ -216,7 +149,6 @@
 
   <div class="table-card anim-up" style="animation-delay:.4s">
     <table id="formationTable">
-      {# ── 7 headers ── #}
       <thead>
         <tr>
           <th>Titre</th>
@@ -238,8 +170,6 @@
             data-coach="{{ (formation.coachId and coachMap[formation.coachId] is defined) ? coachMap[formation.coachId]|lower : '' }}"
             data-video="{{ formation.videoUrl ? 'yes' : 'no' }}"
             data-quiz="{{ formation.quizs|length > 0 ? 'yes' : 'no' }}">
-
-          {# ── col 1: Titre ── #}
           <td>
             <div style="display:flex;align-items:center;gap:12px">
               {% if formation.videoThumbnail %}
@@ -255,13 +185,9 @@
               </div>
             </div>
           </td>
-
-          {# ── col 2: Description ── #}
           <td style="color:var(--text-secondary)">
             {{ formation.description|slice(0,50) }}{% if formation.description|length > 50 %}…{% endif %}
           </td>
-
-          {# ── col 3: Catégorie ── #}
           <td>
             {% if formation.category %}
               <span class="badge badge-blue">{{ formation.category }}</span>
@@ -269,15 +195,11 @@
               <span class="badge badge-orange">—</span>
             {% endif %}
           </td>
-
-          {# ── col 4: Coach ── #}
           <td>
             {% if formation.coachId is not null and coachMap[formation.coachId] is defined %}
               {{ coachMap[formation.coachId] }}
             {% else %}—{% endif %}
           </td>
-
-          {# ── col 5: Vidéo ── #}
           <td>
             {% if formation.videoUrl %}
               <span class="badge badge-green">✓ Oui</span>
@@ -285,8 +207,6 @@
               <span class="badge badge-orange">✗ Non</span>
             {% endif %}
           </td>
-
-          {# ── col 6: Quiz status badge ── #}
           <td>
             {% if formation.quizs|length > 0 %}
               <span class="badge badge-green">✓ Oui</span>
@@ -294,9 +214,6 @@
               <span class="badge badge-orange">✗ Non</span>
             {% endif %}
           </td>
-
-          {# ── col 7: Actions (Voir + Modifier + Quiz + Supprimer) ── #}
-          {# FIX: Quiz link was previously its own <td> causing 8 cols. Now lives here. #}
           <td>
             <div class="actions">
               <a href="{{ path('app_formation_show', {'id': formation.id}) }}" class="btn-action btn-show">Voir</a>
@@ -308,13 +225,12 @@
               </form>
             </div>
           </td>
-
         </tr>
         {% endfor %}
       </tbody>
       <tfoot>
-        <tr id="noResultsRow">
-          <td colspan="7" class="no-results-row" style="display:table-cell">Aucune formation trouvée</td>
+        <tr id="noResultsRow" style="display:none">
+          <td colspan="7" class="no-results-row">Aucune formation trouvée</td>
         </tr>
       </tfoot>
     </table>
@@ -333,18 +249,17 @@ let isAjaxSearch=false;
 let searchTimeout;
 document.getElementById('searchInput').addEventListener('input',function(e){
   const q=e.target.value.trim();clearTimeout(searchTimeout);
-  if(q.length<2){isAjaxSearch=false;state.search=q.toLowerCase();document.querySelectorAll('#tableBody .search-row').forEach(r=>r.remove());document.querySelectorAll('#tableBody .data-row').forEach(r=>r.style.display='');const pg=document.getElementById('paginationBar');if(pg)pg.style.display='';applyFilters();return;}
+  if(q.length<2){isAjaxSearch=false;state.search=q.toLowerCase();document.querySelectorAll('#tableBody .search-row').forEach(r=>r.remove());document.querySelectorAll('#tableBody .data-row').forEach(r=>r.style.display='');applyFilters();return;}
   searchTimeout=setTimeout(()=>{
     fetch('/formation/search/ajax?q='+encodeURIComponent(q)).then(r=>r.json()).then(data=>{
       isAjaxSearch=true;const tbody=document.getElementById('tableBody');
       tbody.querySelectorAll('.search-row').forEach(r=>r.remove());
       tbody.querySelectorAll('.data-row:not(.search-row)').forEach(r=>r.style.display='none');
-      const pg=document.getElementById('paginationBar');if(pg)pg.style.display='none';
       const existingIds=[];tbody.querySelectorAll('.data-row:not(.search-row)').forEach(r=>existingIds.push(parseInt(r.dataset.id)));
       let visible=0;
       tbody.querySelectorAll('.data-row:not(.search-row)').forEach(r=>{if(data.some(d=>d.id===parseInt(r.dataset.id))){r.style.display='';visible++;}});
       data.forEach(item=>{if(!existingIds.includes(item.id)){
-        const tr=document.createElement('tr');tr.className='data-row search-row';tr.dataset.id=item.id;tr.dataset.cat=(item.category||'').toLowerCase();tr.dataset.video=item.hasVideo?'yes':'no';tr.dataset.quiz=item.hasQuiz?'yes':'no';tr.style.animation='fadeInUp .3s ease both';
+        const tr=document.createElement('tr');tr.className='data-row search-row';tr.dataset.id=item.id;tr.dataset.cat=(item.category||'').toLowerCase();tr.dataset.video=item.hasVideo?'yes':'no';tr.dataset.quiz=item.hasQuiz?'yes':'no';
         const quizBadge=item.hasQuiz?'<span class="badge badge-green">✓ Oui</span>':'<span class="badge badge-orange">✗ Non</span>';
         tr.innerHTML='<td><strong>'+item.title+'</strong></td>'
           +'<td style="color:var(--text-secondary)">'+(item.description||'')+'…</td>'
@@ -377,14 +292,14 @@ function applyFilters(){
     if(isAjaxSearch){if(row.style.display!=='none'){row.style.display=match?'':'none';if(match)visible++;}}
     else{row.style.display=match?'':'none';if(match)visible++;}
   });
-  document.getElementById('noResultsRow').querySelector('td').style.display=visible===0?'table-cell':'none';
+  document.getElementById('noResultsRow').style.display=visible===0?'table-row':'none';
   document.getElementById('resultsCount').textContent=visible+(visible!==1?' résultats':' résultat');
   renderActiveFilterTags();
 }
 const tagLabels={search:v=>'Recherche : "'+v+'"',cat:v=>'Catégorie : '+v,video:v=>v==='yes'?'Avec vidéo':'Sans vidéo',quiz:v=>v==='yes'?'Avec quiz':'Sans quiz'};
 function renderActiveFilterTags(){const c=document.getElementById('activeFilters'),t=document.getElementById('afTags'),a=Object.entries(state).filter(([,v])=>v!=='');if(!a.length){c.classList.remove('visible');t.innerHTML='';return;}c.classList.add('visible');t.innerHTML=a.map(([k,v])=>'<span class="af-tag">'+tagLabels[k](v)+'<button onclick="clearFilter(\''+k+'\')">&times;</button></span>').join('');}
-function clearFilter(k){state[k]='';if(k==='search'){document.getElementById('searchInput').value='';isAjaxSearch=false;document.querySelectorAll('#tableBody .search-row').forEach(r=>r.remove());document.querySelectorAll('#tableBody .data-row').forEach(r=>r.style.display='');const pg=document.getElementById('paginationBar');if(pg)pg.style.display='';}if(k==='cat')document.getElementById('catFilter').value='';if(k==='video'||k==='quiz')updateChipStyles();applyFilters();}
-function clearAllFilters(){Object.keys(state).forEach(k=>state[k]='');document.getElementById('searchInput').value='';document.getElementById('catFilter').value='';isAjaxSearch=false;document.querySelectorAll('#tableBody .search-row').forEach(r=>r.remove());document.querySelectorAll('#tableBody .data-row').forEach(r=>r.style.display='');const pg=document.getElementById('paginationBar');if(pg)pg.style.display='';updateChipStyles();applyFilters();}
+function clearFilter(k){state[k]='';if(k==='search'){document.getElementById('searchInput').value='';isAjaxSearch=false;document.querySelectorAll('#tableBody .search-row').forEach(r=>r.remove());document.querySelectorAll('#tableBody .data-row').forEach(r=>r.style.display='');}if(k==='cat')document.getElementById('catFilter').value='';if(k==='video'||k==='quiz')updateChipStyles();applyFilters();}
+function clearAllFilters(){Object.keys(state).forEach(k=>state[k]='');document.getElementById('searchInput').value='';document.getElementById('catFilter').value='';isAjaxSearch=false;document.querySelectorAll('#tableBody .search-row').forEach(r=>r.remove());document.querySelectorAll('#tableBody .data-row').forEach(r=>r.style.display='');updateChipStyles();applyFilters();}
 applyFilters();
 function exportPDF(){const{jsPDF}=window.jspdf;const doc=new jsPDF();doc.setFontSize(18);doc.setTextColor(10,22,40);doc.text('EchoCare — Liste des Formations',14,18);doc.setFontSize(10);doc.setTextColor(148,163,184);doc.text('Généré le '+new Date().toLocaleDateString('fr-FR'),14,26);const rows=[];document.querySelectorAll('#tableBody .data-row').forEach(row=>{if(row.style.display!=='none'){const c=row.querySelectorAll('td');rows.push([c[0]?.innerText||'',c[1]?.innerText||'',c[2]?.innerText||'',c[3]?.innerText||'',c[4]?.innerText||'']);}});doc.autoTable({head:[['Titre','Description','Catégorie','Coach','Vidéo']],body:rows,startY:32,styles:{fontSize:9},headStyles:{fillColor:[10,22,40]}});doc.save('formations-echocare.pdf');}
 </script>
