@@ -12,6 +12,4 @@ class CallsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Calls::class);
     }
-
-    // Add custom methods as needed
 }

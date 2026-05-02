@@ -12,6 +12,4 @@ class RapportRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Rapport::class);
     }
-
-    // Add custom methods as needed
 }

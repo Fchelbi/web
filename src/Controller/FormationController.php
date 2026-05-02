@@ -68,7 +68,7 @@ final class FormationController extends AbstractController
             $users    = $entityManager->getRepository(\App\Entity\User::class)->findAll();
             $coachMap = [];
             foreach ($users as $user) {
-                $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
+                $coachMap[$user->getId()] = $user->getNom() . ' ' . $user->getPrenom();
             }
 
             return $this->render('formation/admin_formations.html.twig', [
@@ -77,7 +77,7 @@ final class FormationController extends AbstractController
             ]);
 
         } elseif ($role === 'Coach') {
-            $coachId = 1; // TODO: replace with $this->getUser()->getId_user()
+            $coachId = 1; // TODO: replace with $this->getUser()->getId()
 
             $query = $entityManager->getRepository(Formation::class)
                 ->createQueryBuilder('f')
@@ -120,10 +120,10 @@ final class FormationController extends AbstractController
             $users    = $entityManager->getRepository(\App\Entity\User::class)->findAll();
             $coachMap = [];
             foreach ($users as $user) {
-                $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
+                $coachMap[$user->getId()] = $user->getNom() . ' ' . $user->getPrenom();
             }
 
-            $patientId    = 1; // TODO: replace with $this->getUser()->getId_user()
+            $patientId    = 1; // TODO: replace with $this->getUser()->getId()
             $patientUser  = $entityManager->getRepository(\App\Entity\User::class)->find($patientId);
             $myParticipations = $entityManager->getRepository(Participation::class)
                 ->findBy(['user_id' => $patientUser]);
@@ -163,7 +163,7 @@ final class FormationController extends AbstractController
                 }
             }
 
-            $formation->setCoachId(1); // TODO: replace with $this->getUser()->getId_user()
+            $formation->setCoachId(1); // TODO: replace with $this->getUser()->getId()
 
             $entityManager->persist($formation);
             $entityManager->flush();
@@ -416,7 +416,7 @@ public function show(
     #[Route('/{id}/enroll', name: 'app_formation_enroll', methods: ['POST'])]
     public function enroll(Formation $formation, EntityManagerInterface $entityManager): Response
     {
-        $patientId   = 6; // TODO: replace with $this->getUser()->getId_user()
+        $patientId   = 6; // TODO: replace with $this->getUser()->getId()
         $patientUser = $entityManager->getRepository(\App\Entity\User::class)->find($patientId);
 
         if (!$patientUser) {
@@ -508,7 +508,7 @@ public function manageQuiz(
         $users    = $entityManager->getRepository(\App\Entity\User::class)->findAll();
         $coachMap = [];
         foreach ($users as $user) {
-            $coachMap[$user->getId_user()] = $user->getNom() . ' ' . $user->getPrenom();
+            $coachMap[$user->getId()] = $user->getNom() . ' ' . $user->getPrenom();
         }
 
         $data = [];
@@ -538,7 +538,7 @@ public function manageQuiz(
         EntityManagerInterface $entityManager,
         CertificateService $certificateService
     ): Response {
-        $userId = 1; // TODO: replace with $this->getUser()->getId_user()
+        $userId = 1; // TODO: replace with $this->getUser()->getId()
 
         $quiz = $entityManager->getRepository(\App\Entity\Quiz::class)
             ->findOneBy(['formation_id' => $formation]);

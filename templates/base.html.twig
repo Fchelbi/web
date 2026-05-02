@@ -1,105 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
-
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}EchoCare{% endblock %}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/css/style.css?v=2">
+        <link rel="stylesheet" href="/css/ai-chatbot.css?v=10">
+        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default/tmpl/pace-theme-minimal.css">
+        {% block stylesheets %}{% endblock %}
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
-
-        {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-        {% if frankenphpHotReload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-        {% endif %}
     </head>
     <script>
-/**
- * Trigger Touch ID / WebAuthn authentication.
- * Returns a Promise that resolves to true (authenticated) or false (cancelled/failed).
- * Works on Chrome localhost with Touch ID enabled MacBooks.
- */
-async function requireTouchID(actionName) {
-  // Check if WebAuthn is supported
-  if (!window.PublicKeyCredential) {
-    alert('Votre navigateur ne supporte pas l\'authentification biométrique. Utilisez Chrome.');
-    return false;
-  }
-
-  // Check if platform authenticator (Touch ID) is available
-  const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-  if (!available) {
-    alert('Touch ID n\'est pas disponible sur cet appareil.');
-    return false;
-  }
-
-  try {
-    // Create a challenge (random bytes)
-    const challenge = new Uint8Array(32);
-    window.crypto.getRandomValues(challenge);
-
-    // Request credential creation — this triggers Touch ID
-    const credential = await navigator.credentials.create({
-      publicKey: {
-        challenge: challenge,
-        rp: {
-          name: "EchoCare",
-          id: "localhost"
-        },
-        user: {
-          id: new Uint8Array(16),
-          name: "echocare-user",
-          displayName: "EchoCare User"
-        },
-        pubKeyCredParams: [
-          { alg: -7, type: "public-key" },   // ES256
-          { alg: -257, type: "public-key" }   // RS256
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: "platform",  // Forces Touch ID (not USB key)
-          userVerification: "required",         // Requires biometric
-          residentKey: "discouraged"
-        },
-        timeout: 60000,
-        attestation: "none"
+    async function requireTouchID(actionName) {
+      if (!window.PublicKeyCredential) { alert('Utilisez Chrome.'); return false; }
+      const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (!available) { alert('Touch ID non disponible.'); return false; }
+      try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const credential = await navigator.credentials.create({ publicKey: { challenge, rp: { name: 'EchoCare', id: 'localhost' }, user: { id: new Uint8Array(16), name: 'echocare-user', displayName: 'EchoCare User' }, pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }], authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required', residentKey: 'discouraged' }, timeout: 60000, attestation: 'none' } });
+        if (credential) { return true; }
+        return false;
+      } catch (error) {
+        if (error.name === 'NotAllowedError') { return false; }
+        return confirm('Touch ID non disponible. Continuer ?');
       }
-    });
-
-    if (credential) {
-      console.log('✅ Touch ID authenticated for:', actionName);
-      return true;
     }
-    return false;
-
-  } catch (error) {
-    if (error.name === 'NotAllowedError') {
-      // User cancelled Touch ID
-      console.log('❌ Touch ID cancelled');
-      return false;
+    async function enrollWithTouchID(formationId) {
+      var authenticated = await requireTouchID('Inscription formation #' + formationId);
+      if (authenticated) { document.getElementById('enrollForm' + formationId).submit(); }
+      else { alert('Touch ID requis pour s\'inscrire.'); }
     }
-    console.error('Touch ID error:', error);
-    // Fallback: allow action if Touch ID has technical issues
-    return confirm('Touch ID non disponible. Voulez-vous continuer sans authentification biométrique ?');
-  }
-}
-</script>
+    </script>
     <body>
-        {% block body %}
+        <div class="aicb-widget">
+            <button id="aicb-trigger" class="aicb-trigger" onclick="toggleAIChatbot()"><span class="aicb-trigger-icon">✦</span></button>
+            <div id="aicb-panel" class="aicb-panel" style="display:none;" data-api-key="{{ gemini_api_key ?? '' }}">
+                <div class="aicb-header"><div class="aicb-header-left"><div class="aicb-header-orb">✦</div><div><p class="aicb-header-title">EchoCare AI</p><p class="aicb-header-status">Ready to assist</p></div></div><button class="aicb-btn-close" onclick="toggleAIChatbot()">×</button></div>
+                <div id="aicb-form" class="aicb-body"><p class="aicb-welcome">What would you like to share today?</p><div class="aicb-input-wrapper"><textarea id="aicb-prompt" class="aicb-textarea" placeholder="e.g. Tips for morning anxiety…" rows="3"></textarea></div><button class="aicb-btn-generate" onclick="generateAICBPost()">Generate Support Post <span class="aicb-sparkle">✦</span></button></div>
+                <div id="aicb-loading" class="aicb-body aicb-body-center" style="display:none;flex-direction:column;"><div class="aicb-spinner"><div class="aicb-ring aicb-ring-1"></div><div class="aicb-ring aicb-ring-2"></div><div class="aicb-ring aicb-ring-3"></div><div class="aicb-core"></div></div><p class="aicb-loading-title">Drafting your post…</p><div class="aicb-progress"><div class="aicb-progress-bar"></div></div></div>
+                <div id="aicb-result" class="aicb-result-wrap" style="display:none;flex-direction:column;padding:20px;text-align:center;"><p id="aicb-error-text" style="color:#e8895a;font-size:0.88rem;margin-bottom:20px;"></p><div class="aicb-result-actions"><button class="aicb-btn-back" onclick="resetAICBForm()" style="width:100%;justify-content:center;">Go Back</button></div></div>
+            </div>
+        </div>
+
+        {% block body %}{% endblock %}
+
         <script>
-async function enrollWithTouchID(formationId) {
-  var authenticated = await requireTouchID('Inscription formation #' + formationId);
-  if (authenticated) {
-    document.getElementById('enrollForm' + formationId).submit();
-  } else {
-    alert('❌ Authentification Touch ID requise pour s\'inscrire.');
-  }
-}
-</script>
-        {% endblock %}
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof lucide !== 'undefined') { lucide.createIcons(); }
+            });
+        </script>
+        <div id="advice-modal" class="advice-modal-overlay">
+            <div class="advice-modal-content">
+                <button class="advice-close-btn" id="advice-close">×</button>
+                <div class="advice-icon-wrap">✦</div>
+                <h3 class="advice-title">Wisdom for you</h3>
+                <p id="advice-text" class="advice-text">Drafting wisdom...</p>
+                <button id="advice-listen-btn" class="advice-btn-listen">Listen Again</button>
+            </div>
+        </div>
+        <script src="/js/ai-chatbot.js?v=16" defer></script>
+        <style>
+            .advice-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(20px);z-index:99999999;display:none;align-items:center;justify-content:center;}
+            .advice-modal-overlay.show{display:flex!important;}
+            .advice-modal-content{position:relative;background:#1a202c;width:90%;max-width:450px;padding:50px 30px;border-radius:24px;border:2px solid #f59e0b;color:white;text-align:center;margin:auto;}
+            .advice-close-btn{position:absolute;top:15px;right:15px;background:rgba(255,255,255,0.05);border:none;color:#94a3b8;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:20px;}
+            .advice-text{font-size:1.35rem;font-weight:500;color:#fff;line-height:1.5;margin-bottom:25px;}
+            .advice-btn-listen{background:transparent;border:1px solid rgba(255,255,255,0.2);color:white;padding:10px 20px;border-radius:30px;cursor:pointer;font-size:14px;}
+        </style>
     </body>
 </html>

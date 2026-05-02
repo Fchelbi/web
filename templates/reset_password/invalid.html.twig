@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Lien invalide · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #F0E6D8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .card {
+            background: white; border-radius: 20px;
+            padding: 50px 40px; max-width: 460px; width: 100%;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .icon { font-size: 60px; margin-bottom: 20px; }
+        h2 { color: #e74c3c; font-size: 24px; margin-bottom: 12px; }
+        p { color: #777; font-size: 14px; }
+        .btn {
+            display: inline-block; margin-top: 24px;
+            padding: 12px 28px; background: #4A6FA5;
+            color: white; border-radius: 10px;
+            text-decoration: none; font-weight: 600;
+        }
+        .btn:hover { background: #3a5f95; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="icon">⏰</div>
+    <h2>Lien expiré ou invalide</h2>
+    <p>Ce lien de réinitialisation est invalide ou a expiré.</p>
+    <a href="{{ path('app_forgot_password') }}" class="btn">Réessayer</a>
+</div>
+</body>
+</html>

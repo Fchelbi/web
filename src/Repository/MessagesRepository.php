@@ -12,6 +12,4 @@ class MessagesRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Messages::class);
     }
-
-    // Add custom methods as needed
 }

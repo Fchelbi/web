@@ -13,5 +13,43 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
-    // Add custom methods as needed
+    public function searchPaginated(string $search, string $role, int $page, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('u');
+
+        if ($search !== '') {
+            $qb->andWhere('u.nom LIKE :s OR u.prenom LIKE :s OR u.email LIKE :s')
+               ->setParameter('s', '%' . $search . '%');
+        }
+        if ($role !== '') {
+            $qb->andWhere('u.role = :role')->setParameter('role', $role);
+        }
+
+        $total = (clone $qb)->select('COUNT(u.id)')->getQuery()->getSingleScalarResult();
+
+        $users = $qb->orderBy('u.nom', 'ASC')
+                    ->setFirstResult(($page - 1) * $limit)
+                    ->setMaxResults($limit)
+                    ->getQuery()
+                    ->getResult();
+
+        return [$users, (int) $total];
+    }
+
+    public function countBanned(): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.isBanned = true')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countActiveForumUsers(): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT COUNT(DISTINCT user_id) as total FROM post";
+        $result = $conn->executeQuery($sql);
+        return (int) $result->fetchOne();
+    }
 }

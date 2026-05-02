@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Configurer Face ID · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif; background: #0D1B2A;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .card {
+            background: #162232; border-radius: 24px; padding: 50px 40px;
+            max-width: 480px; width: 100%; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo { font-size: 20px; font-weight: 700; color: white; margin-bottom: 24px; }
+        .logo span { color: #E8895A; }
+        .icon-wrap {
+            width: 100px; height: 100px;
+            background: rgba(232,137,90,0.1);
+            border: 2px solid rgba(232,137,90,0.3);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 48px; margin: 0 auto 24px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(232,137,90,0.3); }
+            50% { box-shadow: 0 0 0 15px rgba(232,137,90,0); }
+        }
+        h1 { font-size: 26px; font-weight: 700; color: white; margin-bottom: 12px; }
+        p { font-size: 15px; color: #8899AA; line-height: 1.7; margin-bottom: 32px; }
+
+        .features { display: flex; gap: 12px; margin-bottom: 32px; }
+        .feature {
+            flex: 1; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 16px 12px;
+            font-size: 12px; color: #8899AA;
+        }
+        .feature .f-icon { font-size: 24px; margin-bottom: 8px; }
+        .feature h4 { font-size: 12px; font-weight: 700; color: white; margin-bottom: 4px; }
+
+        .buttons { display: flex; flex-direction: column; gap: 12px; }
+        .btn-yes {
+            padding: 16px; background: #E8895A; color: white;
+            border: none; border-radius: 12px; font-size: 16px;
+            font-weight: 600; cursor: pointer; text-decoration: none;
+            display: block; transition: all 0.2s;
+        }
+        .btn-yes:hover { background: #d4784a; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(232,137,90,0.3); }
+        .btn-no {
+            padding: 14px; background: transparent; color: #8899AA;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            text-decoration: none; display: block; transition: all 0.2s;
+        }
+        .btn-no:hover { background: rgba(255,255,255,0.05); color: white; }
+        .skip { font-size: 12px; color: #4A5568; margin-top: 16px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">Echo<span>Care</span></div>
+    <div class="icon-wrap">👁️</div>
+    <h1>Configurez votre Face ID</h1>
+    <p>Connectez-vous en un clin d'oeil grace a la reconnaissance faciale. Plus rapide et plus securise !</p>
+
+    <div class="features">
+        <div class="feature">
+            <div class="f-icon">⚡</div>
+            <h4>Instantane</h4>
+            <p>Plus de mot de passe</p>
+        </div>
+        <div class="feature">
+            <div class="f-icon">🔐</div>
+            <h4>Securise</h4>
+            <p>Votre visage unique</p>
+        </div>
+        <div class="feature">
+            <div class="f-icon">🤖</div>
+            <h4>IA avancee</h4>
+            <p>Precision maximale</p>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <a href="{{ path('face_register') }}" class="btn-yes">📸 Oui, enregistrer mon visage</a>
+        <a href="{{ path('admin_dashboard') }}" class="btn-no">⏭️ Plus tard</a>
+    </div>
+    <p class="skip">Vous pourrez le configurer depuis le dashboard</p>
+</div>
+</body>
+</html>

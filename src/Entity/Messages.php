@@ -2,118 +2,125 @@
 
 namespace App\Entity;
 
+use App\Repository\MessagesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-use App\Entity\User;
-
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: MessagesRepository::class)]
+#[ORM\Table(name: '`messages`')]
 class Messages
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_message;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id_message = null;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "messagess")]
-    #[ORM\JoinColumn(name: 'id_expediteur', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private User $id_expediteur;
+    #[ORM\Column(type: 'integer')]
+    private ?int $id_expediteur = null;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "messagess")]
-    #[ORM\JoinColumn(name: 'id_destinataire', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private User $id_destinataire;
+    #[ORM\Column(type: 'integer')]
+    private ?int $id_destinataire = null;
 
-    #[ORM\Column(type: "text")]
-    private string $contenu;
+    #[ORM\Column(type: 'text')]
+    private ?string $contenu = null;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $date_envoi;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $date_envoi = null;
 
-    #[ORM\Column(type: "boolean")]
-    private bool $lu;
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $lu = null;
 
-    #[ORM\Column(type: "boolean")]
-    private bool $modifie;
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    private ?bool $modifie = null;
 
-    #[ORM\Column(type: "string")]
-    private string $type;
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $type = null;
 
-    public function getId_message()
+    public function getId_message(): ?int
     {
         return $this->id_message;
     }
 
-    public function setId_message($value)
+    public function setId_message(?int $id_message): self
     {
-        $this->id_message = $value;
+        $this->id_message = $id_message;
+        return $this;
     }
 
-    public function getId_expediteur()
+    public function getId_expediteur(): ?int
     {
         return $this->id_expediteur;
     }
 
-    public function setId_expediteur($value)
+    public function setId_expediteur(?int $id_expediteur): self
     {
-        $this->id_expediteur = $value;
+        $this->id_expediteur = $id_expediteur;
+        return $this;
     }
 
-    public function getId_destinataire()
+    public function getId_destinataire(): ?int
     {
         return $this->id_destinataire;
     }
 
-    public function setId_destinataire($value)
+    public function setId_destinataire(?int $id_destinataire): self
     {
-        $this->id_destinataire = $value;
+        $this->id_destinataire = $id_destinataire;
+        return $this;
     }
 
-    public function getContenu()
+    public function getContenu(): ?string
     {
         return $this->contenu;
     }
 
-    public function setContenu($value)
+    public function setContenu(?string $contenu): self
     {
-        $this->contenu = $value;
+        $this->contenu = $contenu;
+        return $this;
     }
 
-    public function getDate_envoi()
+    public function getDate_envoi(): ?\DateTimeInterface
     {
         return $this->date_envoi;
     }
 
-    public function setDate_envoi($value)
+    public function setDate_envoi(?\DateTimeInterface $date_envoi): self
     {
-        $this->date_envoi = $value;
+        $this->date_envoi = $date_envoi;
+        return $this;
     }
 
-    public function getLu()
+    public function getLu(): ?bool
     {
         return $this->lu;
     }
 
-    public function setLu($value)
+    public function setLu(?bool $lu): self
     {
-        $this->lu = $value;
+        $this->lu = $lu;
+        return $this;
     }
 
-    public function getModifie()
+    public function getModifie(): ?bool
     {
         return $this->modifie;
     }
 
-    public function setModifie($value)
+    public function setModifie(?bool $modifie): self
     {
-        $this->modifie = $value;
+        $this->modifie = $modifie;
+        return $this;
     }
 
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType($value)
+    public function setType(?string $type): self
     {
-        $this->type = $value;
+        $this->type = $type;
+        return $this;
     }
+
 }
