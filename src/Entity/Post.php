@@ -48,15 +48,18 @@ class Post
     #[ORM\JoinColumn(nullable: false, referencedColumnName: 'id_user')]
     private ?User $user = null;
 
+    /** @var Collection<int, Comment> */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post', orphanRemoval: true, cascade: ['persist'])]
     private Collection $comments;
 
+    /** @var Collection<int, User> */
     #[ORM\ManyToMany(targetEntity: User::class)]
     #[ORM\JoinTable(name: 'post_likes')]
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id_user')]
     private Collection $likedByUsers;
 
+    /** @var Collection<int, User> */
     #[ORM\ManyToMany(targetEntity: User::class)]
     #[ORM\JoinTable(name: 'post_dislikes')]
     #[ORM\JoinColumn(name: 'post_id', referencedColumnName: 'id')]
@@ -160,6 +163,7 @@ class Post
         return $this;
     }
 
+    /** @return Collection<int, Comment> */
     public function getComments(): Collection
     {
         return $this->comments;
