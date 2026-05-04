@@ -12,4 +12,6 @@ class ReponseRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Reponse::class);
     }
+
+    // Add custom methods as needed
 }

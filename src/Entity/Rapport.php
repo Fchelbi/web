@@ -2,153 +2,144 @@
 
 namespace App\Entity;
 
-use App\Repository\RapportRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: RapportRepository::class)]
-#[ORM\Table(name: '`rapport`')]
+use App\Entity\User;
+
+#[ORM\Entity]
 class Rapport
 {
+
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_rapport = null;
+    #[ORM\Column(type: "integer")]
+    private int $id_rapport;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_patient = null;
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "rapports")]
+    #[ORM\JoinColumn(name: 'id_patient', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
+    private User $id_patient;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_coach = null;
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "rapports")]
+    #[ORM\JoinColumn(name: 'id_coach', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
+    private User $id_coach;
 
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $contenu = null;
+    #[ORM\Column(type: "text")]
+    private string $contenu;
 
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $recommandations = null;
+    #[ORM\Column(type: "text")]
+    private string $recommandations;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $nb_seances = null;
+    #[ORM\Column(type: "integer")]
+    private int $nb_seances;
 
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $score_humeur = null;
+    #[ORM\Column(type: "float")]
+    private float $score_humeur;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $periode = null;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $periode;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $date_creation = null;
+    #[ORM\Column(type: "datetime")]
+    private \DateTimeInterface $date_creation;
 
-    #[ORM\Column(type: 'string', length: 512, nullable: true)]
-    private ?string $fichier_pdf = null;
+    #[ORM\Column(type: "string", length: 512)]
+    private string $fichier_pdf;
 
-    public function getId_rapport(): ?int
+    public function getId_rapport()
     {
         return $this->id_rapport;
     }
 
-    public function setId_rapport(?int $id_rapport): self
+    public function setId_rapport($value)
     {
-        $this->id_rapport = $id_rapport;
-        return $this;
+        $this->id_rapport = $value;
     }
 
-    public function getId_patient(): ?int
+    public function getId_patient()
     {
         return $this->id_patient;
     }
 
-    public function setId_patient(?int $id_patient): self
+    public function setId_patient($value)
     {
-        $this->id_patient = $id_patient;
-        return $this;
+        $this->id_patient = $value;
     }
 
-    public function getId_coach(): ?int
+    public function getId_coach()
     {
         return $this->id_coach;
     }
 
-    public function setId_coach(?int $id_coach): self
+    public function setId_coach($value)
     {
-        $this->id_coach = $id_coach;
-        return $this;
+        $this->id_coach = $value;
     }
 
-    public function getContenu(): ?string
+    public function getContenu()
     {
         return $this->contenu;
     }
 
-    public function setContenu(?string $contenu): self
+    public function setContenu($value)
     {
-        $this->contenu = $contenu;
-        return $this;
+        $this->contenu = $value;
     }
 
-    public function getRecommandations(): ?string
+    public function getRecommandations()
     {
         return $this->recommandations;
     }
 
-    public function setRecommandations(?string $recommandations): self
+    public function setRecommandations($value)
     {
-        $this->recommandations = $recommandations;
-        return $this;
+        $this->recommandations = $value;
     }
 
-    public function getNb_seances(): ?int
+    public function getNb_seances()
     {
         return $this->nb_seances;
     }
 
-    public function setNb_seances(?int $nb_seances): self
+    public function setNb_seances($value)
     {
-        $this->nb_seances = $nb_seances;
-        return $this;
+        $this->nb_seances = $value;
     }
 
-    public function getScore_humeur(): ?float
+    public function getScore_humeur()
     {
         return $this->score_humeur;
     }
 
-    public function setScore_humeur(?float $score_humeur): self
+    public function setScore_humeur($value)
     {
-        $this->score_humeur = $score_humeur;
-        return $this;
+        $this->score_humeur = $value;
     }
 
-    public function getPeriode(): ?string
+    public function getPeriode()
     {
         return $this->periode;
     }
 
-    public function setPeriode(?string $periode): self
+    public function setPeriode($value)
     {
-        $this->periode = $periode;
-        return $this;
+        $this->periode = $value;
     }
 
-    public function getDate_creation(): ?\DateTimeInterface
+    public function getDate_creation()
     {
         return $this->date_creation;
     }
 
-    public function setDate_creation(?\DateTimeInterface $date_creation): self
+    public function setDate_creation($value)
     {
-        $this->date_creation = $date_creation;
-        return $this;
+        $this->date_creation = $value;
     }
 
-    public function getFichier_pdf(): ?string
+    public function getFichier_pdf()
     {
         return $this->fichier_pdf;
     }
 
-    public function setFichier_pdf(?string $fichier_pdf): self
+    public function setFichier_pdf($value)
     {
-        $this->fichier_pdf = $fichier_pdf;
-        return $this;
+        $this->fichier_pdf = $value;
     }
-
 }

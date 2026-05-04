@@ -1,0 +1,232 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ isNew ? 'Créer' : 'Modifier' }} Quiz — {{ formation.title }} | EchoCare{% endblock %}
+{% block body %}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--blue-dark:#0f2a4a;--blue-light:#2d7dd2;--blue-pale:#e8f2ff;--orange:#f4845f;--orange-soft:#fff3ef;--white:#fff;--gray-100:#f7f9fc;--gray-200:#eef2f7;--gray-400:#94a3b8;--gray-700:#374151;--radius:14px;--shadow-sm:0 2px 8px rgba(15,42,74,.08)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-100);color:var(--gray-700);padding:40px 20px}
+  .page-wrap{max-width:820px;margin:0 auto}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--blue-light);font-size:14px;font-weight:600;text-decoration:none;margin-bottom:24px}
+  .back-link:hover{opacity:.75}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;margin-bottom:24px}
+  .card-header{background:linear-gradient(135deg,var(--blue-dark),#1a4a7a);padding:24px 30px}
+  .card-header small{color:rgba(255,255,255,.6);font-size:13px}
+  .card-title{font-size:22px;font-weight:800;color:#fff;margin-top:4px}
+  .card-body{padding:30px}
+  .field{margin-bottom:22px}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--blue-dark);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+  .form-input{width:100%;padding:12px 16px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;color:var(--gray-700);outline:none;transition:.2s;background:#fff}
+  .form-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(45,125,210,.1)}
+  textarea.form-input{resize:vertical;min-height:80px}
+  .error-msg{color:#ef4444;font-size:12px;margin-top:5px;font-weight:600}
+
+  /* Question blocks */
+  .question-block{background:var(--gray-100);border:1.5px solid var(--gray-200);border-radius:12px;padding:22px;margin-bottom:20px;position:relative}
+  .question-block .q-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .q-number{font-size:14px;font-weight:800;color:var(--blue-dark)}
+  .btn-remove-q{background:#fee2e2;color:#dc2626;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
+  .btn-remove-q:hover{background:#dc2626;color:#fff}
+
+  /* Answer rows */
+  .answer-row{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+  .answer-row input[type="text"]{flex:1}
+  .answer-row label{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:var(--gray-700);white-space:nowrap;cursor:pointer}
+  .btn-remove-a{background:none;border:none;color:#ef4444;font-size:18px;cursor:pointer;padding:4px;line-height:1}
+  .btn-add-answer{background:var(--blue-pale);color:var(--blue-light);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;margin-top:6px;transition:.15s}
+  .btn-add-answer:hover{background:var(--blue-light);color:#fff}
+
+  /* Action buttons */
+  .btn-add-question{background:var(--blue-pale);color:var(--blue-light);border:none;border-radius:10px;padding:12px 22px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.15s;margin-bottom:24px}
+  .btn-add-question:hover{background:var(--blue-light);color:#fff}
+  .form-actions{display:flex;gap:12px;padding-top:20px;border-top:1px solid var(--gray-200)}
+  .btn-submit{flex:1;background:var(--orange);color:#fff;border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:700;cursor:pointer;transition:.2s;box-shadow:0 4px 12px rgba(244,132,95,.35)}
+  .btn-submit:hover{background:#e06d47}
+  .btn-cancel{background:var(--gray-100);color:var(--gray-700);border:none;border-radius:10px;padding:13px 22px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .btn-cancel:hover{background:var(--gray-200)}
+  .flash{padding:14px 20px;border-radius:10px;margin-bottom:20px;font-weight:600}
+  .flash-success{background:#e8f8f0;color:#27ae60}
+</style>
+
+<div class="page-wrap">
+  <a href="{{ path('app_formation_quiz', {'id': formation.id}) }}" class="back-link">← Retour à la gestion du quiz</a>
+
+  {% for message in app.flashes('success') %}
+    <div class="flash flash-success">✅ {{ message }}</div>
+  {% endfor %}
+
+  <div class="card">
+    <div class="card-header">
+      <small>📚 {{ formation.title }}</small>
+      <div class="card-title">{{ isNew ? '➕ Créer un Quiz' : '✏️ Modifier le Quiz' }}</div>
+    </div>
+    <div class="card-body">
+      {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'quizForm'}}) }}
+
+        {# ---- Title & Passing Score ---- #}
+        <div class="field">
+          <label>Titre du Quiz <span style="color:var(--orange)">*</span></label>
+          {{ form_widget(form.title, {'attr': {'class': 'form-input'}}) }}
+          {% if form.title.vars.errors|length > 0 %}
+            <div class="error-msg">⚠️ {{ form_errors(form.title) }}</div>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label>Score de passage (%)</label>
+          {{ form_widget(form.passingScore, {'attr': {'class': 'form-input', 'style': 'max-width:120px'}}) }}
+        </div>
+
+        {# ---- Questions ---- #}
+        <h3 style="font-size:16px;font-weight:800;color:var(--blue-dark);margin-bottom:16px">📝 Questions</h3>
+
+        <div id="questionsContainer" data-prototype="{{ form_widget(form.questions.vars.prototype)|e('html_attr') }}" data-index="{{ form.questions|length }}">
+          {% for questionForm in form.questions %}
+            <div class="question-block" data-question-index="{{ loop.index0 }}">
+              <div class="q-header">
+                <span class="q-number">Question {{ loop.index }}</span>
+                <button type="button" class="btn-remove-q" onclick="removeQuestion(this)">✕ Supprimer</button>
+              </div>
+
+              <div class="field">
+                <label>Texte de la question</label>
+                {{ form_widget(questionForm.questionText, {'attr': {'class': 'form-input'}}) }}
+              </div>
+
+              <div class="field" style="max-width:120px">
+                <label>Points</label>
+                {{ form_widget(questionForm.points, {'attr': {'class': 'form-input'}}) }}
+              </div>
+
+              <label style="font-size:12px;font-weight:700;color:var(--blue-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:block">Réponses</label>
+
+              <div class="answers-container"
+                   data-answer-prototype="{{ form_widget(questionForm.reponses.vars.prototype)|e('html_attr') }}"
+                   data-answer-index="{{ questionForm.reponses|length }}">
+                {% for reponseForm in questionForm.reponses %}
+                  <div class="answer-row">
+                    {{ form_widget(reponseForm.optionText, {'attr': {'class': 'form-input', 'placeholder': 'Réponse…'}}) }}
+                    <label>
+                      {{ form_widget(reponseForm.isCorrect) }}
+                      Correcte
+                    </label>
+                    <button type="button" class="btn-remove-a" onclick="removeAnswer(this)" title="Supprimer">&times;</button>
+                  </div>
+                {% endfor %}
+              </div>
+              <button type="button" class="btn-add-answer" onclick="addAnswer(this)">＋ Ajouter une réponse</button>
+            </div>
+          {% endfor %}
+        </div>
+
+        <button type="button" class="btn-add-question" onclick="addQuestion()">＋ Ajouter une question</button>
+
+        <div class="form-actions">
+          <a href="{{ path('app_formation_quiz', {'id': formation.id}) }}" class="btn-cancel">← Annuler</a>
+          <button type="submit" class="btn-submit">
+            {{ isNew ? '✅ Créer le Quiz' : '💾 Sauvegarder' }}
+          </button>
+        </div>
+
+      {{ form_end(form) }}
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+//  Add / Remove QUESTIONS
+// ================================================================
+function addQuestion() {
+  const container = document.getElementById('questionsContainer');
+  let index = parseInt(container.dataset.index);
+  let prototype = container.dataset.prototype;
+
+  // Replace __name__ with the current index
+  let newForm = prototype.replace(/__name__/g, index);
+  container.dataset.index = index + 1;
+
+  const block = document.createElement('div');
+  block.className = 'question-block';
+  block.innerHTML = `
+    <div class="q-header">
+      <span class="q-number">Question ${index + 1}</span>
+      <button type="button" class="btn-remove-q" onclick="removeQuestion(this)">✕ Supprimer</button>
+    </div>
+    ${newForm}
+  `;
+
+  // Style the generated inputs
+  block.querySelectorAll('input, textarea, select').forEach(el => {
+    el.classList.add('form-input');
+  });
+
+  container.appendChild(block);
+
+  // Seed 2 empty answers for the new question
+  const answersDiv = block.querySelector('[data-prototype]');
+  if (answersDiv) {
+    addAnswerToContainer(answersDiv);
+    addAnswerToContainer(answersDiv);
+  }
+
+  renumberQuestions();
+}
+
+function removeQuestion(btn) {
+  const block = btn.closest('.question-block');
+  if (document.querySelectorAll('.question-block').length <= 1) {
+    alert('Le quiz doit avoir au moins une question.');
+    return;
+  }
+  block.remove();
+  renumberQuestions();
+}
+
+function renumberQuestions() {
+  document.querySelectorAll('.question-block .q-number').forEach((el, i) => {
+    el.textContent = 'Question ' + (i + 1);
+  });
+}
+
+// ================================================================
+//  Add / Remove ANSWERS
+// ================================================================
+function addAnswer(btn) {
+  const container = btn.previousElementSibling; // .answers-container
+  addAnswerToContainer(container);
+}
+
+function addAnswerToContainer(container) {
+  let index = parseInt(container.dataset.answerIndex || container.dataset.index || 0);
+  let prototype = container.dataset.answerPrototype || container.dataset.prototype;
+
+  if (!prototype) return;
+
+  let newForm = prototype.replace(/__name__/g, index);
+  container.dataset.answerIndex = index + 1;
+  if (container.dataset.index !== undefined) container.dataset.index = index + 1;
+
+  const row = document.createElement('div');
+  row.className = 'answer-row';
+  row.innerHTML = newForm + '<button type="button" class="btn-remove-a" onclick="removeAnswer(this)" title="Supprimer">&times;</button>';
+
+  row.querySelectorAll('input[type="text"], textarea').forEach(el => {
+    el.classList.add('form-input');
+    el.placeholder = 'Réponse…';
+  });
+
+  container.appendChild(row);
+}
+
+function removeAnswer(btn) {
+  const row = btn.closest('.answer-row');
+  const container = row.parentElement;
+  if (container.querySelectorAll('.answer-row').length <= 2) {
+    alert('Chaque question doit avoir au moins 2 réponses.');
+    return;
+  }
+  row.remove();
+}
+</script>
+{% endblock %}

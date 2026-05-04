@@ -12,4 +12,6 @@ class ParticipationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Participation::class);
     }
+
+    // Add custom methods as needed
 }

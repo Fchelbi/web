@@ -12,4 +12,6 @@ class QuizRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Quiz::class);
     }
+
+    // Add custom methods as needed
 }

@@ -1,70 +1,116 @@
 <?php
-
 namespace App\Entity;
 
-use App\Repository\QuizRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
-#[ORM\Entity(repositoryClass: QuizRepository::class)]
-#[ORM\Table(name: '`quiz`')]
+#[ORM\Entity]
 class Quiz
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $formation_id = null;
+    // Stores the Formation object (not just the ID integer)
+    #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: "quizs")]
+    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private ?Formation $formation_id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private ?string $title = null;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $title = '';
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $passing_score = null;
+    #[ORM\Column(type: "integer")]
+    private int $passing_score = 60;
+
+    // cascade persist+remove + orphanRemoval: deleting a question from the
+    // collection will remove it from the DB automatically
+    #[ORM\OneToMany(
+        mappedBy: "quiz",
+        targetEntity: Question::class,
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true
+    )]
+    private Collection $questions;
+
+    #[ORM\OneToMany(mappedBy: "quiz_id", targetEntity: Quiz_result::class)]
+    private Collection $quiz_results;
+
+    public function __construct()
+    {
+        $this->questions    = new ArrayCollection();
+        $this->quiz_results = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(?int $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    public function getFormation_id(): ?int
+    public function getFormation_id(): ?Formation
     {
         return $this->formation_id;
     }
 
-    public function setFormation_id(?int $formation_id): self
+    public function setFormation_id(?Formation $value): self
     {
-        $this->formation_id = $formation_id;
+        $this->formation_id = $value;
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(?string $title): self
+    public function setTitle(string $value): self
     {
-        $this->title = $title;
+        $this->title = $value;
         return $this;
     }
 
-    public function getPassing_score(): ?int
+    public function getPassingScore(): int
     {
         return $this->passing_score;
     }
 
-    public function setPassing_score(?int $passing_score): self
+    public function setPassingScore(int $value): self
     {
-        $this->passing_score = $passing_score;
+        $this->passing_score = $value;
         return $this;
     }
 
+    // ------------------------------------------------------------------
+    // These two methods are REQUIRED by CollectionType with by_reference:false
+    // Without them Symfony cannot add/remove questions from the collection
+    // ------------------------------------------------------------------
+    public function addQuestion(Question $question): self
+    {
+        if (!$this->questions->contains($question)) {
+            $this->questions->add($question);
+            $question->setQuiz($this); // keep both sides in sync
+        }
+        return $this;
+    }
+
+    public function removeQuestion(Question $question): self
+    {
+        if ($this->questions->removeElement($question)) {
+            if ($question->getQuiz() === $this) {
+                $question->setQuiz(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getQuestions(): Collection
+    {
+        return $this->questions;
+    }
+
+    public function getQuiz_results(): Collection
+    {
+        return $this->quiz_results;
+    }
 }

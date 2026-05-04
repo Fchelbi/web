@@ -31,7 +31,11 @@
                 </div>
 
                 <div class="navbar-links">
-                    <a href="{{ path('patient_dashboard') }}" class="{% if 'patient_dashboard' in app.request.attributes.get('_route') %}active{% endif %}">Accueil</a>
+                <a href="{{ 
+    app.user and app.user.role == 'Admin' ? path('app_admin_dashboard') :
+    (app.user and app.user.role == 'Coach' ? path('coach_dashboard') : 
+    path('patient_dashboard')) 
+}}" class="{% if app.request.attributes.get('_route') in ['app_admin_dashboard', 'coach_dashboard', 'patient_dashboard'] %}active{% endif %}">Accueil</a>
                     <a href="{{ path('patient_bien_etre') }}" class="{% if 'bien_etre' in app.request.attributes.get('_route') %}active{% endif %}">Bien-etre</a>
                     
                     <div class="nav-dropdown">

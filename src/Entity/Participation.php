@@ -2,69 +2,67 @@
 
 namespace App\Entity;
 
-use App\Repository\ParticipationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ParticipationRepository::class)]
-#[ORM\Table(name: '`participation`')]
+use App\Entity\Formation;
+
+#[ORM\Entity]
 class Participation
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $user_id = null;
+   #[ORM\Id]
+#[ORM\GeneratedValue]
+#[ORM\Column(type: "integer")]
+private ?int $id = null;
 
-    #[ORM\Column(type: 'integer')]
-    private ?int $formation_id = null;
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "participations")]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
+    private User $user_id;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $date_inscription = null;
+        #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: "participations")]
+    #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Formation $formation_id;
 
-    public function getId(): ?int
+    #[ORM\Column(type: "datetime")]
+    private \DateTimeInterface $date_inscription;
+
+    public function getId()
     {
         return $this->id;
     }
 
-    public function setId(?int $id): self
+    public function setId($value)
     {
-        $this->id = $id;
-        return $this;
+        $this->id = $value;
     }
 
-    public function getUser_id(): ?int
+    public function getUser_id()
     {
         return $this->user_id;
     }
 
-    public function setUser_id(?int $user_id): self
+    public function setUser_id($value)
     {
-        $this->user_id = $user_id;
-        return $this;
+        $this->user_id = $value;
     }
 
-    public function getFormation_id(): ?int
+    public function getFormation_id()
     {
         return $this->formation_id;
     }
 
-    public function setFormation_id(?int $formation_id): self
+    public function setFormation_id($value)
     {
-        $this->formation_id = $formation_id;
-        return $this;
+        $this->formation_id = $value;
     }
 
-    public function getDate_inscription(): ?\DateTimeInterface
+    public function getDate_inscription()
     {
         return $this->date_inscription;
     }
 
-    public function setDate_inscription(?\DateTimeInterface $date_inscription): self
+    public function setDate_inscription($value)
     {
-        $this->date_inscription = $date_inscription;
-        return $this;
+        $this->date_inscription = $value;
     }
-
 }
