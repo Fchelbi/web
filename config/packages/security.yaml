@@ -33,7 +33,6 @@ security:
                 path: /
 
     access_control:
-        - { path: ^/easyadmin, roles: PUBLIC_ACCESS }
         - { path: ^/check-auth, roles: PUBLIC_ACCESS }
         - { path: ^/check-blocked, roles: PUBLIC_ACCESS }
         - { path: ^/login, roles: PUBLIC_ACCESS }

@@ -415,24 +415,10 @@ class PostController extends AbstractController
             }
         }
         
-        // --- FALLBACK TO ADVICESLIP API ---
-        try {
-            $fallbackResp = file_get_contents('https://api.adviceslip.com/advice');
-            if ($fallbackResp) {
-                $fallbackData = json_decode($fallbackResp, true);
-                if (isset($fallbackData['slip']['advice'])) {
-                    return new JsonResponse([
-                        'advice' => $fallbackData['slip']['advice'],
-                        'note' => 'DeepSeek balance low, using fallback wisdom.'
-                    ]);
-                }
-            }
-        } catch (\Exception $e) {}
-
         return new JsonResponse([
-            'error' => 'Advice Generation Failed',
-            'details' => 'DeepSeek: ' . ($err ?: 'HTTP ' . $httpCode),
-            'fallback' => 'Failed'
+            'error' => 'DeepSeek Error',
+            'details' => $err ?: 'HTTP ' . $httpCode,
+            'raw' => $response
         ], 500);
     }
 }

@@ -10,21 +10,45 @@ class GeminiModerationService
     private string $apiKey;
     private EntityManagerInterface $em;
 
+    // Local profanity blocklist — checked before hitting the AI API
+    private const BANNED_WORDS = [
+        'fuck', 'fucking', 'fucker', 'fuckhead',
+        'shit', 'shitty', 'bullshit',
+        'bitch', 'bitches', 'bastard',
+        'asshole', 'ass', 'arse',
+        'cunt', 'dick', 'cock', 'pussy',
+        'nigger', 'nigga', 'faggot', 'fag',
+        'whore', 'slut', 'retard', 'retarded',
+        'kill yourself', 'kys', 'die bitch',
+        'rape', 'molest',
+        'piss', 'pissed',
+        'damn', 'crap',
+        'wtf', 'stfu', 'gtfo',
+    ];
+
     public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
         $this->apiKey = $_ENV['GEMINI_API_KEY'] ?? '';
     }
 
-    /**
-     * Analyze a single post with Gemini AI for content moderation.
-     * Returns: ['flagged' => bool, 'reason' => string, 'confidence' => float, 'categories' => array]
-     */
     public function moderatePost(Post $post): array
     {
-        $prompt = $this->buildPrompt($post->getTitle() ?? '', $post->getContent() ?? '');
+        $title   = $post->getTitle() ?? '';
+        $content = $post->getContent() ?? '';
 
-        $result = $this->callGeminiApi($prompt);
+        // 1. Local profanity check — fast, no API needed
+        $localResult = $this->checkProfanity($title . ' ' . $content);
+        if ($localResult['flagged']) {
+            $post->setIsFlagged(true);
+            $post->setFlagReason($localResult['reason']);
+            $post->setModerationStatus('pending');
+            $this->em->flush();
+            return $localResult;
+        }
+
+        // 2. AI moderation — deeper semantic analysis
+        $result = $this->callGeminiApi($this->buildPrompt($title, $content));
 
         if ($result['flagged']) {
             $post->setIsFlagged(true);
@@ -36,12 +60,9 @@ class GeminiModerationService
         return $result;
     }
 
-    /**
-     * Scan all provided posts with Gemini AI.
-     * Returns summary: ['scanned' => int, 'flagged' => int, 'results' => array]
-     */
     public function moderateAllPosts(array $posts): array
     {
+        set_time_limit(300); // batch scan can take a while
         $scanned = 0;
         $flagged = 0;
         $results = [];
@@ -54,40 +75,74 @@ class GeminiModerationService
             }
             $results[] = [
                 'post_id' => $post->getId(),
-                'title' => $post->getTitle(),
+                'title'   => $post->getTitle(),
                 'flagged' => $result['flagged'],
-                'reason' => $result['reason'],
+                'reason'  => $result['reason'],
             ];
         }
 
         $this->em->flush();
 
-        return [
-            'scanned' => $scanned,
-            'flagged' => $flagged,
-            'results' => $results,
-        ];
+        return ['scanned' => $scanned, 'flagged' => $flagged, 'results' => $results];
+    }
+
+    /**
+     * Fast local check against the banned-word list.
+     * Uses word-boundary matching to avoid false positives (e.g. "class" ≠ "ass").
+     */
+    private function checkProfanity(string $text): array
+    {
+        $lower = mb_strtolower($text);
+
+        foreach (self::BANNED_WORDS as $word) {
+            // Use word boundaries for single words; phrase match for multi-word entries
+            if (str_contains($word, ' ')) {
+                if (str_contains($lower, $word)) {
+                    return [
+                        'flagged'    => true,
+                        'reason'     => "Contains prohibited phrase: \"{$word}\"",
+                        'confidence' => 1.0,
+                        'categories' => ['profanity'],
+                    ];
+                }
+            } else {
+                // Match whole words only (surrounded by non-alphanumeric chars or start/end)
+                if (preg_match('/(?<![a-z0-9])' . preg_quote($word, '/') . '(?![a-z0-9])/i', $lower)) {
+                    return [
+                        'flagged'    => true,
+                        'reason'     => "Contains prohibited language: \"{$word}\"",
+                        'confidence' => 1.0,
+                        'categories' => ['profanity'],
+                    ];
+                }
+            }
+        }
+
+        return ['flagged' => false, 'reason' => '', 'confidence' => 1.0, 'categories' => []];
     }
 
     private function buildPrompt(string $title, string $content): string
     {
         return <<<PROMPT
-You are a content moderation AI for a community forum. Analyze the following forum post and determine if it contains any of the following:
+You are a strict content moderation AI for a mental health community forum called EchoCare. Your job is to protect users from harmful content.
 
-1. Inappropriate or offensive language (profanity, slurs)
-2. Abusive or harassing content (bullying, threats toward individuals)
-3. Harmful or dangerous content (self-harm, dangerous activities)
-4. Sexual or explicit content (pornography, sexual solicitation)
-5. Violent content (graphic violence, threats of violence)
-6. Hate speech or discrimination (racism, sexism, homophobia, etc.)
-7. Spam or misleading content (scams, phishing, clickbait)
-8. Unsafe content (doxxing, personal information exposure)
+Flag the post if it contains ANY of the following, even mildly:
+1. Profanity or offensive language — ANY swear words, slurs, or vulgar expressions (e.g. "fuck", "shit", "bitch")
+2. Abusive or harassing language — insults, bullying, threats
+3. Self-harm or suicide ideation — explicit or implicit encouragement
+4. Sexual or explicit content
+5. Graphic violence or threats
+6. Hate speech — racism, sexism, homophobia, religious intolerance
+7. Spam or scam content
+8. Doxxing or personal information exposure
 
-You MUST respond ONLY with valid JSON in this exact format, nothing else:
-{"flagged": true, "reason": "Brief explanation of why it was flagged", "confidence": 0.95, "categories": ["hate_speech", "violence"]}
+IMPORTANT: A post that contains ONLY a single profane word (such as "fuck") MUST be flagged. Context does not excuse profanity.
 
-If the content is safe and appropriate, respond with:
-{"flagged": false, "reason": "Content is appropriate and safe", "confidence": 0.98, "categories": []}
+Respond ONLY with valid JSON — no explanation, no markdown, nothing else:
+{"flagged": true, "reason": "Contains profanity: 'fuck'", "confidence": 0.99, "categories": ["profanity"]}
+
+or if safe:
+{"flagged": false, "reason": "Content is appropriate and safe", "confidence": 0.95, "categories": []}
 
 POST TITLE: {$title}
 POST CONTENT: {$content}
@@ -96,54 +151,62 @@ PROMPT;
 
     private function callGeminiApi(string $prompt): array
     {
+        if (empty($this->apiKey)) {
+            return $this->apiUnavailable('No API key configured');
+        }
+
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $this->apiKey;
 
         $payload = json_encode([
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
-            ],
+            'contents' => [[
+                'parts' => [['text' => $prompt]]
+            ]],
             'generationConfig' => [
-                'temperature' => 0.1,
+                'temperature'     => 0.1,
                 'maxOutputTokens' => 300,
-            ]
+            ],
         ]);
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 30,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT        => 10,
             CURLOPT_SSL_VERIFYPEER => false,
         ]);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
+        $error    = curl_error($ch);
         curl_close($ch);
 
         if ($error || $httpCode !== 200) {
-            return [
-                'flagged' => false,
-                'reason' => 'Moderation service unavailable: ' . ($error ?: "HTTP $httpCode"),
-                'confidence' => 0.0,
-                'categories' => [],
-            ];
+            // API unavailable — flag for manual review rather than silently passing
+            return $this->apiUnavailable($error ?: "HTTP $httpCode");
         }
 
         return $this->parseGeminiResponse($response);
     }
 
+    /** When Gemini is unreachable, pass the post — local profanity check already ran. */
+    private function apiUnavailable(string $reason): array
+    {
+        return [
+            'flagged'    => false,
+            'reason'     => "AI unavailable ({$reason}) — passed local filter",
+            'confidence' => 0.0,
+            'categories' => [],
+        ];
+    }
+
     private function parseGeminiResponse(string $response): array
     {
         $default = [
-            'flagged' => false,
-            'reason' => 'Unable to parse moderation response',
+            'flagged'    => false,
+            'reason'     => 'Unable to parse moderation response',
             'confidence' => 0.0,
             'categories' => [],
         ];
@@ -153,13 +216,12 @@ PROMPT;
             return $default;
         }
 
-        // Extract the text content from Gemini's response
         $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
         if (empty($text)) {
             return $default;
         }
 
-        // Clean up: Gemini may wrap JSON in markdown code blocks
+        // Strip markdown code fences if Gemini wraps the JSON
         $text = trim($text);
         $text = preg_replace('/^```json\s*/i', '', $text);
         $text = preg_replace('/^```\s*/i', '', $text);
@@ -172,10 +234,10 @@ PROMPT;
         }
 
         return [
-            'flagged' => (bool) ($result['flagged'] ?? false),
-            'reason' => (string) ($result['reason'] ?? 'No reason provided'),
-            'confidence' => (float) ($result['confidence'] ?? 0.0),
-            'categories' => (array) ($result['categories'] ?? []),
+            'flagged'    => (bool)   ($result['flagged']     ?? false),
+            'reason'     => (string) ($result['reason']      ?? 'No reason provided'),
+            'confidence' => (float)  ($result['confidence']  ?? 0.0),
+            'categories' => (array)  ($result['categories']  ?? []),
         ];
     }
 }
