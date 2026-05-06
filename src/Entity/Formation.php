@@ -63,6 +63,9 @@ class Formation
     #[ORM\Column(type: "integer", nullable: true, name: "coach_id")]
     private ?int $coachId = null;
 
+    /**
+     * @var Collection<int, Quiz>
+     */
     #[ORM\OneToMany(
         mappedBy: "formation_id",
         targetEntity: Quiz::class,
@@ -71,6 +74,9 @@ class Formation
     )]
     private Collection $quizs;
 
+    /**
+     * @var Collection<int, Participation>
+     */
     #[ORM\OneToMany(mappedBy: "formation_id", targetEntity: Participation::class)]
     private Collection $participations;
 
@@ -83,9 +89,9 @@ class Formation
     // --- Existing getters/setters ---
 
     public function getId(): ?int
-     { 
+    { 
         return $this->id; 
-        }
+    }
 
     public function getTitle(): string { return $this->title; }
     public function setTitle(string $v): self { $this->title = $v; return $this; }
@@ -102,6 +108,9 @@ class Formation
     public function getCoachId(): ?int { return $this->coachId; }
     public function setCoachId(?int $v): self { $this->coachId = $v; return $this; }
 
+    /**
+     * @return Collection<int, Quiz>
+     */
     public function getQuizs(): Collection { return $this->quizs; }
 
     public function addQuiz(Quiz $quiz): self
@@ -123,6 +132,9 @@ class Formation
         return $this;
     }
 
+    /**
+     * @return Collection<int, Participation>
+     */
     public function getParticipations(): Collection { return $this->participations; }
 
     // ===== NEW GETTERS/SETTERS =====
