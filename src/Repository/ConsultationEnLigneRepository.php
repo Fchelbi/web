@@ -15,6 +15,13 @@ class ConsultationEnLigneRepository extends ServiceEntityRepository
 
     public function findByStatut(?string $statut): array
     {
+        $qb = $this->createListQueryBuilder($statut);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function createListQueryBuilder(?string $statut): \Doctrine\ORM\QueryBuilder
+    {
         $qb = $this->createQueryBuilder('c')
             ->leftJoin('c.user', 'u')
             ->addSelect('u')
@@ -27,7 +34,7 @@ class ConsultationEnLigneRepository extends ServiceEntityRepository
                 ->setParameter('statut', $statut);
         }
 
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 
     public function isDateAlreadyUsed(\DateTimeInterface $dateConsultation, ?int $excludedId = null): bool
@@ -55,6 +62,8 @@ class ConsultationEnLigneRepository extends ServiceEntityRepository
 
         $rows = $this->createQueryBuilder('c')
             ->select('c.statut AS statut, COUNT(c.id) AS total')
+            ->andWhere('c.statut IN (:statuts)')
+            ->setParameter('statuts', ConsultationEnLigne::STATUTS)
             ->groupBy('c.statut')
             ->getQuery()
             ->getArrayResult();

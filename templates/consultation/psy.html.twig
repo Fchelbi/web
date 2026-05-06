@@ -76,5 +76,8 @@
                 </tbody>
             </table>
         </div>
+        <div class="card-body border-top d-flex justify-content-center">
+            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+        </div>
     </div>
 {% endblock %}

@@ -93,18 +93,7 @@ class ConsultationController extends AbstractController
             $statut = $data['statut'] ?? null;
         }
 
-        $queryBuilder = $repository->createQueryBuilder('c')
-            ->leftJoin('c.user', 'u')
-            ->addSelect('u')
-            ->leftJoin('c.psychologue', 'p')
-            ->addSelect('p')
-            ->orderBy('c.dateConsultation', 'ASC');
-
-        if ($statut !== null && $statut !== '') {
-            $queryBuilder
-                ->andWhere('c.statut = :statut')
-                ->setParameter('statut', $statut);
-        }
+        $queryBuilder = $repository->createListQueryBuilder($statut);
 
         $pagination = $paginator->paginate(
             $queryBuilder,
@@ -180,10 +169,21 @@ class ConsultationController extends AbstractController
     }
 
     #[Route('/psy/consultations', name: 'psy_consultations', methods: ['GET'])]
-    public function psyList(ConsultationEnLigneRepository $repository): Response
+    public function psyList(
+        Request $request,
+        ConsultationEnLigneRepository $repository,
+        PaginatorInterface $paginator
+    ): Response
     {
+        $pagination = $paginator->paginate(
+            $repository->createListQueryBuilder(null),
+            $request->query->getInt('page', 1),
+            10
+        );
+
         return $this->render('consultation/psy.html.twig', [
-            'consultations' => $repository->findByStatut(null),
+            'consultations' => $pagination,
+            'pagination' => $pagination,
         ]);
     }
 

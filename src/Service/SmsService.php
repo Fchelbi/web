@@ -4,9 +4,9 @@ namespace App\Service;
 
 class SmsService
 {
-    private const DEFAULT_ACCOUNT_SID = 'ACd6a636fad3cc49b59bcbbc225d9713a3';
-    private const DEFAULT_AUTH_TOKEN = 'dbcd6327269e4de6fca3985f0536998b';
-    private const DEFAULT_FROM_NUMBER = '+17755005336';
+    private const DEFAULT_ACCOUNT_SID = 'AC6f52e269dfd3a7ca1618611e7126b80f';
+    private const DEFAULT_AUTH_TOKEN = 'd6c049d2849e5bb3a50afa9c63031e24';
+    private const DEFAULT_FROM_NUMBER = '+19062421507';
 
     public function send(?string $to, string $message): bool
     {
