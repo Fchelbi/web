@@ -26,43 +26,12 @@ private ?int $id = null;
     #[ORM\Column(type: "datetime")]
     private \DateTimeInterface $date_inscription;
 
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($value)
-    {
-        $this->id = $value;
-    }
-
-    public function getUser_id()
-    {
-        return $this->user_id;
-    }
-
-    public function setUser_id($value)
-    {
-        $this->user_id = $value;
-    }
-
-    public function getFormation_id()
-    {
-        return $this->formation_id;
-    }
-
-    public function setFormation_id($value)
-    {
-        $this->formation_id = $value;
-    }
-
-    public function getDate_inscription()
-    {
-        return $this->date_inscription;
-    }
-
-    public function setDate_inscription($value)
-    {
-        $this->date_inscription = $value;
-    }
+    public function getId(): ?int { return $this->id; }
+public function setId(int $value): self { $this->id = $value; return $this; }
+public function getUser_id(): User { return $this->user_id; }
+public function setUser_id(User $value): self { $this->user_id = $value; return $this; }
+public function getFormation_id(): Formation { return $this->formation_id; }
+public function setFormation_id(Formation $value): self { $this->formation_id = $value; return $this; }
+public function getDate_inscription(): \DateTimeInterface { return $this->date_inscription; }
+public function setDate_inscription(\DateTimeInterface $value): self { $this->date_inscription = $value; return $this; }
 }
