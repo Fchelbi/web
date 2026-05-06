@@ -13,7 +13,6 @@ class Quiz
     #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    // Stores the Formation object (not just the ID integer)
     #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: "quizs")]
     #[ORM\JoinColumn(name: 'formation_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?Formation $formation_id = null;
@@ -24,8 +23,9 @@ class Quiz
     #[ORM\Column(type: "integer")]
     private int $passing_score = 60;
 
-    // cascade persist+remove + orphanRemoval: deleting a question from the
-    // collection will remove it from the DB automatically
+    /**
+     * @var Collection<int, Question>
+     */
     #[ORM\OneToMany(
         mappedBy: "quiz",
         targetEntity: Question::class,
@@ -34,6 +34,9 @@ class Quiz
     )]
     private Collection $questions;
 
+    /**
+     * @var Collection<int, Quiz_result>
+     */
     #[ORM\OneToMany(mappedBy: "quiz_id", targetEntity: Quiz_result::class)]
     private Collection $quiz_results;
 
@@ -43,15 +46,9 @@ class Quiz
         $this->quiz_results = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getFormation_id(): ?Formation
-    {
-        return $this->formation_id;
-    }
+    public function getFormation_id(): ?Formation { return $this->formation_id; }
 
     public function setFormation_id(?Formation $value): self
     {
@@ -59,10 +56,7 @@ class Quiz
         return $this;
     }
 
-    public function getTitle(): string
-    {
-        return $this->title;
-    }
+    public function getTitle(): string { return $this->title; }
 
     public function setTitle(string $value): self
     {
@@ -70,10 +64,7 @@ class Quiz
         return $this;
     }
 
-    public function getPassingScore(): int
-    {
-        return $this->passing_score;
-    }
+    public function getPassingScore(): int { return $this->passing_score; }
 
     public function setPassingScore(int $value): self
     {
@@ -81,15 +72,11 @@ class Quiz
         return $this;
     }
 
-    // ------------------------------------------------------------------
-    // These two methods are REQUIRED by CollectionType with by_reference:false
-    // Without them Symfony cannot add/remove questions from the collection
-    // ------------------------------------------------------------------
     public function addQuestion(Question $question): self
     {
         if (!$this->questions->contains($question)) {
             $this->questions->add($question);
-            $question->setQuiz($this); // keep both sides in sync
+            $question->setQuiz($this);
         }
         return $this;
     }
@@ -104,11 +91,17 @@ class Quiz
         return $this;
     }
 
+    /**
+     * @return Collection<int, Question>
+     */
     public function getQuestions(): Collection
     {
         return $this->questions;
     }
 
+    /**
+     * @return Collection<int, Quiz_result>
+     */
     public function getQuiz_results(): Collection
     {
         return $this->quiz_results;

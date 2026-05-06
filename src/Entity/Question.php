@@ -14,18 +14,19 @@ class Question
     #[ORM\Column]
     private ?int $id = null;
 
-    // The owning side of the ManyToOne — mappedBy in Quiz must match this property name "quiz"
     #[ORM\ManyToOne(targetEntity: Quiz::class, inversedBy: 'questions')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Quiz $quiz = null;
 
-    // camelCase property — QuestionType field name must also be camelCase (questionText)
     #[ORM\Column(type: Types::TEXT)]
     private ?string $questionText = null;
 
     #[ORM\Column]
     private int $points = 1;
 
+    /**
+     * @var Collection<int, Reponse>
+     */
     #[ORM\OneToMany(
         mappedBy: 'question',
         targetEntity: Reponse::class,
@@ -39,15 +40,9 @@ class Question
         $this->reponses = new ArrayCollection();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getQuiz(): ?Quiz
-    {
-        return $this->quiz;
-    }
+    public function getQuiz(): ?Quiz { return $this->quiz; }
 
     public function setQuiz(?Quiz $quiz): self
     {
@@ -55,10 +50,7 @@ class Question
         return $this;
     }
 
-    public function getQuestionText(): ?string
-    {
-        return $this->questionText;
-    }
+    public function getQuestionText(): ?string { return $this->questionText; }
 
     public function setQuestionText(string $questionText): self
     {
@@ -66,10 +58,7 @@ class Question
         return $this;
     }
 
-    public function getPoints(): int
-    {
-        return $this->points;
-    }
+    public function getPoints(): int { return $this->points; }
 
     public function setPoints(int $points): self
     {
@@ -77,12 +66,14 @@ class Question
         return $this;
     }
 
+    /**
+     * @return Collection<int, Reponse>
+     */
     public function getReponses(): Collection
     {
         return $this->reponses;
     }
 
-    // Required by CollectionType with by_reference: false
     public function addReponse(Reponse $reponse): self
     {
         if (!$this->reponses->contains($reponse)) {

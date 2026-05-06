@@ -5,7 +5,7 @@ use App\Entity\Formation;
 use App\Service\FormationManager;
 use PHPUnit\Framework\TestCase;
 
-class FormationManagerTestPhpTest extends TestCase
+class FormationManagerTest extends TestCase
 {
     private FormationManager $manager;
 
