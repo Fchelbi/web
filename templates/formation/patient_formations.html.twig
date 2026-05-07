@@ -9,9 +9,9 @@
            a JS function that was never defined anywhere, so clicking
            the button did nothing.  Replaced with a normal form submit.
    ============================================================ #}
-{% extends 'base.html.twig' %}
+{% extends 'layout.html.twig' %}
 {% block title %}Formations | EchoCare{% endblock %}
-{% block body %}
+{% block content %}
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -20,10 +20,10 @@
     --cyan:#38bdf8;--cyan-pale:rgba(56,189,248,.08);--cyan-glow:rgba(56,189,248,.15);
     --emerald:#34d399;--emerald-pale:rgba(52,211,153,.08);
     --violet:#a78bfa;
-    --surface:#f8fafc;--surface-card:#ffffff;
+--surface:#0D1B2A;--surface-card:#162232;
     --border:#e2e8f0;--border-light:#f1f5f9;
-    --text-primary:#0f172a;--text-secondary:#64748b;--text-muted:#94a3b8;
-    --radius:16px;--radius-sm:10px;--radius-xs:8px;
+--text-primary:#ffffff;--text-secondary:#CBD5E0;--text-muted:#8899AA;  
+  --radius:16px;--radius-sm:10px;--radius-xs:8px;
     --shadow-sm:0 1px 3px rgba(10,22,40,.06);
     --shadow-md:0 4px 16px rgba(10,22,40,.08);
     --shadow-lg:0 12px 40px rgba(10,22,40,.12);
@@ -111,20 +111,14 @@
   .pagination a,.pagination span:not(.flex){display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 12px;border-radius:8px;font-size:14px;font-weight:600;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;transition:all .2s}
   .pagination a:hover{border-color:#38bdf8;color:#38bdf8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(56,189,248,.15)}
   .pagination span.current,.pagination em{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:38px;padding:0 12px;border-radius:8px;font-size:14px;font-weight:700;background:#0a1628;color:#fff;border:1.5px solid #0a1628;font-style:normal}
+
+  body{background:#0D1B2A !important;}
+.formation-card{background:#162232 !important;border:1px solid rgba(255,255,255,0.05) !important;}
+.card-title{color:#ffffff !important;}
+.card-body{background:#162232 !important;}
 </style>
 
-<nav>
-  <div class="nav-logo">Echo<span>Care</span></div>
-  <div class="nav-links">
-    <a href="{{ path('app_formation_index') }}" class="nav-link active">📚 Formations</a>
-    <a href="#" class="nav-link">💬 Messages</a>
-    <a href="#" class="nav-link">📊 Mon Progrès</a>
-  </div>
-  <div class="nav-user">
-    <div class="user-avatar">P</div>
-    <span style="font-size:14px;font-weight:600">Mon Profil</span>
-  </div>
-</nav>
+
 
 <div class="hero">
   <div class="hero-tag">🎯 Formations Disponibles</div>

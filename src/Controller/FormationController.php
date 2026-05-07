@@ -36,8 +36,7 @@ final class FormationController extends AbstractController
     // =========================================================================
     private function getUserRole(): string
     {
-        return 'Admin'; // ← change to 'Coach' or 'Patient' to test
-        // TODO: return $this->getUser()->getRole();
+        return $this->getUser()->getRole();
     }
 
     // =========================================================================
@@ -123,7 +122,7 @@ final class FormationController extends AbstractController
                 $coachMap[$user->getId()] = $user->getNom() . ' ' . $user->getPrenom();
             }
 
-            $patientId    = 1; // TODO: replace with $this->getUser()->getId()
+            $patientId = $this->getUser()->getId();
             $patientUser  = $entityManager->getRepository(\App\Entity\User::class)->find($patientId);
             $myParticipations = $entityManager->getRepository(Participation::class)
                 ->findBy(['user_id' => $patientUser]);
@@ -416,7 +415,7 @@ public function show(
     #[Route('/{id}/enroll', name: 'app_formation_enroll', methods: ['POST'])]
     public function enroll(Formation $formation, EntityManagerInterface $entityManager): Response
     {
-        $patientId   = 6; // TODO: replace with $this->getUser()->getId()
+        $patientId = $this->getUser()->getId();
         $patientUser = $entityManager->getRepository(\App\Entity\User::class)->find($patientId);
 
         if (!$patientUser) {

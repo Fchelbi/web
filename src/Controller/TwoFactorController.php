@@ -61,7 +61,7 @@ class TwoFactorController extends AbstractController
                     if (!$user->getFaceDescriptor()) {
                         $route = 'face_id_prompt';
                     } else {
-                        $route = 'admin_dashboard';
+                        $route = 'app_admin_dashboard';
                     }
                 } elseif ($role === 'Coach') {
                     $route = 'coach_dashboard';
