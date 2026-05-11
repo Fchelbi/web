@@ -81,6 +81,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $isBanned = false;
 
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+private int $badWordsCount = 0;
+
+#[ORM\Column(nullable: true)]
+private ?\DateTime $bannedAt = null;
+
+#[ORM\Column(nullable: true)]
+private ?\DateTime $updatedAt = null;
+
+
     public function getId(): ?int { return $this->id; }
     public function getNom(): ?string { return $this->nom; }
     public function setNom(string $nom): static { $this->nom = $nom; return $this; }
@@ -114,6 +124,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFaceDescriptor(?string $f): static { $this->faceDescriptor = $f; return $this; }
     public function isBanned(): bool { return $this->isBanned; }
     public function setIsBanned(bool $b): static { $this->isBanned = $b; return $this; }
+    public function getBadWordsCount(): int { return $this->badWordsCount; }
+public function setBadWordsCount(int $c): static { $this->badWordsCount = $c; return $this; }
+public function incrementBadWordsCount(): static { $this->badWordsCount++; return $this; }
+public function getBannedAt(): ?\DateTime { return $this->bannedAt; }
+public function setBannedAt(?\DateTime $d): static { $this->bannedAt = $d; return $this; }
+public function getUpdatedAt(): ?\DateTime { return $this->updatedAt; }
+public function setUpdatedAt(?\DateTime $d): static { $this->updatedAt = $d; return $this; }
 
     public function getRoles(): array
     {
