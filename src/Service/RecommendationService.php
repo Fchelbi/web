@@ -23,7 +23,7 @@ class RecommendationService
      * 3. Recommend un-enrolled formations from preferred categories
      * 4. Diversify with 1-2 formations from other categories
      *
-     * Returns array of Formation entities, max $limit items.
+     * @return Formation[]
      */
     public function getRecommendations(int $userId, int $limit = 6): array
     {

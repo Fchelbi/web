@@ -32,19 +32,19 @@ if (!$user) {
     $user->setNom('User');
     $user->setPrenom('Demo');
     $user->setEmail('demo@community.local');
-    $user->setNum_tel('1234567890');
+    $user->setNumTel('1234567890');
     $user->setRole('ROLE_USER');
     
     // Hash password "demo123"
     $hashedPassword = $hasher->hashPassword($user, 'demo123');
-    $user->setMdp($hashedPassword);
+    $user->setPassword($hashedPassword);
     
     $em->persist($user);
     $em->flush();
     
-    echo "Default user created with id_user: " . $user->getId_user() . "\n";
+    echo "Default user created with id_user: " . $user->getId() . "\n";
     echo "Email: demo@community.local\n";
     echo "Password: demo123\n";
 } else {
-    echo "User already exists with id_user: " . $user->getId_user() . "\n";
+    echo "User already exists with id_user: " . $user->getId() . "\n";
 }

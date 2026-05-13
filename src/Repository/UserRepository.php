@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 class UserRepository extends ServiceEntityRepository
@@ -13,6 +14,9 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * @return array{0: User[], 1: int}
+     */
     public function searchPaginated(string $search, string $role, int $page, int $limit): array
     {
         $qb = $this->createQueryBuilder('u');
@@ -51,5 +55,14 @@ class UserRepository extends ServiceEntityRepository
         $sql = "SELECT COUNT(DISTINCT user_id) as total FROM post";
         $result = $conn->executeQuery($sql);
         return (int) $result->fetchOne();
+    }
+
+    public function createCoachesQueryBuilder(): QueryBuilder
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.role = :coach')
+            ->setParameter('coach', User::ROLE_COACH)
+            ->orderBy('u.nom', 'ASC')
+            ->addOrderBy('u.prenom', 'ASC');
     }
 }

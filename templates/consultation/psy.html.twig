@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Psychologue · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 0 40px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-logo { font-size: 22px; font-weight: 700; color: white; }
+        .navbar-logo span { color: #E8895A; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .user-name { font-size: 14px; color: #8899AA; }
+        .btn-logout {
+            padding: 8px 18px; background: rgba(231,76,60,0.15); color: #e74c3c;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(231,76,60,0.3); }
+        .btn-back {
+            padding: 8px 18px; background: rgba(232,137,90,0.15); color: #E8895A;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; border: 1px solid rgba(232,137,90,0.3); transition: all 0.2s;
+        }
+        .btn-back:hover { background: #E8895A; color: white; }
+        .content { padding: 40px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h2 { font-size: 26px; font-weight: 700; color: white; }
+        .page-header p { font-size: 14px; color: #8899AA; margin-top: 6px; }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+
+        .table-container {
+            background: #162232; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        .table-container table {
+            width: 100%; border-collapse: collapse; margin: 0;
+        }
+        .table-container thead {
+            background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .table-container th {
+            padding: 16px; color: #8899AA; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em; text-align: left;
+        }
+        .table-container td {
+            padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.02);
+            font-size: 14px;
+        }
+        .table-container tbody tr:hover {
+            background: rgba(232,137,90,0.05);
+        }
+        .table-container tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-block; padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+        }
+        .status-badge.en_attente { background: rgba(255,193,7,0.2); color: #FFC107; }
+        .status-badge.confirmee { background: rgba(76,175,80,0.2); color: #4CAF50; }
+        .status-badge.annulee { background: rgba(244,67,54,0.2); color: #F44336; }
+        .status-badge.completee { background: rgba(76,175,80,0.2); color: #4CAF50; }
+
+        .btn {
+            padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            text-decoration: none; border: 1px solid transparent; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary {
+            background: #4A6FA5; color: white;
+        }
+        .btn-primary:hover {
+            background: #3A5585; box-shadow: 0 4px 12px rgba(74,111,165,0.3);
+        }
+        .btn-success {
+            background: rgba(76,175,80,0.2); color: #4CAF50; border: 1px solid rgba(76,175,80,0.3);
+        }
+        .btn-success:hover {
+            background: rgba(76,175,80,0.3);
+        }
+        .btn-danger {
+            background: rgba(244,67,54,0.2); color: #F44336; border: 1px solid rgba(244,67,54,0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(244,67,54,0.3);
+        }
+        .btn-warning {
+            background: rgba(255,193,7,0.2); color: #FFC107; border: 1px solid rgba(255,193,7,0.3);
+        }
+        .btn-warning:hover {
+            background: rgba(255,193,7,0.3);
+        }
+
+        .actions-cell {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        .name-section { font-weight: 600; margin-bottom: 4px; }
+        .secondary-text { font-size: 12px; color: #8899AA; }
+        .link-open {
+            color: #4A6FA5; text-decoration: none; font-weight: 600; transition: all 0.2s;
+        }
+        .link-open:hover {
+            color: #E8895A;
+        }
+        .empty-state {
+            text-align: center; padding: 60px 40px; color: #4A5568;
+        }
+        .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+        .empty-state p { font-size: 16px; margin-top: 12px; }
+        .pagination {
+            display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding: 20px;
+        }
+        .pagination a, .pagination span {
+            padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+            color: #8899AA; text-decoration: none; font-size: 13px; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .pagination a:hover {
+            background: rgba(232,137,90,0.2); color: #E8895A; border-color: rgba(232,137,90,0.3);
+        }
+        .pagination .active {
+            background: #4A6FA5; color: white; border-color: #4A6FA5;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">Echo<span>Care</span> · Psychologue</div>
+    <div class="navbar-right">
+        <span class="user-name">👋 {{ app.user.prenom }} {{ app.user.nom }}</span>
+        <a href="{{ path('app_logout') }}" class="btn-logout">🚪 Déconnexion</a>
+    </div>
+</nav>
+
+<div class="content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+        <div class="page-header" style="margin-bottom: 0;">
+            <h2>📋 Consultations Demandées</h2>
+            <p>Gérez les demandes de consultation et les rendez-vous en ligne de vos patients</p>
+        </div>
+        <a href="{{ path('app_home') }}" class="btn-back">← Retour dashboard</a>
+    </div>
+
+    {% if consultations|length == 0 %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>Aucune consultation trouvée</p>
+        </div>
+    {% else %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Psychologue</th>
+                        <th>Motif</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Lien Meet</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultation in consultations %}
+                        <tr>
+                            <td>
+                                <div class="name-section">{{ consultation.user ? consultation.user.name : 'Non défini' }}</div>
+                            </td>
+                            <td>
+                                {% if consultation.psychologue %}
+                                    <div class="name-section">{{ consultation.psychologue.nomComplet }}</div>
+                                    <div class="secondary-text">{{ consultation.psychologue.email }}</div>
+                                {% else %}
+                                    <span class="secondary-text">Non attribué</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ consultation.motif }}</td>
+                            <td>{{ consultation.dateConsultation|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <span class="status-badge {{ consultation.statut }}">
+                                    {% if consultation.statut == 'en_attente' %}En attente
+                                    {% elseif consultation.statut == 'confirmee' %}Confirmée
+                                    {% elseif consultation.statut == 'annulee' %}Annulée
+                                    {% elseif consultation.statut == 'completee' %}Complétée
+                                    {% else %}{{ consultation.statutLabel }}{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if consultation.meetLink %}
+                                    <a href="{{ consultation.meetLink }}" target="_blank" rel="noopener noreferrer" class="link-open">🔗 Ouvrir</a>
+                                {% else %}
+                                    <span class="secondary-text">—</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div class="actions-cell" style="justify-content: flex-end;">
+                                    {% if consultation.statut == 'en_attente' %}
+                                        <form method="post" action="{{ path('psy_accept', {'id': consultation.id}) }}" style="display: inline;">
+                                            <button class="btn btn-success">✓ Accepter</button>
+                                        </form>
+                                        <form method="post" action="{{ path('psy_cancel', {'id': consultation.id}) }}" style="display: inline;">
+                                            <button class="btn btn-danger">✕ Refuser</button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="{{ path('consultation_edit', {'id': consultation.id}) }}" class="btn btn-warning">⚙ Gérer</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

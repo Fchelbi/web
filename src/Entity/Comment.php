@@ -40,7 +40,7 @@ class Comment
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\ManyToOne(targetEntity: Post::class)]
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Post $post = null;
 

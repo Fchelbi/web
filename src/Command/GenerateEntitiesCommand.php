@@ -21,6 +21,7 @@ class GenerateEntitiesCommand extends Command
 {
     private Connection $connection;
     // private Filesystem $filesystem;
+    /** @var AbstractSchemaManager<string>|null */
     private ?AbstractSchemaManager $schemaManager = null;
     private array $generatedRelations = [];
 
@@ -94,7 +95,7 @@ class GenerateEntitiesCommand extends Command
     /**
      * Retrieves the schema manager instance, caching it to avoid redundant queries.
      *
-     * @return AbstractSchemaManager The schema manager.
+     * @return AbstractSchemaManager<string>
      */
     private function getSchemaManager(): AbstractSchemaManager
     {

@@ -204,7 +204,7 @@
             {% for participation in formationParts %}
             <tr>
               <td><strong>{{ formation.title }}</strong></td>
-              <td>Patient #{{ participation.getUser_id().getId_user() }}</td>
+              <td>Patient #{{ participation.getUser_id().getId() }}</td>
               <td>{{ participation.getDate_inscription() is not null ? participation.getDate_inscription()|date('d/m/Y') : '—' }}</td>
               <td><span class="score-pill score-pending">—</span></td>
               <td><span class="score-pill score-pending">En attente</span></td>

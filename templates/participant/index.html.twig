@@ -172,7 +172,7 @@
               </div>
               <div>
                 <strong>{{ patient.getNom() }} {{ patient.getPrenom() }}</strong>
-                <div style="font-size:11px;color:var(--text-muted)">#{{ patient.getId_user() }}</div>
+                <div style="font-size:11px;color:var(--text-muted)">#{{ patient.getId() }}</div>
               </div>
             </div>
           </td>
@@ -185,7 +185,7 @@
 
           {# Score column — hidden until Touch ID unlocks #}
           <td class="score-cell-{{ participation.getId() }}">
-            <span class="badge badge-gray" style="cursor:pointer" onclick="unlockResults({{ participation.getId() }}, {{ patient.getId_user() }}, '{{ patient.getNom() }} {{ patient.getPrenom() }}', '{{ formationTitle }}')">
+            <span class="badge badge-gray" style="cursor:pointer" onclick="unlockResults({{ participation.getId() }}, {{ patient.getId() }}, '{{ patient.getNom() }} {{ patient.getPrenom() }}', '{{ formationTitle }}')">
               🔐 Voir score
             </span>
           </td>
@@ -200,7 +200,7 @@
               <a href="{{ path('app_formation_show', {'id': fid}) }}" class="btn-action btn-view">📚 Formation</a>
               {# Touch ID protected quiz results button #}
               <button type="button" class="btn-touchid"
-                onclick="unlockResults({{ participation.getId() }}, {{ patient.getId_user() }}, '{{ patient.getNom() }} {{ patient.getPrenom() }}', '{{ formationTitle }}')">
+                onclick="unlockResults({{ participation.getId() }}, {{ patient.getId() }}, '{{ patient.getNom() }} {{ patient.getPrenom() }}', '{{ formationTitle }}')">
                 🔐 Résultats
               </button>
               <form method="post" action="{{ path('app_participation_delete', {'id': participation.getId()}) }}"

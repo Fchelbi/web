@@ -54,6 +54,7 @@ class TranslateService
 
     /**
      * Get available language options.
+     * @return array<string, string>
      */
     public function getLanguages(): array
     {

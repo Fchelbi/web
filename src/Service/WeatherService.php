@@ -16,7 +16,7 @@ class WeatherService
 
     /**
      * Get current weather + health tip for a city.
-     * Returns ['city', 'temp', 'condition', 'icon', 'humidity', 'wind', 'healthTip']
+     * @return array{city: string, country: string, temp: float, feelsLike: float, condition: string, icon: string, humidity: int, wind: float, uv: float, healthTip: string} | null
      */
     public function getWeatherWithTip(string $city = 'Tunis'): ?array
     {

@@ -14,11 +14,11 @@ class Rapport
     #[ORM\Column(type: "integer")]
     private int $id_rapport;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "rapports")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'id_patient', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
     private User $id_patient;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "rapports")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'id_coach', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
     private User $id_coach;
 

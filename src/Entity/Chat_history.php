@@ -14,7 +14,7 @@ class Chat_history
     #[ORM\Column(type: "integer")]
     private int $id;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "chat_historys")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'id_patient', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
     private User $id_patient;
 

@@ -32,6 +32,9 @@ class GeminiModerationService
         $this->apiKey = $_ENV['GEMINI_API_KEY'] ?? '';
     }
 
+    /**
+     * @return array{flagged: bool, reason: string, confidence: float, categories: string[]}
+     */
     public function moderatePost(Post $post): array
     {
         $title   = $post->getTitle() ?? '';
@@ -60,6 +63,9 @@ class GeminiModerationService
         return $result;
     }
 
+    /**
+     * @return array{scanned: int, flagged: int, results: array<int, array{post_id: int, title: string, flagged: bool, reason: string}>}
+     */
     public function moderateAllPosts(array $posts): array
     {
         set_time_limit(300); // batch scan can take a while

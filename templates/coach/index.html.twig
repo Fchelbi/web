@@ -93,6 +93,10 @@
 
 <nav class="navbar">
     <div class="navbar-logo">Echo<span>Care</span> · Coach</div>
+    <div style="display: flex; gap: 20px;">
+        <a href="{{ path('coach_dashboard') }}" style="color: #8899AA; text-decoration: none; font-size: 14px; display: flex; align-items: center; padding: 0 16px; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.color='white';" onmouseout="this.style.color='#8899AA';">👥 Mes Patients</a>
+        <a href="{{ path('psy_consultations') }}" style="color: #8899AA; text-decoration: none; font-size: 14px; display: flex; align-items: center; padding: 0 16px; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.color='white';" onmouseout="this.style.color='#8899AA';">📅 Consultations</a>
+    </div>
     <div class="navbar-right">
         <span class="user-name">👋 {{ app.user.prenom }} {{ app.user.nom }}</span>
         <a href="{{ path('app_logout') }}" class="btn-logout">🚪 Deconnexion</a>

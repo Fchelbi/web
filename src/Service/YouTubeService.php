@@ -38,7 +38,7 @@ class YouTubeService
 
     /**
      * Fetch video details from YouTube Data API v3.
-     * Returns ['title', 'duration', 'thumbnail', 'embedUrl'] or null on failure.
+     * @return array{videoId: string, title: string, thumbnail: string, duration: string, embedUrl: string} | null
      */
     public function getVideoDetails(string $url): ?array
     {
@@ -104,7 +104,7 @@ class YouTubeService
 
     /**
  * Search YouTube videos by keyword.
- * Returns array of video results with title, thumbnail, duration, URL.
+ * @return array<int, array{videoId: string, title: string, thumbnail: string, channel: string, duration: string, url: string, embedUrl: string}>
  */
 public function searchVideos(string $query, int $maxResults = 5): array
 {

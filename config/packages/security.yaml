@@ -45,6 +45,15 @@ security:
         - { path: ^/post/\d+/edit, roles: ROLE_USER }
         - { path: ^/post/\d+/delete, roles: ROLE_USER }
         - { path: ^/post/\d+/comment, roles: ROLE_USER }
+        - { path: ^/consultations, roles: ROLE_USER }
+        - { path: ^/consultation/delete, roles: ROLE_USER }
+        - { path: ^/consultation/edit, roles: ROLE_COACH }
+        - { path: ^/consultation/auto-assign, roles: ROLE_PATIENT }
+        - { path: ^/consultation/add, roles: ROLE_PATIENT }
+        - { path: ^/psychologues, roles: ROLE_USER }
+        - { path: ^/psy/, roles: ROLE_COACH }
+        - { path: ^/google/, roles: ROLE_COACH }
+        - { path: ^/ai/suggest, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/coach, roles: ROLE_COACH }
         - { path: ^/patient, roles: ROLE_PATIENT }

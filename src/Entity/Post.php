@@ -40,7 +40,7 @@ class Post
     #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private ?string $photo = null;
 
-    #[ORM\ManyToOne(targetEntity: Category::class)]
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
 

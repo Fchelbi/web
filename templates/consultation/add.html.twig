@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvelle Consultation · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 0 40px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-logo { font-size: 22px; font-weight: 700; color: white; }
+        .navbar-logo span { color: #E8895A; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .user-name { font-size: 14px; color: #8899AA; }
+        .btn-logout {
+            padding: 8px 18px; background: rgba(231,76,60,0.15); color: #e74c3c;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(231,76,60,0.3); }
+        .content { padding: 40px; max-width: 900px; margin: 0 auto; }
+        .form-header { margin-bottom: 32px; }
+        .form-header h2 { font-size: 26px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .form-header p { font-size: 14px; color: #8899AA; }
+
+        .form-card {
+            background: #162232; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05);
+            padding: 32px; position: relative;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group:last-of-type {
+            margin-bottom: 28px;
+        }
+        .form-group label {
+            display: block; font-size: 13px; color: #CBD5E0; font-weight: 600;
+            margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 14px; background: #0D1B2A;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+            color: white; font-size: 13px; font-family: 'Segoe UI', sans-serif;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: rgba(232,137,90,0.5);
+            box-shadow: 0 0 8px rgba(232,137,90,0.1);
+            background: #162232;
+        }
+        .form-group textarea {
+            resize: vertical; min-height: 100px;
+        }
+        .form-text { font-size: 12px; color: #8899AA; margin-top: 6px; }
+        .form-text a { color: #E8895A; text-decoration: none; }
+        .form-text a:hover { text-decoration: underline; }
+
+        .alert {
+            padding: 14px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;
+        }
+        .alert-danger {
+            background: rgba(244,67,54,0.15); border: 1px solid rgba(244,67,54,0.3); color: #F44336;
+        }
+        .alert-info {
+            background: rgba(74,111,165,0.15); border: 1px solid rgba(74,111,165,0.3); color: #4A6FA5;
+        }
+        .alert-success {
+            background: rgba(76,175,80,0.15); border: 1px solid rgba(76,175,80,0.3); color: #4CAF50;
+        }
+        .alert-warning {
+            background: rgba(255,193,7,0.15); border: 1px solid rgba(255,193,7,0.3); color: #FFC107;
+        }
+        .alert.d-none { display: none; }
+
+        .btn {
+            padding: 11px 20px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            text-decoration: none; border: 1px solid transparent; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary {
+            background: #4A6FA5; color: white;
+        }
+        .btn-primary:hover {
+            background: #3A5585; box-shadow: 0 4px 12px rgba(74,111,165,0.3);
+        }
+        .btn-secondary {
+            background: rgba(232,137,90,0.15); color: #E8895A; border: 1px solid rgba(232,137,90,0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(232,137,90,0.25);
+        }
+        .btn-sm {
+            padding: 8px 14px; font-size: 12px;
+        }
+
+        .form-actions {
+            display: flex; gap: 12px; margin-top: 28px; align-items: center;
+        }
+
+        .ai-suggestion-box {
+            background: rgba(232,137,90,0.1); border: 1px solid rgba(232,137,90,0.3);
+            border-radius: 8px; padding: 14px 16px; margin-top: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">Echo<span>Care</span> · Consultation</div>
+    <div class="navbar-right">
+        <span class="user-name">👋 {{ app.user.prenom }} {{ app.user.nom }}</span>
+        <a href="{{ path('app_logout') }}" class="btn-logout">🚪 Déconnexion</a>
+    </div>
+</nav>
+
+<div class="content">
+    <div class="form-header">
+        <h2>📋 Nouvelle Consultation</h2>
+        <p>Choisissez votre psychologue, expliquez votre besoin et sélectionnez une date adaptée</p>
+    </div>
+
+    <div class="form-card">
+        {% if form.vars.submitted and not form.vars.valid %}
+            <div class="alert alert-danger">
+                <div style="font-weight: 600; margin-bottom: 6px;">Le formulaire contient des erreurs</div>
+                {% for error in form.vars.errors %}
+                    <div>{{ error.message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            <div class="form-group">
+                {{ form_label(form.psychologue, null, {'label_attr': {'for': 'consultation_psychologue'}}) }}
+                {{ form_widget(form.psychologue, {'attr': {
+                    'class': form.psychologue.vars.errors|length > 0 ? 'is-invalid' : '',
+                    'id': 'consultation_psychologue'
+                }}) }}
+                {% if form.psychologue.vars.errors|length > 0 %}
+                    <div style="color: #F44336; font-size: 12px; margin-top: 6px;">
+                        {{ form_errors(form.psychologue) }}
+                    </div>
+                {% endif %}
+                <div class="form-text">
+                    <a href="{{ path('psychologue_list') }}">Voir la liste des psychologues</a>
+                    {% if psychologueSelectionne %}
+                        | Psychologue présélectionné : <strong>{{ psychologueSelectionne.nomComplet }}</strong>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.motif, null, {'label_attr': {'for': 'consultation_motif'}}) }}
+                {{ form_widget(form.motif, {'attr': {
+                    'class': form.motif.vars.errors|length > 0 ? 'is-invalid' : '',
+                    'id': 'consultation_motif',
+                    'rows': 4
+                }}) }}
+                <div class="form-text">{{ form_help(form.motif) }}</div>
+                <button type="button" id="aiSuggestButton" class="btn btn-secondary btn-sm" style="margin-top: 10px;">
+                    💡 Suggérer un psy
+                </button>
+                <div id="aiSuggestion" class="ai-suggestion-box d-none"></div>
+                {% if form.motif.vars.errors|length > 0 %}
+                    <div style="color: #F44336; font-size: 12px; margin-top: 6px;">
+                        {{ form_errors(form.motif) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateConsultation, null, {'label_attr': {'for': 'consultation_dateConsultation'}}) }}
+                {{ form_widget(form.dateConsultation, {'attr': {
+                    'class': form.dateConsultation.vars.errors|length > 0 ? 'is-invalid' : '',
+                    'id': 'consultation_dateConsultation'
+                }}) }}
+                <div class="form-text">
+                    {{ form_help(form.dateConsultation) }}<br>
+                    Exemple : 21/05/2026 à 15:00
+                </div>
+                {% if form.dateConsultation.vars.errors|length > 0 %}
+                    <div style="color: #F44336; font-size: 12px; margin-top: 6px;">
+                        {{ form_errors(form.dateConsultation) }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">✓ Envoyer la demande</button>
+                <a href="{{ path('consultation_list') }}" class="btn btn-secondary">← Retour</a>
+            </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const button = document.getElementById('aiSuggestButton');
+        const resultBox = document.getElementById('aiSuggestion');
+        const motifField = document.getElementById('{{ form.motif.vars.id }}');
+
+        button.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const motif = motifField.value.trim();
+
+            resultBox.className = 'ai-suggestion-box';
+            resultBox.textContent = '';
+            resultBox.classList.remove('d-none');
+
+            if (!motif) {
+                resultBox.style.background = 'rgba(255,193,7,0.1)';
+                resultBox.style.borderColor = 'rgba(255,193,7,0.3)';
+                resultBox.style.color = '#FFC107';
+                resultBox.textContent = 'Veuillez saisir un motif avant de demander une suggestion.';
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = '⏳ Analyse en cours...';
+            resultBox.textContent = 'Analyse du motif en cours...';
+
+            try {
+                const response = await fetch('{{ path('ai_suggest') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ motif: motif })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Suggestion indisponible.');
+                }
+
+                resultBox.style.background = 'rgba(76,175,80,0.1)';
+                resultBox.style.borderColor = 'rgba(76,175,80,0.3)';
+                resultBox.style.color = '#4CAF50';
+                resultBox.innerHTML = '<div style="font-weight: 600; margin-bottom: 6px;">✓ Suggestion IA</div>' + data.suggestion;
+            } catch (error) {
+                resultBox.style.background = 'rgba(244,67,54,0.1)';
+                resultBox.style.borderColor = 'rgba(244,67,54,0.3)';
+                resultBox.style.color = '#F44336';
+                resultBox.textContent = '✗ ' + error.message;
+            } finally {
+                button.disabled = false;
+                button.textContent = '💡 Suggérer un psy';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

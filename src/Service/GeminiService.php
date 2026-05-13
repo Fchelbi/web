@@ -16,6 +16,7 @@ class GeminiService
 
     /**
      * Generate quiz questions from a formation topic.
+     * @return array<int, array{question: string, points: int, answers: array{text: string, correct: bool}[]}> | null
      */
     public function generateQuizQuestions(string $formationTitle, ?string $formationDescription, int $count = 5): ?array
     {
@@ -67,6 +68,7 @@ PROMPT;
 
     /**
      * Analyze sentiment of a feedback text.
+     * @return array{sentiment: string, confidence: float, summary: string} | null
      */
     public function analyzeSentiment(string $feedbackText): ?array
     {

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Consultations · EchoCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0D1B2A; min-height: 100vh; color: white; }
+        .navbar {
+            background: #162232; padding: 0 40px; height: 70px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .navbar-logo { font-size: 22px; font-weight: 700; color: white; }
+        .navbar-logo span { color: #E8895A; }
+        .navbar-links { display: flex; gap: 32px; align-items: center; }
+        .navbar-links a {
+            color: #8899AA; text-decoration: none; font-size: 14px;
+            font-weight: 500; transition: color 0.2s; padding: 0 8px;
+        }
+        .navbar-links a:hover { color: white; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .user-name { font-size: 14px; color: #8899AA; }
+        .btn-logout {
+            padding: 8px 18px; background: rgba(231,76,60,0.15); color: #e74c3c;
+            border-radius: 8px; text-decoration: none; font-size: 13px;
+            font-weight: 600; border: 1px solid rgba(231,76,60,0.2); transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(231,76,60,0.3); }
+        .content { padding: 40px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h2 { font-size: 26px; font-weight: 700; color: white; }
+        .page-header p { font-size: 14px; color: #8899AA; margin-top: 6px; }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+        .stat-card {
+            background: #162232; padding: 20px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-2px); }
+        .stat-card .label { font-size: 12px; color: #8899AA; margin-bottom: 8px; }
+        .stat-card .number { font-size: 28px; font-weight: 700; }
+        .stat-card.waiting .number { color: #FFC107; }
+        .stat-card.confirmed .number { color: #4CAF50; }
+        .stat-card.cancelled .number { color: #F44336; }
+
+        .filter-section {
+            background: #162232; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+            padding: 20px; margin-bottom: 24px;
+        }
+        .filter-section label {
+            display: block; font-size: 13px; color: #8899AA; font-weight: 600;
+            margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .filter-section select, .filter-section input {
+            background: #0D1B2A; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+            color: white; padding: 10px 12px; font-size: 13px; width: 100%;
+            transition: all 0.2s;
+        }
+        .filter-section select:focus, .filter-section input:focus {
+            outline: none; border-color: rgba(232,137,90,0.5); box-shadow: 0 0 8px rgba(232,137,90,0.1);
+        }
+        .filter-buttons {
+            display: flex; gap: 12px; margin-top: 16px;
+        }
+        .btn {
+            padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            text-decoration: none; border: 1px solid transparent; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary {
+            background: #4A6FA5; color: white;
+        }
+        .btn-primary:hover {
+            background: #3A5585; box-shadow: 0 4px 12px rgba(74,111,165,0.3);
+        }
+        .btn-secondary {
+            background: rgba(232,137,90,0.15); color: #E8895A; border: 1px solid rgba(232,137,90,0.3);
+        }
+        .btn-secondary:hover {
+            background: rgba(232,137,90,0.25);
+        }
+        .btn-dark {
+            background: rgba(255,255,255,0.05); color: #CBD5E0; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-dark:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .table-container {
+            background: #162232; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+        .table-container table {
+            width: 100%; border-collapse: collapse; margin: 0;
+        }
+        .table-container thead {
+            background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .table-container th {
+            padding: 16px; color: #8899AA; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em; text-align: left;
+        }
+        .table-container td {
+            padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.02);
+            font-size: 13px;
+        }
+        .table-container tbody tr:hover {
+            background: rgba(232,137,90,0.05);
+        }
+        .table-container tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .status-badge {
+            display: inline-block; padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 600;
+        }
+        .status-badge.en_attente { background: rgba(255,193,7,0.2); color: #FFC107; }
+        .status-badge.confirmee { background: rgba(76,175,80,0.2); color: #4CAF50; }
+        .status-badge.annulee { background: rgba(244,67,54,0.2); color: #F44336; }
+        .status-badge.completee { background: rgba(76,175,80,0.2); color: #4CAF50; }
+
+        .btn-join {
+            background: rgba(76,175,80,0.15); color: #4CAF50; border: 1px solid rgba(76,175,80,0.3);
+        }
+        .btn-join:hover {
+            background: rgba(76,175,80,0.25);
+        }
+        .btn-delete {
+            background: rgba(244,67,54,0.15); color: #F44336; border: 1px solid rgba(244,67,54,0.3);
+        }
+        .btn-delete:hover {
+            background: rgba(244,67,54,0.25);
+        }
+        .link-open {
+            color: #4A6FA5; text-decoration: none; font-weight: 600; transition: all 0.2s;
+        }
+        .link-open:hover {
+            color: #E8895A;
+        }
+        .name-section { font-weight: 600; margin-bottom: 4px; }
+        .secondary-text { font-size: 12px; color: #8899AA; }
+        .empty-state {
+            text-align: center; padding: 60px 40px; color: #4A5568;
+        }
+        .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+        .empty-state p { font-size: 16px; margin-top: 12px; }
+        .pagination {
+            display: flex; justify-content: center; gap: 8px; margin-top: 20px; padding: 20px;
+        }
+        .pagination a, .pagination span {
+            padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);
+            color: #8899AA; text-decoration: none; font-size: 13px; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .pagination a:hover {
+            background: rgba(232,137,90,0.2); color: #E8895A; border-color: rgba(232,137,90,0.3);
+        }
+        .pagination .active {
+            background: #4A6FA5; color: white; border-color: #4A6FA5;
+        }
+        .header-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: 1fr; }
+            .header-actions { justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-logo">Echo<span>Care</span> · Patient</div>
+    <div class="navbar-links">
+        <a href="{{ path('consultation_list') }}">📋 Mes Consultations</a>
+        {% if app.user and 'ROLE_COACH' not in app.user.roles %}
+            <a href="{{ path('psychologue_list') }}">👨‍⚕️ Psychologues</a>
+        {% endif %}
+    </div>
+    <div class="navbar-right">
+        <span class="user-name">👋 {{ app.user.prenom }} {{ app.user.nom }}</span>
+        <a href="{{ path('app_logout') }}" class="btn-logout">🚪 Déconnexion</a>
+    </div>
+</nav>
+
+<div class="content">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 20px;">
+        <div class="page-header" style="margin-bottom: 0;">
+            {% if app.user and 'ROLE_COACH' in app.user.roles %}
+                <h2>📋 Mes Consultations (Coach)</h2>
+                <p>Gérez les demandes de consultation de vos patients et suivez vos rendez-vous</p>
+            {% else %}
+                <h2>📋 Mes Consultations (Patient)</h2>
+                <p>Retrouvez vos demandes, choisissez un psychologue et suivez l'évolution de vos rendez-vous</p>
+            {% endif %}
+        </div>
+        <div class="header-actions">
+            {% if app.user and 'ROLE_COACH' not in app.user.roles %}
+                <a href="{{ path('psychologue_list') }}" class="btn btn-secondary">👨‍⚕️ Voir les psychologues</a>
+                <a href="{{ path('consultation_add') }}" class="btn btn-primary">+ Nouvelle consultation</a>
+            {% endif %}
+            <a href="{{ path('patient_dashboard') }}" class="btn btn-dark">← Retour</a>
+        </div>
+    </div>
+
+    {% if countEnAttente is defined %}
+    <div class="stats">
+        <div class="stat-card waiting">
+            <div class="label">⏳ En attente</div>
+            <div class="number">{{ countEnAttente }}</div>
+        </div>
+        <div class="stat-card confirmed">
+            <div class="label">✓ Confirmées</div>
+            <div class="number">{{ countConfirmee }}</div>
+        </div>
+        <div class="stat-card cancelled">
+            <div class="label">✕ Annulées</div>
+            <div class="number">{{ countAnnulee }}</div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if filterForm is defined %}
+    <div class="filter-section">
+        {{ form_start(filterForm, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div style="display: flex; gap: 20px; align-items: flex-end;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label class="form-label">Filtrer par statut</label>
+                    {{ form_widget(filterForm.statut) }}
+                </div>
+                <div class="filter-buttons">
+                    <button type="submit" class="btn btn-primary">🔍 Filtrer</button>
+                    <a href="{{ path('consultation_list') }}" class="btn btn-dark">↻ Réinitialiser</a>
+                </div>
+            </div>
+        {{ form_end(filterForm) }}
+    </div>
+    {% endif %}
+
+    {% if consultations|length == 0 %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <p>Aucune consultation trouvée</p>
+        </div>
+    {% else %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Psychologue</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Lien Meet</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for consultation in consultations %}
+                        <tr>
+                            <td>
+                                {% if consultation.psychologue %}
+                                    <div class="name-section">{{ consultation.psychologue.nomComplet }}</div>
+                                    <div class="secondary-text">{{ consultation.psychologue.email }}</div>
+                                {% else %}
+                                    <span class="secondary-text">Non choisi</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ consultation.dateConsultation|date('d/m/Y H:i') }}</td>
+                            <td>
+                                <span class="status-badge {{ consultation.statut }}">
+                                    {% if consultation.statut == 'en_attente' %}En attente
+                                    {% elseif consultation.statut == 'confirmee' %}Confirmée
+                                    {% elseif consultation.statut == 'annulee' %}Annulée
+                                    {% elseif consultation.statut == 'completee' %}Complétée
+                                    {% else %}{{ consultation.statutLabel }}{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if consultation.meetLink %}
+                                    <a href="{{ consultation.meetLink }}" target="_blank" rel="noopener noreferrer" class="btn btn-join btn-sm">🔗 Rejoindre</a>
+                                {% else %}
+                                    <span class="secondary-text">Pas encore disponible</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <form method="post" action="{{ path('consultation_delete', {'id': consultation.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette consultation ?');">
+                                    <button type="submit" class="btn btn-delete btn-sm">🗑️ Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination">
+            {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+        </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

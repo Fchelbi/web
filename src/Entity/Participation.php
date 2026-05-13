@@ -15,7 +15,7 @@ class Participation
 #[ORM\Column(type: "integer")]
 private ?int $id = null;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "participations")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
     private User $user_id;
 

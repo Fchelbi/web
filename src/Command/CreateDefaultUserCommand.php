@@ -33,7 +33,7 @@ class CreateDefaultUserCommand extends Command
         $user = $userRepo->findOneBy(['email' => 'demo@community.local']);
         
         if ($user) {
-            $output->writeln('User already exists with ID: ' . $user->getId_user());
+            $output->writeln('User already exists with ID: ' . $user->getId());
             return Command::SUCCESS;
         }
 
@@ -42,18 +42,18 @@ class CreateDefaultUserCommand extends Command
         $user->setNom('User');
         $user->setPrenom('Demo');
         $user->setEmail('demo@community.local');
-        $user->setNum_tel('1234567890');
+        $user->setNumTel('1234567890');
         $user->setRole('ROLE_USER');
         
         // Hash password
         $hashedPassword = $this->passwordHasher->hashPassword($user, 'demo123');
-        $user->setMdp($hashedPassword);
+        $user->setPassword($hashedPassword);
         
         $this->entityManager->persist($user);
         $this->entityManager->flush();
         
         $output->writeln('Default user created successfully!');
-        $output->writeln('ID: ' . $user->getId_user());
+        $output->writeln('ID: ' . $user->getId());
         $output->writeln('Email: demo@community.local');
         $output->writeln('Password: demo123');
         

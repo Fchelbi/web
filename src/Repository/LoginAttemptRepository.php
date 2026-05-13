@@ -37,6 +37,9 @@ class LoginAttemptRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return LoginAttempt[]
+     */
     public function getRecentBlocked(): array
     {
         return $this->createQueryBuilder('l')
@@ -48,6 +51,9 @@ class LoginAttemptRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return LoginAttempt[]
+     */
     public function getAllSuspicious(): array
     {
         return $this->createQueryBuilder('l')

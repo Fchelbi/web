@@ -13,6 +13,9 @@ class PostRepository extends ServiceEntityRepository
         parent::__construct($registry, Post::class);
     }
 
+    /**
+     * @return Post[]
+     */
     public function searchByKeyword(string $query, int $limit = 5, int $offset = 0): array
     {
         return $this->createQueryBuilder('p')
@@ -34,6 +37,9 @@ class PostRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return Post[]
+     */
     public function findFlaggedPosts(): array
     {
         return $this->createQueryBuilder('p')
@@ -47,6 +53,9 @@ class PostRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getPostsPerDay(int $days = 30): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -66,6 +75,9 @@ class PostRepository extends ServiceEntityRepository
         return $data;
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function getPostsByCategory(): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -84,6 +96,9 @@ class PostRepository extends ServiceEntityRepository
         return $data;
     }
 
+    /**
+     * @return Post[]
+     */
     public function findAllForAdmin(): array
     {
         return $this->createQueryBuilder('p')
