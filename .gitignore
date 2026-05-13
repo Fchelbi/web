@@ -29,3 +29,7 @@
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+
+# Local Google OAuth secrets
+/config/google/credentials.json
+/config/google/token.json
